@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { login, register } from '../services/auth';
 import './AuthPage.css';
 
 function AuthPage({ onLoginSuccess }) {
-  const [isLogin, setIsLogin] = useState(true);
+  const [isActive, setIsActive] = useState(false); // false = Sign In, true = Sign Up
+  const [isLoading, setIsLoading] = useState(false);
+
   const [loginData, setLoginData] = useState({
-    correo: '',
+    username: '',
     password: ''
   });
+
   const [registerData, setRegisterData] = useState({
     nombre: '',
-    tipoUsuario: 'interno',
-    cargo: '',
-    correo: '',
+    username: '',
     password: '',
-    confirmPassword: ''
+    cargo: 'Directora'
   });
 
   const handleLoginChange = (e) => {
@@ -31,50 +31,37 @@ function AuthPage({ onLoginSuccess }) {
     });
   };
 
-  const handleTipoUsuario = (tipo) => {
-    setRegisterData({
-      ...registerData,
-      tipoUsuario: tipo
-    });
-  };
-
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-
-    // Validaciones básicas
-    if (!loginData.correo || !loginData.password) {
+    if (!loginData.username || !loginData.password) {
       alert('Por favor completa todos los campos');
       return;
     }
 
     try {
-      // Llamada real a la API
-      // Nota: El backend espera 'username', pero el form usa 'correo'
-      // Ajustamos aquí o en el backend. Asumiremos username = correo por simplicidad
-      const response = await login(loginData.correo, loginData.password);
-
-      // Notificar al padre (App.jsx)
-      onLoginSuccess(response.user);
+      setIsLoading(true);
+      const response = await fetch('http://localhost:3000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(loginData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.mensaje || 'Error al iniciar sesión');
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      onLoginSuccess(data.user);
     } catch (error) {
       console.error(error);
       alert(error.message || 'Error al iniciar sesión');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const [isLoading, setIsLoading] = useState(false);
-
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-
-    // Validar que las contraseñas coincidan
-    if (registerData.password !== registerData.confirmPassword) {
-      alert('Las contraseñas no coinciden');
-      return;
-    }
-
-    // Validar longitud mínima
-    if (registerData.password.length < 6) {
-      alert('La contraseña debe tener al menos 6 caracteres');
+    if (!registerData.username || !registerData.password || !registerData.nombre) {
+      alert('Por favor completa todos los campos requeridos');
       return;
     }
 
@@ -82,20 +69,21 @@ function AuthPage({ onLoginSuccess }) {
 
     try {
       const payload = {
-        username: registerData.correo,
-        email: registerData.correo,
+        username: registerData.username,
         password: registerData.password,
-        rol: registerData.tipoUsuario,
         nombre: registerData.nombre,
         cargo: registerData.cargo
       };
 
-      const response = await register(payload);
-
-      // Usuario puede iniciar sesión inmediatamente
-      alert(response.mensaje || 'Cuenta creada exitosamente. Ya puedes iniciar sesión.');
-      setIsLogin(true); // Cambiar a pestaña de login
-
+      const response = await fetch('http://localhost:3000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.mensaje || 'Error al registrar usuario');
+      alert(data.mensaje || 'Cuenta creada exitosamente. Ya puedes iniciar sesión.');
+      setIsActive(false); // Cambiar a inicio de sesión
     } catch (error) {
       console.error(error);
       alert(error.message || 'Error al registrar usuario');
@@ -106,180 +94,181 @@ function AuthPage({ onLoginSuccess }) {
 
   return (
     <div className="auth-page">
-      <div className="auth-container">
-        {/* Logo */}
-        <div className="auth-logo">
-          <img src="/logo-ichilo.png?v=2" alt="Facultad Integral de Ichilo" />
-        </div>
+      <div className={`auth-sliding-container ${isActive ? 'active' : ''}`} id="container">
+        
+        {/* FORMULARIO DE REGISTRO (Sign Up) */}
+        <div className="form-container sign-up">
+          <form className="auth-form" onSubmit={handleRegisterSubmit}>
+            <div className="form-brand">
+              <img src="/logo-ichilo.png?v=2" alt="Logo FINI" className="brand-logo" />
+              <h2>Crear Cuenta</h2>
+              <p className="brand-subtitle">SIGAD - Dirección de Carrera</p>
+            </div>
 
-        {/* Título */}
-        <h1 className="auth-title">Sistema de Documentos</h1>
-        <p className="auth-subtitle">
-          {isLogin
-            ? 'Ingresa tus credenciales para continuar'
-            : 'Crea tu cuenta para comenzar'}
-        </p>
+            <div className="form-scrollable">
+              <div className="input-group">
+                <label>Nombre Completo</label>
+                <input
+                  type="text"
+                  name="nombre"
+                  placeholder="Ej. Juan Pérez"
+                  value={registerData.nombre}
+                  onChange={handleRegisterChange}
+                  required
+                />
+              </div>
 
-        {/* Pestañas */}
-        <div className="auth-tabs">
-          <button
-            className={`auth-tab ${isLogin ? 'active' : ''}`}
-            onClick={() => setIsLogin(true)}
-          >
-            Iniciar Sesión
-          </button>
-          <button
-            className={`auth-tab ${!isLogin ? 'active' : ''}`}
-            onClick={() => setIsLogin(false)}
-          >
-            Registrarse
-          </button>
-        </div>
+              <div className="input-group">
+                <label>Usuario</label>
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="Ej: directora"
+                  value={registerData.username}
+                  onChange={handleRegisterChange}
+                  required
+                />
+              </div>
 
-        {/* Contenido según pestaña */}
-        {isLogin ? (
-          // Formulario de LOGIN
-          <form className="auth-form" onSubmit={handleLoginSubmit}>
-            <label className="auth-label">Correo electrónico</label>
-            <input
-              type="email"
-              name="correo"
-              placeholder="tu@email.com"
-              value={loginData.correo}
-              onChange={handleLoginChange}
-              className="auth-input"
-              required
-            />
+              <div className="input-group">
+                <label>Cargo / Función</label>
+                <input
+                  type="text"
+                  name="cargo"
+                  placeholder="Opcional, por defecto: Directora"
+                  value={registerData.cargo}
+                  onChange={handleRegisterChange}
+                />
+              </div>
 
-            <label className="auth-label">Contraseña</label>
-            <input
-              type="password"
-              name="password"
-              placeholder="••••••••"
-              value={loginData.password}
-              onChange={handleLoginChange}
-              className="auth-input"
-              required
-            />
+              <div className="input-group">
+                <label>Contraseña</label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="••••••••"
+                  value={registerData.password}
+                  onChange={handleRegisterChange}
+                  minLength="6"
+                  required
+                />
+              </div>
+            </div>
 
-            <button type="submit" className="auth-button">
-              Iniciar Sesión
+            <button type="submit" className="submit-btn" disabled={isLoading}>
+              {isLoading ? 'Creando cuenta...' : 'Registrarse'}
             </button>
 
-            <p className="auth-footer">
-              ¿No tienes cuenta?{' '}
-              <span
-                className="auth-link"
-                onClick={() => setIsLogin(false)}
-              >
-                Regístrate aquí
-              </span>
-            </p>
+            <div className="mobile-toggle">
+              <span>¿Ya tienes cuenta?</span>
+              <button type="button" onClick={() => setIsActive(false)}>Iniciar Sesión</button>
+            </div>
           </form>
-        ) : (
-          // Formulario de REGISTRO
-          <form className="auth-form" onSubmit={handleRegisterSubmit}>
-            <label className="auth-label">Nombre Completo</label>
-            <input
-              type="text"
-              name="nombre"
-              placeholder="Juan Pérez"
-              value={registerData.nombre}
-              onChange={handleRegisterChange}
-              className="auth-input"
-              required
-            />
+        </div>
 
-            <label className="auth-label">Tipo de Usuario</label>
-            <div className="tipo-usuario-container">
-              <button
-                type="button"
-                className={`tipo-usuario-btn ${registerData.tipoUsuario === 'interno' ? 'active' : ''}`}
-                onClick={() => handleTipoUsuario('interno')}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="9" y1="9" x2="15" y2="9"></line>
-                  <line x1="9" y1="15" x2="15" y2="15"></line>
+        {/* FORMULARIO DE INICIO DE SESIÓN (Sign In) */}
+        <div className="form-container sign-in">
+          <form className="auth-form" onSubmit={handleLoginSubmit}>
+            <div className="form-brand">
+              <img src="/logo-ichilo.png?v=2" alt="Logo FINI" className="brand-logo" />
+              <h2>SIGAD FINI</h2>
+              <p className="brand-subtitle">Dirección de Carrera - UAGRM</p>
+            </div>
+
+            <div className="input-group">
+              <label>Usuario</label>
+              <div className="input-with-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                  <polyline points="22,6 12,13 2,6" />
                 </svg>
-                Interno
-              </button>
-              <button
-                type="button"
-                className={`tipo-usuario-btn ${registerData.tipoUsuario === 'externo' ? 'active' : ''}`}
-                onClick={() => handleTipoUsuario('externo')}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="2" y1="12" x2="22" y2="12"></line>
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                <input
+                  type="text"
+                  name="username"
+                  placeholder="Ej: directora"
+                  value={loginData.username}
+                  onChange={handleLoginChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="input-group">
+              <label>Contraseña</label>
+              <div className="input-with-icon">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                 </svg>
-                Externo
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="••••••••"
+                  value={loginData.password}
+                  onChange={handleLoginChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="forgot-password">
+              <a href="#forgot" onClick={(e) => { e.preventDefault(); alert('Por favor contacta al administrador del sistema para restablecer tu clave.'); }}>
+                ¿Olvidaste tu contraseña?
+              </a>
+            </div>
+
+            <button type="submit" className="submit-btn" disabled={isLoading}>
+              {isLoading ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
+            </button>
+
+            <div className="mobile-toggle">
+              <span>¿No tienes una cuenta?</span>
+              <button type="button" onClick={() => setIsActive(true)}>Registrarse</button>
+            </div>
+          </form>
+        </div>
+
+        {/* CONTENEDOR DESLIZANTE DE TRANSICIÓN */}
+        <div className="toggle-container">
+          <div className="toggle">
+            
+            {/* PANEL IZQUIERDO */}
+            <div className="toggle-panel toggle-left">
+              <div className="toggle-icon-badge">
+                <img src="/logo-uagrm.png" alt="UAGRM Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              </div>
+              <h1>¡Bienvenido de Nuevo!</h1>
+              <p>
+                Si ya posees un usuario registrado en el Sistema de Gestión Documental FINI, ingresa tus credenciales para continuar.
+              </p>
+              <button className="toggle-action-btn" id="login" onClick={() => setIsActive(false)}>
+                Iniciar Sesión
               </button>
             </div>
 
-            <label className="auth-label">Cargo</label>
-            <input
-              type="text"
-              name="cargo"
-              placeholder="Ej: Secretari@, Docente, Estudiante..."
-              value={registerData.cargo}
-              onChange={handleRegisterChange}
-              className="auth-input"
-              required
-            />
+            {/* PANEL DERECHO */}
+            <div className="toggle-panel toggle-right">
+              <div className="toggle-icon-badge">
+                <img src="/logo-uagrm.png" alt="UAGRM Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+              </div>
+              <h1>¡Hola, Bienvenido!</h1>
+              <p>
+                Regístrate con tus datos para acceder a SIGAD - Dirección de Carrera de la Facultad Integral de Ichilo.
+              </p>
+              <button className="toggle-action-btn" id="register" onClick={() => setIsActive(true)}>
+                Registrarse
+              </button>
+            </div>
 
-            <label className="auth-label">Correo electrónico</label>
-            <input
-              type="email"
-              name="correo"
-              placeholder="tu@email.com"
-              value={registerData.correo}
-              onChange={handleRegisterChange}
-              className="auth-input"
-              required
-            />
+          </div>
+        </div>
 
-            <label className="auth-label">Contraseña</label>
-            <input
-              type="password"
-              name="password"
-              placeholder="••••••••"
-              value={registerData.password}
-              onChange={handleRegisterChange}
-              className="auth-input"
-              minLength="6"
-              required
-            />
-            <p className="password-hint">Mínimo 6 caracteres</p>
-
-            <label className="auth-label">Confirmar Contraseña</label>
-            <input
-              type="password"
-              name="confirmPassword"
-              placeholder="••••••••"
-              value={registerData.confirmPassword}
-              onChange={handleRegisterChange}
-              className="auth-input"
-              required
-            />
-
-            <button type="submit" className="auth-button" disabled={isLoading}>
-              {isLoading ? 'Procesando...' : 'Crear Cuenta'}
-            </button>
-
-            <p className="auth-footer">
-              ¿Ya tienes cuenta?{' '}
-              <span
-                className="auth-link"
-                onClick={() => setIsLogin(true)}
-              >
-                Inicia sesión aquí
-              </span>
-            </p>
-          </form>
-        )}
       </div>
+
+      {/* Pie de Página Institucional */}
+      <footer className="auth-footer-bottom">
+        <p>© 2026 Universidad Autónoma Gabriel René Moreno — Facultad Integral de Ichilo</p>
+      </footer>
     </div>
   );
 }

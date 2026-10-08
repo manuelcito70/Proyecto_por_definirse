@@ -1,106 +1,69 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import VerifyEmail from './components/VerifyEmail';
 import AuthPage from './components/AuthPage';
-import Sidebar from './components/Sidebar';
-import Dashboard from './components/Dashboard';
-import Documentos from './components/Documentos';
-import Usuarios from './components/Usuarios';
-import Calendario from './components/Calendario';
-import { getUser, logout } from './services/auth';
+import Layout from './components/Layout';
+import Recibidos from './components/Recibidos';
+import Expedidos from './components/Expedidos';
+import Actas from './components/Actas';
+import Auxiliares from './components/Auxiliares';
+import Docentes from './components/Docentes';
+import IntroAnimation from './components/IntroAnimation';
 import './App.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null); // { username, rol }
-  const [currentPage, setCurrentPage] = useState('dashboard');
-  const [navParams, setNavParams] = useState(null);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [user, setUser] = useState(null);
+  const [showIntro, setShowIntro] = useState(false);
 
-  // Función para cerrar sesión
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setIsAuthenticated(false);
     setUser(null);
-    setCurrentPage('dashboard');
-    setNavParams(null);
   };
 
-  // Verificar sesión al inicio
   useEffect(() => {
-    const savedUser = getUser();
-    if (savedUser) {
-      setUser(savedUser);
+    const token = localStorage.getItem('token');
+    const savedUser = localStorage.getItem('user');
+    if (token && savedUser) {
+      setUser(JSON.parse(savedUser));
       setIsAuthenticated(true);
     }
-
-    // Escuchar evento de sesión expirada
-    const handleUnauthorized = () => {
-      handleLogout();
-      // Opcional: Mostrar mensaje de 'Sesión expirada'
-      alert('Tu sesión ha expirado. Por favor, inicia sesión nuevamente.');
-    };
-
-    window.addEventListener('auth:unauthorized', handleUnauthorized);
-
-    return () => {
-      window.removeEventListener('auth:unauthorized', handleUnauthorized);
-    };
   }, []);
 
-  // Función para manejar el login exitoso
   const handleLoginSuccess = (userData) => {
+    setShowIntro(true);
     setUser(userData);
     setIsAuthenticated(true);
-    setCurrentPage('dashboard');
   };
 
-  // Función para navegar con parámetros
-  const handleNavigate = (page, params = null) => {
-    setCurrentPage(page);
-    setNavParams(params);
-  };
-
-
-
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
-  };
-
-  // Componente principal de la aplicación (Auth o Dashboard)
   const MainContent = () => {
-    // Si no está autenticado, mostrar página de login
     if (!isAuthenticated) {
       return <AuthPage onLoginSuccess={handleLoginSuccess} />;
     }
 
-    // Si está autenticado, mostrar el dashboard con sidebar
     return (
-      <div className="app-container">
-        <Sidebar
-          currentPage={currentPage}
-          onPageChange={(page) => handleNavigate(page)}
-          onLogout={handleLogout}
-          isCollapsed={isSidebarCollapsed}
-          toggleSidebar={toggleSidebar}
-          user={user}
-        />
-        <div className={`app-content ${isSidebarCollapsed ? 'collapsed' : ''}`}>
-          {currentPage === 'dashboard' && <Dashboard user={user} onNavigate={handleNavigate} />}
-          {currentPage === 'documentos' && <Documentos user={user} initialFilters={navParams} />}
-          {currentPage === 'calendario' && <Calendario user={user} onNavigate={handleNavigate} />}
-          {currentPage === 'usuarios' && <Usuarios />}
-        </div>
-      </div>
+      <Layout user={user} onLogout={handleLogout}>
+        <Routes>
+          <Route path="/" element={<Navigate to="/recibidos" replace />} />
+          <Route path="/recibidos" element={<Recibidos />} />
+          <Route path="/expedidos" element={<Expedidos />} />
+          <Route path="/actas" element={<Actas />} />
+          <Route path="/auxiliares" element={<Auxiliares />} />
+          <Route path="/docentes" element={<Docentes />} />
+          <Route path="*" element={<Navigate to="/recibidos" replace />} />
+        </Routes>
+      </Layout>
     );
   };
 
   return (
-    <Routes>
-      <Route path="/verify-email" element={<VerifyEmail />} />
-      <Route path="/" element={<MainContent />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/*" element={<MainContent />} />
+      </Routes>
+      {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
+    </>
   );
 }
 

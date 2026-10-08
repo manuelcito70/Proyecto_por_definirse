@@ -5,17 +5,11 @@ const pal = ['#ff1a1a', '#ff5a1f', '#ff2d95', '#e50914', '#ffb300', '#3a4cff', '
 const r = (a, b) => a + Math.random() * (b - a);
 
 const IntroAnimation = ({ onComplete }) => {
-  const [stage, setStage] = useState('initial');
+  const [stage, setStage] = useState('intro-play');
   const furRef = useRef(null);
   const burstRef = useRef(null);
 
   useEffect(() => {
-    // 1. Iniciar cierre de puertas de inmediato
-    requestAnimationFrame(() => {
-      // Un pequeño retraso para asegurar que el render original haya sido capturado
-      setTimeout(() => setStage('entering'), 50);
-    });
-
     // Generar SVG rects para "fur"
     if (furRef.current && furRef.current.children.length === 0) {
       const NS = 'http://www.w3.org/2000/svg';
@@ -47,13 +41,8 @@ const IntroAnimation = ({ onComplete }) => {
       }
     }
 
-    // 2. Iniciar animación después de que las puertas cierren (800ms)
-    const playTimer = setTimeout(() => {
-      setStage('intro-play');
-    }, 850);
-
-    // 3. Temporizador para iniciar la partición (split transition)
-    // 6600ms es lo que duraba la intro + 850ms de cierre = 7450ms
+    // Temporizador para iniciar la partición (split transition)
+    // 6600ms es lo que dura la intro original
     const splitTimer = setTimeout(() => {
       setStage('splitting');
       
@@ -61,10 +50,9 @@ const IntroAnimation = ({ onComplete }) => {
       setTimeout(() => {
         if (onComplete) onComplete();
       }, 800);
-    }, 7450);
+    }, 6600);
 
     return () => {
-      clearTimeout(playTimer);
       clearTimeout(splitTimer);
     };
   }, [onComplete]);

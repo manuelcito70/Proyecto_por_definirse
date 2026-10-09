@@ -31,7 +31,7 @@ const Recibidos = () => {
         <a href="#consulta">Consulta y resguardo documental</a>
       </div>
 
-      <div className="info-box" style={{ padding: '15px 20px', background: '#f0fdf4' }}>
+      <div className="info-box" style={{ padding: '15px 20px', background: 'var(--surface-success)' }}>
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#166534" strokeWidth="2" style={{ flexShrink: 0 }}>
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -56,7 +56,7 @@ const Recibidos = () => {
         <select className="filter-select">
           <option>Todos los remitentes</option>
         </select>
-        <button style={{ background: 'white', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '0 15px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem' }}>
+        <button style={{ background: 'var(--surface)', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '0 15px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.9rem' }}>
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
             <polyline points="17 8 12 3 7 8"></polyline>
@@ -78,7 +78,7 @@ const Recibidos = () => {
           </thead>
           <tbody>
             {recibidos.map((doc) => (
-              <tr key={doc.id} style={{ background: doc.id === '014' ? '#f8fafc' : 'white' }}>
+              <tr key={doc.id} style={{ background: doc.id === '014' ? 'var(--surface-alt)' : 'var(--surface)' }}>
                 <td className="cell-bold">{doc.id}</td>
                 <td>
                   <span className="cell-bold">{doc.remitente}</span>

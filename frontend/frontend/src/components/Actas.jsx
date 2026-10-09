@@ -29,7 +29,7 @@ const Actas = () => {
         <a href="#consulta">Consulta y resguardo documental</a>
       </div>
 
-      <div className="info-box" style={{ padding: '15px 20px', background: '#f0fdf4' }}>
+      <div className="info-box" style={{ padding: '15px 20px', background: 'var(--surface-success)' }}>
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#166534" strokeWidth="2" style={{ flexShrink: 0 }}>
           <circle cx="12" cy="12" r="10"></circle>
           <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -57,7 +57,7 @@ const Actas = () => {
         <p style={{ fontSize: '0.65rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '10px' }}>FILTRAR POR MODALIDAD</p>
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
           {['Excelencia académica', 'Buen rendimiento', 'Buen desempeño', 'Tesis de grado', 'Trabajo dirigido', 'Examen de grado', 'Proyecto de grado', 'Titulación vía continua'].map(mod => (
-            <span key={mod} style={{ padding: '6px 15px', borderRadius: '99px', border: '1px solid var(--border-color)', fontSize: '0.8rem', cursor: 'pointer', background: 'white' }}>
+            <span key={mod} style={{ padding: '6px 15px', borderRadius: '99px', border: '1px solid var(--border-color)', fontSize: '0.8rem', cursor: 'pointer', background: 'var(--surface)' }}>
               {mod}
             </span>
           ))}

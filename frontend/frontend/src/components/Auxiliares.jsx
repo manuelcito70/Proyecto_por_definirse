@@ -49,7 +49,7 @@ const Auxiliares = () => {
       </div>
 
       {/* Ruta de Aprobación banner from Figma mockup */}
-      <div className="info-box" style={{ background: 'white', border: '1px solid var(--border-color)', padding: '15px 25px', display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
+      <div className="info-box" style={{ background: 'var(--surface)', border: '1px solid var(--border-color)', padding: '15px 25px', display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
         <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)' }}>RUTA DE APROBACIÓN</div>
         <div style={{ display: 'flex', gap: '40px', color: '#166534', fontSize: '0.85rem', fontWeight: 500 }}>
           <span><strong style={{ fontSize: '1.2rem', marginRight: '5px' }}>01</strong> Dirección propone</span>

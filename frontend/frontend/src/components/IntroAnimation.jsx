@@ -92,7 +92,10 @@ const IntroAnimation = ({ onComplete }) => {
           </div>
         </div>
         <div className="intro-burst" ref={burstRef}></div>
-        <div className="intro-word">F.I.N.I.</div>
+        <div className="intro-word">
+          <img src="/logo-uagrm.png" alt="UAGRM" className="intro-uagrm-logo" />
+          <span>F.I.N.I.</span>
+        </div>
       </div>
     </div>
   );

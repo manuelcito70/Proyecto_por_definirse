@@ -17,9 +17,13 @@
   top: 0;
   bottom: 0;
   width: 50%;
-  background: #fff;
+  background: var(--bg-color, #fff);
   z-index: 10000; 
   transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+body.dark-mode .intro-half {
+  background: #121212;
 }
 
 .intro-half.left {
@@ -181,6 +185,13 @@
 
 .intro-play .intro-word {
   animation: word 1.6s ease 4.6s forwards;
+}
+
+.intro-uagrm-logo {
+  height: clamp(60px, 15vw, 150px);
+  margin-right: 30px;
+  object-fit: contain;
+  /* El logo tiene su propia transparencia, no aplicaremos filtro rojo para que mantenga sus colores oficiales */
 }
 
 @keyframes word {

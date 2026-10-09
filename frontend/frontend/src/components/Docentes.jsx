@@ -48,12 +48,12 @@ const Docentes = () => {
 
       <div style={{ display: 'flex', gap: '20px' }}>
         {/* Sidebar list of docentes */}
-        <div style={{ width: '280px', flexShrink: 0, background: 'white', border: '1px solid var(--border-color)', borderRadius: '4px' }}>
+        <div style={{ width: '280px', flexShrink: 0, background: 'var(--surface)', border: '1px solid var(--border-color)', borderRadius: '4px' }}>
           <div style={{ padding: '20px', borderBottom: '1px solid var(--border-color)' }}>
             <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 500 }}>Archivo por docente</h3>
           </div>
           <div>
-            <div style={{ padding: '15px 20px', background: '#f8fafc', borderLeft: '3px solid var(--primary-red)' }}>
+            <div style={{ padding: '15px 20px', background: 'var(--surface-alt)', borderLeft: '3px solid var(--primary-red)' }}>
               <div className="cell-bold">Mario Renato Chocala</div>
               <div className="cell-subtitle">Ingeniero - Nombre mencionado</div>
             </div>
@@ -77,7 +77,7 @@ const Docentes = () => {
 
         {/* Content area */}
         <div style={{ flex: 1 }}>
-          <div style={{ border: '1px solid var(--border-color)', borderRadius: '4px', background: 'white', padding: '25px', marginBottom: '25px' }}>
+          <div style={{ border: '1px solid var(--border-color)', borderRadius: '4px', background: 'var(--surface)', padding: '25px', marginBottom: '25px' }}>
             <div className="module-breadcrumbs" style={{ margin: 0 }}>EXPEDIENTE DOCENTE</div>
             <h2 style={{ margin: '5px 0 20px 0', fontSize: '1.5rem', fontWeight: 400 }}>Ing. Mario Renato Chocala</h2>
             
@@ -96,7 +96,7 @@ const Docentes = () => {
               </div>
             </div>
 
-            <div style={{ background: '#f8fafc', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ background: 'var(--surface-alt)', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                 <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#64748b" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                 <div>
@@ -104,7 +104,7 @@ const Docentes = () => {
                   <div className="cell-subtitle" style={{ margin: 0 }}>Respaldo digital en PDF · Versión actualizable</div>
                 </div>
               </div>
-              <button style={{ background: 'white', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '8px 15px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
+              <button style={{ background: 'var(--surface)', border: '1px solid var(--border-color)', borderRadius: '4px', padding: '8px 15px', display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem' }}>
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                 Actualizar currículum
               </button>

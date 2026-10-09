@@ -299,24 +299,29 @@ body {
 
 /* Dark mode styles */
 body.dark-mode {
-  --bg-color: #0d1b2e;
-  --text-main: #e8e8e8;
-  --text-muted: #a0a0a0;
-  --border-color: #333333;
-  --surface: #1e1e1e;
-  --surface-alt: #15273f;
-  --surface-success: #0b2e1b;
+  --bg-color: #121212;
+  --text-main: #e4e4e7;
+  --text-muted: #a1a1aa;
+  --border-color: #27272a;
+  --surface: #18181b;
+  --surface-alt: #27272a;
+  --surface-success: #022c22;
+}
+
+body.dark-mode .top-navbar {
+  background-color: #09090b;
+  border-bottom: 1px solid var(--border-color);
 }
 
 body.dark-mode .sub-header {
-  background-color: #15273f;
-  border-bottom: 1px solid #233f61;
+  background-color: #18181b;
+  border-bottom: 1px solid var(--border-color);
 }
 
 body.dark-mode .gestion-select {
-  background: #183153;
-  color: #fff;
-  border-color: #233f61;
+  background: #27272a;
+  color: var(--text-main);
+  border-color: var(--border-color);
 }
 
 body.dark-mode .app-layout {

@@ -8,6 +8,7 @@ import Actas from './components/Actas';
 import Auxiliares from './components/Auxiliares';
 import Docentes from './components/Docentes';
 import IntroAnimation from './components/IntroAnimation';
+import { GestionProvider } from './context/GestionContext';
 import './App.css';
 
 function App() {
@@ -58,12 +59,12 @@ function App() {
   };
 
   return (
-    <>
+    <GestionProvider>
       <Routes>
         <Route path="/*" element={<MainContent />} />
       </Routes>
       {showIntro && <IntroAnimation onComplete={() => setShowIntro(false)} />}
-    </>
+    </GestionProvider>
   );
 }
 

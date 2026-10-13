@@ -1,11 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
+import { useGestion } from '../context/GestionContext';
+import { getRecibidos } from '../services/api';
 import './Layout.css';
 
 const Layout = ({ user, onLogout, children }) => {
-  const [isDark, setIsDark] = React.useState(() => {
+  const { gestion, setGestion } = useGestion();
+  const [pendientesCount, setPendientesCount] = useState(0);
+
+  const [isDark, setIsDark] = useState(() => {
     return localStorage.getItem('darkMode') === 'true';
   });
+
+  useEffect(() => {
+    // Consultar periódicamente o al montar cuántos recibidos pendientes hay
+    const fetchPendientes = () => {
+      getRecibidos({ estado: 'pendiente' })
+        .then(docs => setPendientesCount(docs.length))
+        .catch(() => {});
+    };
+    fetchPendientes();
+    const interval = setInterval(fetchPendientes, 15000);
+    return () => clearInterval(interval);
+  }, []);
 
   React.useEffect(() => {
     if (isDark) {
@@ -34,6 +51,19 @@ const Layout = ({ user, onLogout, children }) => {
           <NavLink to="/recibidos" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
             Documentos recibidos
+            {pendientesCount > 0 && (
+              <span style={{
+                background: '#dc2626',
+                color: 'white',
+                fontSize: '0.7rem',
+                fontWeight: 'bold',
+                padding: '2px 7px',
+                borderRadius: '99px',
+                marginLeft: '6px'
+              }} title={`${pendientesCount} documentos pendientes de respuesta`}>
+                {pendientesCount}
+              </span>
+            )}
           </NavLink>
           
           <NavLink to="/actas" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
@@ -74,11 +104,16 @@ const Layout = ({ user, onLogout, children }) => {
         <div className="header-title">DIRECCIÓN DE CARRERA / SISTEMAS</div>
         <div className="header-controls">
           <span className="gestion-label">Gestión</span>
-          <select className="gestion-select">
+          <select 
+            className="gestion-select"
+            value={gestion}
+            onChange={(e) => setGestion(e.target.value)}
+          >
             <option value="2026">2026 • Actual</option>
             <option value="2025">2025</option>
+            <option value="2024">2024</option>
           </select>
-          <span className="gestion-prev">Anterior: 2025</span>
+          <span className="gestion-prev">Visualizando: {gestion}</span>
         </div>
       </div>
 

@@ -175,6 +175,10 @@ function AuthPage({ onLoginSuccess }) {
               <p className="brand-subtitle">Dirección de Carrera - UAGRM</p>
             </div>
 
+            <div style={{ background: '#f0fdf4', padding: '10px', borderRadius: '6px', fontSize: '0.8rem', color: '#166534', border: '1px solid #bbf7d0', textAlign: 'center', marginBottom: '14px' }}>
+              🔑 Acceso de Prueba: Usuario <strong>directora</strong> · Contraseña <strong>1234</strong>
+            </div>
+
             <div className="input-group">
               <label>Usuario</label>
               <div className="input-with-icon">

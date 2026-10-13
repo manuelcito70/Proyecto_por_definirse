@@ -15,7 +15,9 @@ const Acta = sequelize.define('Acta', {
       'buen_desempeno',
       'tesis',
       'trabajo_dirigido',
-      'examen_grado'
+      'examen_grado',
+      'proyecto_grado',
+      'titulacion_continua'
     ),
     allowNull: false
   },

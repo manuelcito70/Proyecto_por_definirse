@@ -79,7 +79,7 @@ const Auxiliares = () => {
 
   const selectedAux = useMemo(() => {
     if (!filteredAuxiliares.length) return null;
-    return filteredAuxiliares.find(a => a && a.id === selectedAuxId) || filteredAuxiliares[0] || null;
+    return filteredAuxiliares.find(a => a && String(a.id) === String(selectedAuxId)) || filteredAuxiliares[0] || null;
   }, [filteredAuxiliares, selectedAuxId]);
 
   const getInitials = (name) => {
@@ -541,7 +541,7 @@ const Auxiliares = () => {
                 </tr>
               ) : (
                 filteredAuxiliares.map((aux) => {
-                  const isSelected = selectedAux && selectedAux.id === aux.id;
+                  const isSelected = selectedAux && String(selectedAux.id) === String(aux.id);
                   const initials = getInitials(aux.nombre);
                   return (
                     <tr

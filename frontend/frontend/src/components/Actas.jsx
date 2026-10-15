@@ -78,7 +78,7 @@ const Actas = () => {
 
   const selectedActa = useMemo(() => {
     if (!filteredActas.length) return null;
-    return filteredActas.find(a => a && a.id === selectedActaId) || filteredActas[0] || null;
+    return filteredActas.find(a => a && String(a.id) === String(selectedActaId)) || filteredActas[0] || null;
   }, [filteredActas, selectedActaId]);
 
   // Statistics with full safety
@@ -474,7 +474,7 @@ const Actas = () => {
                     </tr>
                   ) : (
                     filteredActas.map((acta) => {
-                      const isSelected = selectedActa && selectedActa.id === acta.id;
+                      const isSelected = selectedActa && String(selectedActa.id) === String(acta.id);
                       return (
                         <tr
                           key={acta.id}

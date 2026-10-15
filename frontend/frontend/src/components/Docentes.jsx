@@ -89,7 +89,7 @@ const Docentes = () => {
 
   const selectedDocente = useMemo(() => {
     const list = Array.isArray(docentes) ? docentes : [];
-    return list.find(d => d && d.id === selectedDocenteId) || list[0] || null;
+    return list.find(d => d && String(d.id) === String(selectedDocenteId)) || list[0] || null;
   }, [docentes, selectedDocenteId]);
 
   // General documents (CV, programa analitico, anexos)
@@ -306,7 +306,7 @@ const Docentes = () => {
                 </div>
               ) : (
                 docentes.map((doc) => {
-                  const isSelected = selectedDocente && selectedDocente.id === doc.id;
+                  const isSelected = selectedDocente && String(selectedDocente.id) === String(doc.id);
                   const initials = getInitials(doc.nombre);
 
                   return (

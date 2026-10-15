@@ -8,7 +8,6 @@ import {
   deleteDocenteArchivo,
   downloadFile 
 } from '../services/api';
-import PersonalAcademicoDock from './PersonalAcademicoDock';
 
 const Docentes = () => {
   const { gestion } = useGestion();
@@ -1059,64 +1058,6 @@ const Docentes = () => {
           </div>
         </div>
       )}
-
-      {/* Dock Flotante de Gestión de Personal Académico */}
-      <PersonalAcademicoDock
-        tipo="docentes"
-        totalItems={Array.isArray(docentes) ? docentes.length : 0}
-        onRegistrar={() => {
-          setDocenteForm({
-            nombre: '',
-            ci: '',
-            materia_principal: '',
-            gestion_ingreso: gestion
-          });
-          setIsDocenteModalOpen(true);
-        }}
-        onGenerarConstancia={() => {
-          const docente = selectedDocente;
-          if (docente) {
-            const vent = window.open('', '_blank');
-            vent.document.write(`
-              <!DOCTYPE html>
-              <html lang="es">
-                <head>
-                  <meta charset="utf-8" />
-                  <title>Constancia Docente - ${docente.nombre}</title>
-                  <style>
-                    body { font-family: sans-serif; padding: 40px; color: #0b2545; line-height: 1.6; }
-                    .header { text-align: center; border-bottom: 2px solid #0b2545; padding-bottom: 15px; margin-bottom: 30px; }
-                    .seal { margin-top: 50px; font-size: 11px; color: #64748b; text-align: center; }
-                  </style>
-                </head>
-                <body>
-                  <div class="header">
-                    <h2>UNIVERSIDAD AUTÓNOMA GABRIEL RENÉ MORENO</h2>
-                    <h3>FACULTAD INTEGRAL DEL ICHILO — SEDE ICHILO</h3>
-                    <p>DIRECCIÓN DE CARRERA DE INGENIERÍA DE SISTEMAS</p>
-                  </div>
-                  <h3>CERTIFICACIÓN DE DESEMPEÑO DOCENTE</h3>
-                  <p>La Dirección de la Carrera de Ingeniería de Sistemas de la Facultad Integral del Ichilo (UAGRM) certifica que:</p>
-                  <p style="font-size: 18px; font-weight: bold; text-align: center; margin: 25px 0;">${docente.nombre}</p>
-                  <p>Con Cédula de Identidad <strong>${docente.ci || 'S/N'}</strong>, desempeña funciones como docente en la materia de <strong>${docente.materia_principal || 'Asignada por Consejo'}</strong>, constando en el archivo oficial institucional su legajo y documentación semestral reglamentaria.</p>
-                  <p>Se expide la presente certificación a solicitud de la parte interesada para los fines consiguientes.</p>
-                  <p style="margin-top: 40px;">Yapacaní, Gestión ${gestion}</p>
-                  <div class="seal">Dirección de Carrera - Ingeniería de Sistemas FINI UAGRM · Sede Ichilo</div>
-                  <script>window.onload = function() { window.print(); }</script>
-                </body>
-              </html>
-            `);
-            vent.document.close();
-          } else {
-            alert('Seleccione un docente para generar su certificación.');
-          }
-        }}
-        onFiltrarCiclo={(ciclo) => {
-          if (ciclo === 'I-2026') setFiltroSemestre('1');
-          else if (ciclo === 'II-2026') setFiltroSemestre('2');
-          else setFiltroSemestre('');
-        }}
-      />
     </div>
   );
 };

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useGestion } from '../context/GestionContext';
 import { getAuxiliares, createAuxiliar, deleteAuxiliar } from '../services/api';
-import PersonalAcademicoDock from './PersonalAcademicoDock';
 
 const Auxiliares = () => {
   const { gestion, setGestion } = useGestion();
@@ -971,33 +970,6 @@ const Auxiliares = () => {
           </div>
         </div>
       )}
-
-      {/* Dock Flotante de Gestión de Personal Académico */}
-      <PersonalAcademicoDock
-        tipo="auxiliares"
-        totalItems={Array.isArray(auxiliares) ? auxiliares.length : 0}
-        onRegistrar={handleOpenModal}
-        onGenerarConstancia={() => {
-          const list = Array.isArray(auxiliares) ? auxiliares : [];
-          if (selectedAux) {
-            handlePrintConstancia(selectedAux);
-          } else if (list.length > 0) {
-            handlePrintConstancia(list[0]);
-          } else {
-            alert('No hay auxiliares registrados para generar constancia.');
-          }
-        }}
-        onGenerarInforme={() => {
-          const list = Array.isArray(auxiliares) ? auxiliares : [];
-          if (selectedAux) {
-            handlePrintInforme(selectedAux);
-          } else if (list.length > 0) {
-            handlePrintInforme(list[0]);
-          } else {
-            alert('No hay auxiliares registrados para generar informe.');
-          }
-        }}
-      />
     </div>
   );
 };

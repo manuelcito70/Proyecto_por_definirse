@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useGestion } from '../context/GestionContext';
 import { getRecibidos } from '../services/api';
+import GlobalDock from './GlobalDock';
 
 const Layout = ({ user, onLogout, children }) => {
   const { gestion, setGestion } = useGestion();
   const [pendientesCount, setPendientesCount] = useState(0);
+  const [modoEnfoque, setModoEnfoque] = useState(false);
 
   useEffect(() => {
     const fetchPendientes = () => {
@@ -26,7 +28,7 @@ const Layout = ({ user, onLogout, children }) => {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       {/* HEADER INSTITUCIONAL */}
-      <header className="sticky top-0 z-40 w-full bg-surface-container-lowest border-b border-outline-variant/30 shadow-[0_1px_8px_rgba(11,37,69,0.04)]">
+      <header className={`sticky top-0 z-40 w-full bg-surface-container-lowest border-b border-outline-variant/30 shadow-[0_1px_8px_rgba(11,37,69,0.04)] transition-all duration-300 ${modoEnfoque ? '-translate-y-full max-h-0 opacity-0 overflow-hidden pointer-events-none' : 'translate-y-0 max-h-[300px] opacity-100'}`}>
         {/* Top Navbar */}
         <div className="w-full px-gutter-desktop py-2.5 flex items-center justify-between border-b border-outline-variant/20 bg-primary text-on-primary">
           <div className="flex items-center gap-space-md">
@@ -134,15 +136,28 @@ const Layout = ({ user, onLogout, children }) => {
         </nav>
       </header>
 
+      {/* Botón flotante para restaurar cabecera cuando está en Modo Enfoque */}
+      {modoEnfoque && (
+        <button 
+          onClick={() => setModoEnfoque(false)}
+          className="fixed top-3 right-5 z-50 bg-[#07162c]/85 hover:bg-[#07162c] text-white px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-lg backdrop-blur-md transition-all flex items-center gap-1.5 border border-white/20 cursor-pointer active:scale-95"
+          type="button"
+          title="Restaurar barra institucional"
+        >
+          <span className="material-symbols-outlined text-sm text-blue-300">fullscreen_exit</span>
+          <span>Restaurar Cabecera</span>
+        </button>
+      )}
+
       {/* CONTENIDO PRINCIPAL */}
-      <main className="w-full flex-1 px-gutter-desktop py-space-lg bg-background">
+      <main className="w-full flex-1 px-gutter-desktop py-space-lg pb-32 bg-background">
         <div className="max-w-[1440px] mx-auto w-full">
           {children}
         </div>
       </main>
 
       {/* PIE DE PÁGINA INSTITUCIONAL */}
-      <footer className="w-full bg-surface-container-lowest shadow-[0_-1px_6px_rgba(11,37,69,0.03)] py-space-lg border-t border-outline-variant/20 mt-auto">
+      <footer className="w-full bg-surface-container-lowest shadow-[0_-1px_6px_rgba(11,37,69,0.03)] py-space-lg border-t border-outline-variant/20 mt-auto pb-24">
         <div className="max-w-[1440px] mx-auto px-gutter-desktop flex flex-col md:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-caption text-caption">
           <div>
             <span className="font-semibold text-on-surface">UAGRM — Facultad Integral del Ichilo</span> · Sistema de Gestión Documental y Archivo Institucional
@@ -154,6 +169,17 @@ const Layout = ({ user, onLogout, children }) => {
           </div>
         </div>
       </footer>
+
+      {/* GLOBAL DOCK (OPCIÓN 2: NAVEGACIÓN FLOTANTE & PANTALLA COMPLETA) */}
+      <GlobalDock 
+        gestion={gestion}
+        setGestion={setGestion}
+        pendientesCount={pendientesCount}
+        user={user}
+        onLogout={onLogout}
+        modoEnfoque={modoEnfoque}
+        setModoEnfoque={setModoEnfoque}
+      />
     </div>
   );
 };

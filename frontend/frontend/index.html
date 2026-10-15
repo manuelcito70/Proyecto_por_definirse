@@ -1,12 +1,101 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/logo-fini.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sistema de Documentos</title>
+    <title>Dirección de Carrera - Ingeniería de Sistemas FINI UAGRM</title>
+
+    <!-- Google Fonts & Material Symbols Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <!-- Tailwind CSS with Institutional UAGRM / FINI Palette -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#001026",
+              "primary-container": "#0b2545",
+              "on-primary": "#ffffff",
+              "on-primary-container": "#778db2",
+              "primary-fixed": "#d5e3ff",
+              "primary-fixed-dim": "#b1c7f0",
+              "on-primary-fixed": "#001c3b",
+              "on-primary-fixed-variant": "#314769",
+              "secondary": "#1d4ed8",
+              "secondary-container": "#4069f2",
+              "on-secondary": "#ffffff",
+              "on-secondary-container": "#fffbff",
+              "secondary-fixed": "#dce1ff",
+              "secondary-fixed-dim": "#b7c4ff",
+              "on-secondary-fixed": "#001551",
+              "on-secondary-fixed-variant": "#0039b5",
+              "background": "#f8f9ff",
+              "surface": "#f8f9ff",
+              "surface-bright": "#f8f9ff",
+              "surface-dim": "#cbdbf5",
+              "surface-variant": "#d3e4fe",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-low": "#eff4ff",
+              "surface-container": "#e5eeff",
+              "surface-container-high": "#dce9ff",
+              "surface-container-highest": "#d3e4fe",
+              "on-surface": "#0b1c30",
+              "on-surface-variant": "#44474e",
+              "outline": "#74777f",
+              "outline-variant": "#c4c6cf",
+              "error": "#ba1a1a",
+              "error-container": "#ffdad6",
+              "on-error": "#ffffff",
+              "on-error-container": "#93000a",
+              "tertiary": "#2b0001",
+              "tertiary-container": "#530003",
+              "on-tertiary": "#ffffff",
+              "on-tertiary-container": "#ff4840",
+            },
+            fontFamily: {
+              sans: ["Plus Jakarta Sans", "sans-serif"],
+              display: ["Plus Jakarta Sans", "sans-serif"],
+              "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
+              "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+              "body-lg": ["Plus Jakarta Sans", "sans-serif"],
+              "body-md": ["Plus Jakarta Sans", "sans-serif"],
+              "body-sm": ["Plus Jakarta Sans", "sans-serif"],
+              caption: ["Plus Jakarta Sans", "sans-serif"],
+              "label-badge": ["Plus Jakarta Sans", "sans-serif"],
+              mono: ["JetBrains Mono", "monospace"],
+              "label-code": ["JetBrains Mono", "monospace"],
+              "correlative-counter": ["JetBrains Mono", "monospace"],
+            },
+            spacing: {
+              "space-xs": "0.25rem",
+              "space-sm": "0.5rem",
+              "space-md": "1rem",
+              "space-lg": "1.5rem",
+              "space-xl": "2rem",
+              "space-2xl": "3rem",
+              "gutter-desktop": "1.5rem",
+            }
+          }
+        }
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .material-symbols-outlined.fill {
+        font-variation-settings: 'FILL' 1;
+      }
+    </style>
   </head>
-  <body>
+  <body class="bg-background font-sans text-on-surface antialiased">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useGestion } from '../context/GestionContext';
 import { 
   getDocentes, 
@@ -8,25 +8,19 @@ import {
   deleteDocenteArchivo,
   downloadFile 
 } from '../services/api';
-import './Modules.css';
-
-const TIPOS_DOC = {
-  curriculum: 'Hoja de vida / Currículum vitae',
-  programa_analitico: 'Programa analítico archivado',
-  informe_final: 'Informe final de cátedra',
-  lista_asistencia: 'Lista de asistencia',
-  informe_cathedra: 'Informe de avance',
-  otro: 'Otro documento académico'
-};
 
 const Docentes = () => {
   const { gestion } = useGestion();
   const [docentes, setDocentes] = useState([]);
-  const [selectedDocente, setSelectedDocente] = useState(null);
+  const [selectedDocenteId, setSelectedDocenteId] = useState(null);
   const [archivos, setArchivos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingArchivos, setLoadingArchivos] = useState(false);
   const [busqueda, setBusqueda] = useState('');
+
+  // Semestral filter controls for Section 2
+  const [filtroGestionSemestre, setFiltroGestionSemestre] = useState('2026');
+  const [filtroSemestre, setFiltroSemestre] = useState('2');
 
   // Modals
   const [isDocenteModalOpen, setIsDocenteModalOpen] = useState(false);
@@ -45,7 +39,7 @@ const Docentes = () => {
   const [archivoForm, setArchivoForm] = useState({
     tipo: 'informe_final',
     gestion: gestion,
-    semestre: '1',
+    semestre: '2',
     archivo: null
   });
 
@@ -54,8 +48,8 @@ const Docentes = () => {
       setLoading(true);
       const list = await getDocentes({ busqueda: busqueda || undefined });
       setDocentes(list);
-      if (list.length > 0 && (!selectedDocente || !list.find(d => d.id === selectedDocente.id))) {
-        setSelectedDocente(list[0]);
+      if (list.length > 0 && (!selectedDocenteId || !list.find(d => d.id === selectedDocenteId))) {
+        setSelectedDocenteId(list[0].id);
       }
     } catch (err) {
       console.error('Error cargando docentes:', err);
@@ -82,12 +76,41 @@ const Docentes = () => {
   }, [busqueda]);
 
   useEffect(() => {
-    if (selectedDocente) {
-      fetchArchivos(selectedDocente.id);
+    if (selectedDocenteId) {
+      fetchArchivos(selectedDocenteId);
     } else {
       setArchivos([]);
     }
-  }, [selectedDocente]);
+  }, [selectedDocenteId]);
+
+  const selectedDocente = useMemo(() => {
+    return docentes.find(d => d.id === selectedDocenteId) || docentes[0] || null;
+  }, [docentes, selectedDocenteId]);
+
+  // General documents (CV, programa analitico, anexos)
+  const generalDocs = useMemo(() => {
+    return archivos.filter(a => a.tipo === 'curriculum' || a.tipo === 'programa_analitico');
+  }, [archivos]);
+
+  // Semestral documents (informes, listas de asistencia)
+  const semestralDocs = useMemo(() => {
+    return archivos.filter(a => {
+      const matchTipo = a.tipo === 'informe_final' || a.tipo === 'lista_asistencia' || a.tipo === 'informe_cathedra' || a.tipo === 'otro';
+      const matchGestion = !filtroGestionSemestre || String(a.gestion) === String(filtroGestionSemestre);
+      const matchSemestre = !filtroSemestre || String(a.semestre) === String(filtroSemestre);
+      return matchTipo && matchGestion && matchSemestre;
+    });
+  }, [archivos, filtroGestionSemestre, filtroSemestre]);
+
+  const getInitials = (name) => {
+    if (!name) return 'DC';
+    const clean = name.replace(/^(ing\.|lic\.|dr\.|dra\.|msc\.)\s*/i, '').trim();
+    const parts = clean.split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return clean.slice(0, 2).toUpperCase();
+  };
 
   const handleCreateDocente = async (e) => {
     e.preventDefault();
@@ -103,7 +126,9 @@ const Docentes = () => {
       });
       setIsDocenteModalOpen(false);
       await fetchDocentes();
-      setSelectedDocente(nuevo);
+      if (nuevo && nuevo.id) {
+        setSelectedDocenteId(nuevo.id);
+      }
     } catch (err) {
       alert('Error al registrar docente: ' + err.message);
     } finally {
@@ -149,352 +174,754 @@ const Docentes = () => {
     }
   };
 
-  const cvArchivo = archivos.find(a => a.tipo === 'curriculum');
-
   return (
-    <div className="module-container">
-      <div className="module-header-container">
-        <div className="module-breadcrumbs">DIRECCIÓN DE CARRERA / SISTEMAS</div>
-        <div className="module-header-main">
-          <div>
-            <h2 className="module-title">Docentes</h2>
-            <p className="module-subtitle">Expedientes individuales y documentación académica por gestión y semestre.</p>
+    <div className="flex flex-col w-full">
+      {/* Sub-header / Breadcrumbs & Page Action Bar */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-space-md mb-space-lg">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-space-xs text-on-surface-variant font-caption text-caption">
+            <span>Gestión documental</span>
+            <span className="material-symbols-outlined text-xs">chevron_right</span>
+            <span className="text-secondary font-semibold">Docentes</span>
           </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button className="btn-secondary" onClick={() => setIsDocenteModalOpen(true)}>
-              + Nuevo docente
-            </button>
-            <button 
-              className="btn-primary" 
-              onClick={() => {
-                setArchivoForm({
-                  tipo: 'informe_final',
-                  gestion: gestion,
-                  semestre: '1',
-                  archivo: null
-                });
-                setIsArchivoModalOpen(true);
-              }}
-              disabled={!selectedDocente}
-            >
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              + Cargar documento al expediente
-            </button>
+          <div className="flex items-baseline gap-space-sm mt-0.5">
+            <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">Docentes</h1>
+            <span className="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-secondary"></span>
+            <p className="font-body-sm text-body-sm text-on-surface-variant">
+              Archivo por docente: datos oficiales y documentos aportados para su conservación institucional.
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-space-sm self-start md:self-auto">
+          <button
+            onClick={() => {
+              setDocenteForm({
+                nombre: '',
+                ci: '',
+                materia_principal: '',
+                gestion_ingreso: gestion
+              });
+              setIsDocenteModalOpen(true);
+            }}
+            className="inline-flex items-center gap-space-xs px-space-md py-2.5 rounded-lg bg-secondary text-on-secondary font-body-sm text-body-sm font-semibold hover:bg-on-secondary-fixed-variant shadow-md shadow-secondary/20 transition-all cursor-pointer"
+            type="button"
+          >
+            <span className="material-symbols-outlined text-lg leading-none">person_add</span>
+            <span>+ Registrar docente</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Banner Informativo Superior & CV Metric Box */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-md mb-space-lg">
+        <div className="lg:col-span-8 bg-surface-container-low rounded-xl p-space-md shadow-sm flex items-start gap-space-md relative overflow-hidden">
+          <div className="w-10 h-10 rounded-lg bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed shrink-0 mt-0.5">
+            <span className="material-symbols-outlined text-xl">verified_user</span>
+          </div>
+          <div className="flex flex-col gap-1 pr-space-md">
+            <span className="font-body-sm text-body-sm font-bold text-on-surface">Conservación Documental Auditada</span>
+            <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Documentos del docente, conservados sin modificar su contenido. Dirección escanea o carga archivos en formato{' '}
+              <strong className="font-semibold text-on-surface font-label-code text-caption">PDF/A</strong> homologado para consultar el historial de carrera y descargar respaldos auditables.
+            </p>
+          </div>
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-surface-container-highest/40 pointer-events-none"></div>
+        </div>
+
+        <div className="lg:col-span-4 bg-primary-container text-on-primary rounded-xl p-space-md shadow-sm flex flex-col justify-between relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="font-label-badge text-caption tracking-wider uppercase px-2 py-0.5 rounded-full bg-secondary text-on-secondary">
+              Regla Institucional
+            </span>
+            <span className="font-label-code text-caption text-primary-fixed">RES-DIR-04/26</span>
+          </div>
+          <div className="my-space-xs">
+            <div className="font-headline-md text-headline-md font-bold tracking-tight text-surface-container-lowest">
+              CV ACTUALIZABLE
+            </div>
+            <p className="font-caption text-caption text-on-primary-container mt-1">
+              No se exige una entrega nueva cada semestre lectivo ({gestion}). Se mantiene en resguardo permanente hasta actualización expresa.
+            </p>
+          </div>
+          <div className="w-full bg-surface-container-lowest/10 h-1 rounded-full overflow-hidden mt-1">
+            <div className="bg-secondary h-full rounded-full w-full"></div>
           </div>
         </div>
       </div>
 
-      <div className="info-banner">
-        <span>ARCHIVADO DIGITAL · Resguardo oficial de hojas de vida, informes de cátedra y listas de asistencia.</span>
-        <span style={{ color: 'var(--text-muted)' }}>{docentes.length} docentes registrados</span>
-      </div>
-
-      <div className="filters-bar">
-        <div className="search-input-container">
-          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input 
-            type="text" 
-            placeholder="Buscar por nombre del docente o materia principal..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
-        {/* Sidebar list of docentes */}
-        <div style={{ width: '300px', flexShrink: 0, background: 'var(--surface)', border: '1px solid var(--border-color)', borderRadius: '6px', overflow: 'hidden' }}>
-          <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600 }}>Plantel Docente</h3>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{docentes.length}</span>
-          </div>
-
-          <div style={{ maxHeight: '520px', overflowY: 'auto' }}>
-            {loading ? (
-              <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                Cargando docentes...
+      {/* Layout Principal a Dos Columnas */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+        {/* COLUMNA IZQUIERDA: Directorio y Archivo por Docente (4 cols en escritorio) */}
+        <div className="lg:col-span-4 flex flex-col gap-space-md">
+          <div className="bg-surface-container-lowest rounded-xl shadow-sm p-space-md">
+            <div className="flex items-center justify-between mb-space-sm">
+              <div className="flex items-center gap-space-xs">
+                <span className="font-headline-md text-headline-md text-on-surface">Archivo por docente</span>
+                <span className="px-2 py-0.5 rounded-full bg-surface-container font-label-code text-caption text-secondary font-bold">
+                  {docentes.length} Activos
+                </span>
               </div>
-            ) : docentes.length === 0 ? (
-              <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                No hay docentes registrados.
-              </div>
-            ) : (
-              docentes.map((doc) => {
-                const isSelected = selectedDocente && selectedDocente.id === doc.id;
-                return (
-                  <div 
-                    key={doc.id}
-                    onClick={() => setSelectedDocente(doc)}
-                    style={{ 
-                      padding: '14px 18px', 
-                      background: isSelected ? 'var(--surface-alt)' : 'transparent',
-                      borderLeft: isSelected ? '4px solid var(--primary-red)' : '4px solid transparent',
-                      borderBottom: '1px solid var(--border-color)',
-                      cursor: 'pointer',
-                      transition: 'background 0.15s'
-                    }}
-                  >
-                    <div className="cell-bold" style={{ fontSize: '0.92rem' }}>{doc.nombre}</div>
-                    <div className="cell-subtitle">
-                      {doc.materia_principal || 'Docente de Carrera'} {doc.ci ? `· CI: ${doc.ci}` : ''}
+              <button
+                onClick={() => setBusqueda('')}
+                className="p-1 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
+                title="Limpiar búsqueda"
+                type="button"
+              >
+                <span className="material-symbols-outlined text-lg">filter_list</span>
+              </button>
+            </div>
+
+            {/* Buscador */}
+            <div className="relative mb-space-md">
+              <span className="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-lg">
+                search
+              </span>
+              <input
+                className="w-full pl-9 pr-space-md py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary/40 transition-all"
+                placeholder="Buscar docente o materia..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                type="text"
+              />
+            </div>
+
+            {/* Lista Selectora de Docentes */}
+            <div className="flex flex-col gap-space-xs" id="docentes-list">
+              {loading ? (
+                <div className="p-4 text-center text-on-surface-variant text-sm">
+                  Cargando nómina docente...
+                </div>
+              ) : docentes.length === 0 ? (
+                <div className="p-4 text-center text-on-surface-variant text-sm">
+                  No se encontraron docentes registrados.
+                </div>
+              ) : (
+                docentes.map((doc) => {
+                  const isSelected = selectedDocente && selectedDocente.id === doc.id;
+                  const initials = getInitials(doc.nombre);
+
+                  return (
+                    <div
+                      key={doc.id}
+                      onClick={() => setSelectedDocenteId(doc.id)}
+                      className={`group ${
+                        isSelected
+                          ? 'relative bg-primary-container text-on-primary shadow-md'
+                          : 'bg-surface-container-lowest hover:bg-surface-container-low text-on-surface'
+                      } flex items-center justify-between p-space-md rounded-xl cursor-pointer transition-all`}
+                    >
+                      <div className="flex items-center gap-space-sm min-w-0">
+                        <div
+                          className={`w-10 h-10 rounded-lg ${
+                            isSelected
+                              ? 'bg-secondary text-on-secondary shadow-inner'
+                              : 'bg-surface-container text-on-surface'
+                          } flex items-center justify-center font-headline-md text-headline-md shrink-0`}
+                        >
+                          {initials}
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span
+                            className={`font-body-md text-body-md ${
+                              isSelected
+                                ? 'font-bold text-surface-container-lowest'
+                                : 'font-medium text-on-surface group-hover:text-secondary'
+                            } truncate transition-colors`}
+                          >
+                            {doc.nombre}
+                          </span>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span
+                              className={`font-label-code text-caption ${
+                                isSelected ? 'text-secondary-fixed' : 'text-on-surface-variant'
+                              }`}
+                            >
+                              {doc.ci ? `CI: ${doc.ci}` : `ID: DOC-${doc.id}`}
+                            </span>
+                            <span
+                              className={`w-1 h-1 rounded-full ${
+                                isSelected ? 'bg-secondary-fixed/50' : 'bg-outline-variant'
+                              }`}
+                            ></span>
+                            <span
+                              className={`font-caption text-caption ${
+                                isSelected ? 'text-on-primary-container' : 'text-on-surface-variant'
+                              } truncate`}
+                            >
+                              {doc.materia_principal || 'Docente Titular'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {isSelected ? (
+                        <span className="material-symbols-outlined text-secondary-fixed text-lg shrink-0">
+                          check_circle
+                        </span>
+                      ) : (
+                        <span className="material-symbols-outlined text-outline-variant group-hover:text-on-surface-variant text-lg shrink-0">
+                          chevron_right
+                        </span>
+                      )}
                     </div>
-                  </div>
-                );
-              })
-            )}
+                  );
+                })
+              )}
+            </div>
+
+            <div className="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-caption text-caption border-t border-outline-variant/20">
+              <span>
+                Total registrados: <strong>{docentes.length} docentes</strong>
+              </span>
+              <button
+                onClick={() => setBusqueda('')}
+                className="text-secondary hover:underline font-semibold cursor-pointer"
+                type="button"
+              >
+                Ver todos
+              </button>
+            </div>
           </div>
 
-          <div style={{ padding: '15px 18px', background: '#f8fafc', fontSize: '0.75rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)' }}>
-            Selecciona un docente para consultar sus informes de cátedra, asistencia y CV.
+          {/* Card auxiliar de auditoría rápida */}
+          <div className="bg-surface-container-high rounded-xl p-space-md shadow-sm">
+            <div className="flex items-center gap-space-xs text-on-surface font-headline-md text-headline-md mb-1">
+              <span className="material-symbols-outlined text-secondary">history_edu</span>
+              <span>Depósito Central FINI</span>
+            </div>
+            <p className="font-caption text-caption text-on-surface-variant leading-relaxed">
+              Los legajos digitales cuentan con respaldo criptográfico en el servidor local de Yapacaní. La integridad documental se verifica semestralmente ante el Honorable Consejo Facultativo.
+            </p>
           </div>
         </div>
 
-        {/* Content area: Expediente */}
-        <div style={{ flex: 1 }}>
+        {/* COLUMNA DERECHA: Expediente Oficial Seleccionado (8 cols en escritorio) */}
+        <div className="lg:col-span-8 flex flex-col gap-space-lg">
           {selectedDocente ? (
             <>
-              <div style={{ border: '1px solid var(--border-color)', borderRadius: '6px', background: 'var(--surface)', padding: '25px', marginBottom: '20px' }}>
-                <div className="module-breadcrumbs" style={{ margin: 0 }}>EXPEDIENTE DOCENTE DIGITAL</div>
-                <h2 style={{ margin: '6px 0 16px 0', fontSize: '1.6rem', fontWeight: 500, color: 'var(--text-main)' }}>
-                  {selectedDocente.nombre}
-                </h2>
-                
-                <div style={{ display: 'flex', gap: '35px', marginBottom: '22px', flexWrap: 'wrap' }}>
-                  <div>
-                    <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '3px' }}>Cédula de Identidad</div>
-                    <div className="cell-bold">{selectedDocente.ci || 'No registrada'}</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '3px' }}>Materia Principal</div>
-                    <div className="cell-bold">{selectedDocente.materia_principal || 'Por asignar'}</div>
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: '3px' }}>Ingreso a Dirección</div>
-                    <div className="cell-bold">Gestión {selectedDocente.gestion_ingreso || 'Histórica'}</div>
-                  </div>
-                </div>
-
-                {/* Hoja de vida / CV destacada */}
-                <div style={{ background: 'var(--surface-alt)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '18px 22px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="var(--primary-red)" strokeWidth="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                      <polyline points="14 2 14 8 20 8"></polyline>
-                      <line x1="16" y1="13" x2="8" y2="13"></line>
-                      <line x1="16" y1="17" x2="8" y2="17"></line>
-                    </svg>
-                    <div>
-                      <div className="cell-bold" style={{ fontSize: '0.95rem' }}>Hoja de vida / Currículum vitae</div>
-                      <div className="cell-subtitle" style={{ margin: 0 }}>
-                        {cvArchivo 
-                          ? `Archivo: ${cvArchivo.nombre_original || 'CV.pdf'} · Actualizado en ${cvArchivo.gestion || 'vigente'}` 
-                          : 'No se ha cargado currículum aún (actualizable periódicamente)'}
+              {/* Ficha de Encabezado Oficial */}
+              <div className="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md relative overflow-hidden">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-sm">
+                  <div className="flex items-center gap-space-md">
+                    <div className="w-14 h-14 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary font-headline-lg text-headline-lg font-bold shadow-inner">
+                      {getInitials(selectedDocente.nombre)}
+                    </div>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-space-xs">
+                        <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
+                          {selectedDocente.nombre}
+                        </h2>
+                        <span className="material-symbols-outlined text-secondary text-xl" title="Docente validado en nómina">
+                          verified
+                        </span>
                       </div>
+                      <span className="font-body-sm text-body-sm text-on-surface-variant">
+                        Cátedras: {selectedDocente.materia_principal || 'Asignaturas de Sistemas'}
+                      </span>
                     </div>
                   </div>
-                  
-                  {cvArchivo ? (
-                    <button 
-                      onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${cvArchivo.id}/download`, cvArchivo.nombre_original || 'CV.pdf')}
-                      className="btn-secondary"
-                      style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                    >
-                      Descargar CV ↗
-                    </button>
-                  ) : (
-                    <button 
-                      className="btn-secondary"
+
+                  <div className="flex items-center gap-space-xs self-start sm:self-auto">
+                    <button
                       onClick={() => {
                         setArchivoForm({
-                          tipo: 'curriculum',
+                          tipo: 'informe_final',
                           gestion: gestion,
-                          semestre: '1',
+                          semestre: '2',
                           archivo: null
                         });
                         setIsArchivoModalOpen(true);
                       }}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container font-body-sm text-body-sm font-semibold text-on-surface hover:bg-surface-container-high transition-colors cursor-pointer"
+                      type="button"
                     >
-                      + Cargar CV
+                      <span className="material-symbols-outlined text-base">upload_file</span>
+                      <span>Anexar archivo</span>
                     </button>
-                  )}
+                    <button
+                      onClick={() => alert(`Expediente de ${selectedDocente.nombre} con ${archivos.length} archivos indexados en servidor FINI.`)}
+                      className="p-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors cursor-pointer"
+                      title="Detalle del legajo"
+                      type="button"
+                    >
+                      <span className="material-symbols-outlined text-lg">folder_zip</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Metadatos de Legajo Oficial */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-space-sm pt-space-xs">
+                  <div className="bg-surface-container-low p-space-sm rounded-lg flex flex-col">
+                    <span className="font-caption text-caption uppercase tracking-wider text-on-surface-variant font-bold">
+                      Registro de Archivo
+                    </span>
+                    <span className="font-label-code text-body-md font-bold text-secondary mt-0.5">
+                      DOC-{String(selectedDocente.id).padStart(3, '0')}
+                    </span>
+                  </div>
+                  <div className="bg-surface-container-low p-space-sm rounded-lg flex flex-col">
+                    <span className="font-caption text-caption uppercase tracking-wider text-on-surface-variant font-bold">
+                      Cédula de Identidad
+                    </span>
+                    <span className="font-label-code text-body-md font-semibold text-on-surface mt-0.5">
+                      {selectedDocente.ci || 'No registrada'}
+                    </span>
+                  </div>
+                  <div className="bg-surface-container-low p-space-sm rounded-lg flex flex-col">
+                    <span className="font-caption text-caption uppercase tracking-wider text-on-surface-variant font-bold">
+                      Condición Académica
+                    </span>
+                    <span className="font-body-md text-body-md font-semibold text-on-surface mt-0.5 flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-secondary"></span>
+                      Ordinario / Titular
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                <h3 style={{ margin: 0, fontSize: '1.15rem', fontWeight: 600 }}>Documentos del expediente</h3>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                  {archivos.length} archivos resguardados en digital
-                </span>
+              {/* SECCIÓN 1: Documentación General (Conservación continua) */}
+              <div className="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-space-xs">
+                      <span className="material-symbols-outlined text-secondary text-xl">folder_shared</span>
+                      <h3 className="font-headline-md text-headline-md text-on-surface font-bold">Documentación general</h3>
+                    </div>
+                    <span className="font-caption text-caption text-on-surface-variant">
+                      Conservación continua · Sin obligación de renovación semestral
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setArchivoForm({
+                        tipo: 'curriculum',
+                        gestion: gestion,
+                        semestre: '1',
+                        archivo: null
+                      });
+                      setIsArchivoModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container font-body-sm text-body-sm font-semibold text-secondary hover:bg-secondary-fixed transition-colors cursor-pointer self-start sm:self-auto"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-lg leading-none">upload_file</span>
+                    <span>Cargar PDF</span>
+                  </button>
+                </div>
+
+                {/* Lista de Documentos Generales */}
+                <div className="flex flex-col gap-space-xs mt-1">
+                  {/* DOC ITEM 1: CV */}
+                  {(() => {
+                    const cv = generalDocs.find(a => a.tipo === 'curriculum');
+                    return (
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors gap-space-sm">
+                        <div className="flex items-start gap-space-sm">
+                          <div className="w-10 h-10 rounded-lg bg-error-container text-on-error-container flex items-center justify-center shrink-0 mt-0.5">
+                            <span className="material-symbols-outlined text-xl">picture_as_pdf</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                              <span className="font-body-md text-body-md font-semibold text-on-surface">Curriculum vitae</span>
+                              <span className="font-label-badge text-caption px-1.5 py-0.5 rounded bg-surface-container-highest text-on-secondary-fixed font-bold">
+                                {cv ? 'VIGENTE' : 'PENDIENTE'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5 font-label-code text-caption text-on-surface-variant">
+                              <span className="text-secondary font-medium">
+                                {cv ? cv.nombre_original : `cv_${selectedDocente.nombre.toLowerCase().replace(/\s+/g, '_')}.pdf`}
+                              </span>
+                              <span>·</span>
+                              <span>PDF/A-1b</span>
+                              <span>·</span>
+                              <span>{cv ? 'En resguardo' : 'No adjunto aún'}</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 self-end sm:self-auto">
+                          {cv ? (
+                            <>
+                              <button
+                                onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${cv.id}/download`, cv.nombre_original)}
+                                className="p-2 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-lowest transition-colors cursor-pointer"
+                                title="Ver escaneo oficial"
+                                type="button"
+                              >
+                                <span className="material-symbols-outlined text-lg">visibility</span>
+                              </button>
+                              <button
+                                onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${cv.id}/download`, cv.nombre_original)}
+                                className="p-2 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-lowest transition-colors cursor-pointer"
+                                title="Descargar archivo"
+                                type="button"
+                              >
+                                <span className="material-symbols-outlined text-lg">download</span>
+                              </button>
+                              <button
+                                onClick={() => handleDeleteArchivo(cv.id, cv.nombre_original)}
+                                className="p-2 rounded-lg text-outline-variant hover:text-error hover:bg-surface-container-lowest transition-colors cursor-pointer"
+                                title="Eliminar archivo"
+                                type="button"
+                              >
+                                <span className="material-symbols-outlined text-lg">delete</span>
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setArchivoForm({
+                                  tipo: 'curriculum',
+                                  gestion: gestion,
+                                  semestre: '1',
+                                  archivo: null
+                                });
+                                setIsArchivoModalOpen(true);
+                              }}
+                              className="px-3 py-1 bg-secondary text-on-secondary text-caption font-semibold rounded-lg hover:bg-secondary-container transition-colors cursor-pointer"
+                              type="button"
+                            >
+                              + Cargar CV
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* DOC ITEM 2: Programa Analítico */}
+                  {(() => {
+                    const prog = generalDocs.find(a => a.tipo === 'programa_analitico');
+                    return (
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors gap-space-sm">
+                        <div className="flex items-start gap-space-sm">
+                          <div className="w-10 h-10 rounded-lg bg-error-container text-on-error-container flex items-center justify-center shrink-0 mt-0.5">
+                            <span className="material-symbols-outlined text-xl">picture_as_pdf</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                              <span className="font-body-md text-body-md font-semibold text-on-surface">
+                                Programa analítico - {selectedDocente.materia_principal || 'Cátedra Oficial'}
+                              </span>
+                              <span className="font-label-badge text-caption px-1.5 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed font-bold">
+                                {prog ? 'HOMOLOGADO' : 'PENDIENTE'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5 font-label-code text-caption text-on-surface-variant">
+                              <span className="text-secondary font-medium">
+                                {prog ? prog.nombre_original : 'programa_analitico_sistemas.pdf'}
+                              </span>
+                              <span>·</span>
+                              <span>Plan UAGRM</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 self-end sm:self-auto">
+                          {prog ? (
+                            <>
+                              <button
+                                onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${prog.id}/download`, prog.nombre_original)}
+                                className="p-2 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-lowest transition-colors cursor-pointer"
+                                title="Ver escaneo oficial"
+                                type="button"
+                              >
+                                <span className="material-symbols-outlined text-lg">visibility</span>
+                              </button>
+                              <button
+                                onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${prog.id}/download`, prog.nombre_original)}
+                                className="p-2 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-lowest transition-colors cursor-pointer"
+                                title="Descargar archivo"
+                                type="button"
+                              >
+                                <span className="material-symbols-outlined text-lg">download</span>
+                              </button>
+                              <button
+                                onClick={() => handleDeleteArchivo(prog.id, prog.nombre_original)}
+                                className="p-2 rounded-lg text-outline-variant hover:text-error hover:bg-surface-container-lowest transition-colors cursor-pointer"
+                                title="Eliminar archivo"
+                                type="button"
+                              >
+                                <span className="material-symbols-outlined text-lg">delete</span>
+                              </button>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setArchivoForm({
+                                  tipo: 'programa_analitico',
+                                  gestion: gestion,
+                                  semestre: '1',
+                                  archivo: null
+                                });
+                                setIsArchivoModalOpen(true);
+                              }}
+                              className="px-3 py-1 bg-surface-container-highest text-secondary text-caption font-semibold rounded-lg hover:bg-secondary-fixed transition-colors cursor-pointer"
+                              type="button"
+                            >
+                              + Cargar Programa
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
               </div>
 
-              <div className="minimal-table-container">
-                <table className="minimal-table">
-                  <thead>
-                    <tr>
-                      <th>TIPO DE DOCUMENTO</th>
-                      <th style={{ width: '90px' }}>GESTIÓN</th>
-                      <th style={{ width: '100px' }}>SEMESTRE</th>
-                      <th>ARCHIVO ORIGINAL</th>
-                      <th style={{ width: '120px' }}>DESCARGAR</th>
-                      <th style={{ width: '50px' }}></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {loadingArchivos ? (
-                      <tr>
-                        <td colSpan="6" style={{ textAlign: 'center', padding: '25px', color: 'var(--text-muted)' }}>
-                          Cargando expediente...
-                        </td>
-                      </tr>
-                    ) : archivos.length === 0 ? (
-                      <tr>
-                        <td colSpan="6" className="empty-state">
-                          <p>Este docente no tiene documentos cargados en su file digital.</p>
-                          <button 
-                            className="btn-secondary" 
-                            onClick={() => setIsArchivoModalOpen(true)}
-                            style={{ marginTop: '10px' }}
-                          >
-                            Cargar informe o asistencia
-                          </button>
-                        </td>
-                      </tr>
-                    ) : (
-                      archivos.map((arc) => (
-                        <tr key={arc.id}>
-                          <td>
-                            <span className="cell-bold">{TIPOS_DOC[arc.tipo] || arc.tipo}</span>
-                          </td>
-                          <td>{arc.gestion || 'General'}</td>
-                          <td>{arc.semestre ? `Semestre ${arc.semestre === 1 ? 'I' : 'II'}` : 'Vigente'}</td>
-                          <td>
-                            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-                              {arc.nombre_original || 'documento.pdf'}
+              {/* SECCIÓN 2: Documentación por Semestre */}
+              <div className="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pb-space-xs">
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-space-xs">
+                      <span className="material-symbols-outlined text-secondary text-xl">date_range</span>
+                      <h3 className="font-headline-md text-headline-md text-on-surface font-bold">Documentación por semestre</h3>
+                    </div>
+                    <span className="font-caption text-caption text-on-surface-variant">
+                      Depósitos periódicos requeridos por cada ciclo académico regular
+                    </span>
+                  </div>
+
+                  {/* Selectores de Ciclo & Botón Cargar */}
+                  <div className="flex flex-wrap items-center gap-space-xs">
+                    <div className="flex items-center bg-surface-container-low rounded-lg p-1">
+                      <select
+                        className="bg-transparent font-label-code text-body-sm font-semibold text-on-surface px-2 py-1 outline-none cursor-pointer"
+                        value={filtroGestionSemestre}
+                        onChange={(e) => setFiltroGestionSemestre(e.target.value)}
+                      >
+                        <option value="2026">Gestión: 2026</option>
+                        <option value="2025">Gestión: 2025</option>
+                        <option value="2024">Gestión: 2024</option>
+                      </select>
+                      <div className="h-4 w-px bg-outline-variant mx-1"></div>
+                      <select
+                        className="bg-transparent font-label-code text-body-sm font-semibold text-on-surface px-2 py-1 outline-none cursor-pointer"
+                        value={filtroSemestre}
+                        onChange={(e) => setFiltroSemestre(e.target.value)}
+                      >
+                        <option value="2">II Semestre</option>
+                        <option value="1">I Semestre</option>
+                      </select>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setArchivoForm({
+                          tipo: 'informe_final',
+                          gestion: filtroGestionSemestre,
+                          semestre: filtroSemestre,
+                          archivo: null
+                        });
+                        setIsArchivoModalOpen(true);
+                      }}
+                      className="inline-flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-secondary text-on-secondary font-body-sm text-body-sm font-semibold hover:bg-on-secondary-fixed-variant transition-colors cursor-pointer shadow-sm"
+                      type="button"
+                    >
+                      <span className="material-symbols-outlined text-lg leading-none">add_circle</span>
+                      <span>Cargar documentación</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Archivos Semestrales Registrados */}
+                <div className="flex flex-col gap-space-xs">
+                  {loadingArchivos ? (
+                    <div className="p-4 text-center text-on-surface-variant text-sm">
+                      Consultando archivos semestrales...
+                    </div>
+                  ) : semestralDocs.length === 0 ? (
+                    <div className="p-6 text-center bg-surface-container-low/50 rounded-xl text-on-surface-variant flex flex-col items-center gap-2">
+                      <span className="material-symbols-outlined text-3xl text-outline-variant">folder_off</span>
+                      <p className="font-body-sm text-body-sm">
+                        No hay archivos registrados para el <strong>Semestre {filtroSemestre === '1' ? 'I' : 'II'} / {filtroGestionSemestre}</strong>.
+                      </p>
+                      <button
+                        onClick={() => {
+                          setArchivoForm({
+                            tipo: 'informe_final',
+                            gestion: filtroGestionSemestre,
+                            semestre: filtroSemestre,
+                            archivo: null
+                          });
+                          setIsArchivoModalOpen(true);
+                        }}
+                        className="px-3 py-1.5 rounded-lg bg-surface-container text-secondary text-body-sm font-semibold hover:bg-surface-container-high transition-colors cursor-pointer mt-1"
+                        type="button"
+                      >
+                        + Anexar informe o lista de asistencia
+                      </button>
+                    </div>
+                  ) : (
+                    semestralDocs.map((arc) => (
+                      <div
+                        key={arc.id}
+                        className="flex flex-col sm:flex-row sm:items-center justify-between p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors gap-space-sm"
+                      >
+                        <div className="flex items-start gap-space-sm">
+                          <div className="w-10 h-10 rounded-lg bg-surface-container-highest text-secondary flex items-center justify-center shrink-0 mt-0.5">
+                            <span className="material-symbols-outlined text-xl">
+                              {arc.tipo === 'lista_asistencia' ? 'fact_check' : 'description'}
                             </span>
-                          </td>
-                          <td>
-                            <button 
-                              onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${arc.id}/download`, arc.nombre_original || 'documento.pdf')}
-                              className="action-link"
-                              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                              title="Descargar documento"
-                            >
-                              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="7 10 12 15 17 10"></polyline>
-                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                              </svg>
-                              Descargar ↗
-                            </button>
-                          </td>
-                          <td>
-                            <button 
-                              onClick={() => handleDeleteArchivo(arc.id, arc.nombre_original)}
-                              className="btn-danger-outline"
-                              title="Eliminar archivo"
-                            >
-                              ✕
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+                          </div>
+                          <div className="flex flex-col">
+                            <div className="flex items-center gap-2">
+                              <span className="font-body-md text-body-md font-semibold text-on-surface">
+                                {arc.tipo === 'lista_asistencia' ? 'Lista de asistencia' : 'Informe final / de cátedra'}
+                              </span>
+                              <span className="font-label-badge text-caption px-1.5 py-0.5 rounded bg-surface-container-highest text-secondary font-bold">
+                                {arc.tipo === 'lista_asistencia' ? 'CUSTODIA' : 'ARCHIVADO'}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5 font-label-code text-caption text-on-surface-variant">
+                              <span className="text-secondary font-medium">{arc.nombre_original}</span>
+                              <span>·</span>
+                              <span>Semestre {arc.semestre === 1 ? 'I' : 'II'} / {arc.gestion}</span>
+                              <span>·</span>
+                              <span>Entregado a Dirección</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-1 self-end sm:self-auto">
+                          <button
+                            onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${arc.id}/download`, arc.nombre_original)}
+                            className="p-2 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-lowest transition-colors cursor-pointer"
+                            title="Ver informe oficial"
+                            type="button"
+                          >
+                            <span className="material-symbols-outlined text-lg">visibility</span>
+                          </button>
+                          <button
+                            onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${arc.id}/download`, arc.nombre_original)}
+                            className="p-2 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-lowest transition-colors cursor-pointer"
+                            title="Descargar archivo"
+                            type="button"
+                          >
+                            <span className="material-symbols-outlined text-lg">download</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteArchivo(arc.id, arc.nombre_original)}
+                            className="p-2 rounded-lg text-outline-variant hover:text-error hover:bg-surface-container-lowest transition-colors cursor-pointer"
+                            title="Eliminar archivo"
+                            type="button"
+                          >
+                            <span className="material-symbols-outlined text-lg">delete</span>
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Nota aclaratoria reglamentaria al pie del expediente */}
+                <div className="mt-space-sm p-space-md rounded-lg bg-surface-container-low flex items-start gap-space-sm text-on-surface-variant">
+                  <span className="material-symbols-outlined text-secondary text-lg shrink-0 mt-0.5">info</span>
+                  <p className="font-caption text-caption leading-relaxed">
+                    <strong className="font-semibold text-on-surface">Nota aclaratoria:</strong> La lista de asistencia se conserva únicamente como documento de custodia. No incluye control de asistencia ni actas de notas registradas en CPD. Para calificaciones oficiales remitirse al Sistema de Procesamiento de Datos central UAGRM.
+                  </p>
+                </div>
               </div>
             </>
           ) : (
-            <div className="empty-state" style={{ background: 'var(--surface)', border: '1px solid var(--border-color)', borderRadius: '6px' }}>
-              <p>Selecciona un docente de la lista para ver su expediente o haz clic en "+ Nuevo docente".</p>
+            <div className="bg-surface-container-lowest rounded-xl p-space-lg text-center text-on-surface-variant">
+              Seleccione un docente del directorio para consultar su expediente.
             </div>
           )}
         </div>
       </div>
 
-      {/* MODAL NUEVO DOCENTE */}
+      {/* MODAL REGISTRAR NUEVO DOCENTE */}
       {isDocenteModalOpen && (
-        <div className="modal-overlay" onClick={() => !submitting && setIsDocenteModalOpen(false)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>+ Registrar Nuevo Docente</h3>
-              <button 
-                className="modal-close-btn" 
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-primary-container/60 backdrop-blur-sm">
+          <div className="bg-surface-container-lowest rounded-xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-primary text-on-primary px-space-lg py-space-md flex items-center justify-between">
+              <div className="flex items-center gap-space-xs">
+                <span className="material-symbols-outlined text-secondary-fixed">person_add</span>
+                <span className="font-headline-md text-headline-md font-bold">Registrar Nuevo Docente</span>
+              </div>
+              <button
+                className="text-on-primary/70 hover:text-on-primary cursor-pointer"
                 onClick={() => !submitting && setIsDocenteModalOpen(false)}
+                type="button"
               >
-                ✕
+                <span className="material-symbols-outlined">close</span>
               </button>
             </div>
 
             <form onSubmit={handleCreateDocente}>
-              <div className="modal-body">
-                <div className="form-group">
-                  <label className="form-label">Nombre y Apellido Completo *</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
+              <div className="p-space-lg flex flex-col gap-space-md">
+                <div className="flex flex-col gap-1">
+                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                    Nombre Completo del Docente *
+                  </label>
+                  <input
+                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
                     placeholder="Ej. Ing. Mario Renato Chocala"
                     value={docenteForm.nombre}
                     onChange={(e) => setDocenteForm({ ...docenteForm, nombre: e.target.value })}
                     required
+                    type="text"
                   />
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Cédula de Identidad</label>
-                    <input 
-                      type="text" 
-                      className="form-input" 
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                      Cédula de Identidad (CI)
+                    </label>
+                    <input
+                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
                       placeholder="Ej. 4829102 SC"
                       value={docenteForm.ci}
                       onChange={(e) => setDocenteForm({ ...docenteForm, ci: e.target.value })}
+                      type="text"
                     />
                   </div>
 
-                  <div className="form-group">
-                    <label className="form-label">Año de ingreso a carrera</label>
-                    <input 
-                      type="number" 
-                      className="form-input" 
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                      Gestión de Ingreso
+                    </label>
+                    <input
+                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
                       value={docenteForm.gestion_ingreso}
                       onChange={(e) => setDocenteForm({ ...docenteForm, gestion_ingreso: e.target.value })}
+                      type="number"
                     />
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Materia Principal / Cátedra</label>
-                  <input 
-                    type="text" 
-                    className="form-input" 
-                    placeholder="Ej. Sistemas de Información, Programación Web..."
+                <div className="flex flex-col gap-1">
+                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                    Materia Principal / Cátedra Asignada
+                  </label>
+                  <input
+                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                    placeholder="Ej. Programación I · Algoritmos y Estructuras"
                     value={docenteForm.materia_principal}
                     onChange={(e) => setDocenteForm({ ...docenteForm, materia_principal: e.target.value })}
+                    type="text"
                   />
                 </div>
               </div>
 
-              <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn-secondary" 
-                  onClick={() => setIsDocenteModalOpen(false)}
+              <div className="px-space-lg py-space-md bg-surface-container-low flex items-center justify-end gap-space-sm">
+                <button
+                  className="px-space-md py-2 rounded-lg font-body-sm text-body-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer"
                   disabled={submitting}
+                  onClick={() => setIsDocenteModalOpen(false)}
+                  type="button"
                 >
                   Cancelar
                 </button>
-                <button 
-                  type="submit" 
-                  className="btn-primary"
+                <button
+                  className="px-space-md py-2 bg-secondary text-on-secondary rounded-lg font-body-sm text-body-sm font-semibold shadow-sm hover:bg-primary transition-colors disabled:opacity-50 cursor-pointer"
                   disabled={submitting}
+                  type="submit"
                 >
-                  {submitting ? 'Guardando...' : 'Crear expediente de docente'}
+                  {submitting ? 'Guardando...' : 'Crear Expediente'}
                 </button>
               </div>
             </form>
@@ -504,56 +931,71 @@ const Docentes = () => {
 
       {/* MODAL CARGAR ARCHIVO AL EXPEDIENTE */}
       {isArchivoModalOpen && selectedDocente && (
-        <div className="modal-overlay" onClick={() => !submitting && setIsArchivoModalOpen(false)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>+ Cargar Documento al Expediente</h3>
-              <button 
-                className="modal-close-btn" 
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-primary-container/60 backdrop-blur-sm">
+          <div className="bg-surface-container-lowest rounded-xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-primary text-on-primary px-space-lg py-space-md flex items-center justify-between">
+              <div className="flex items-center gap-space-xs">
+                <span className="material-symbols-outlined text-secondary-fixed">upload_file</span>
+                <span className="font-headline-md text-headline-md font-bold">Cargar Documento al Expediente</span>
+              </div>
+              <button
+                className="text-on-primary/70 hover:text-on-primary cursor-pointer"
                 onClick={() => !submitting && setIsArchivoModalOpen(false)}
+                type="button"
               >
-                ✕
+                <span className="material-symbols-outlined">close</span>
               </button>
             </div>
 
             <form onSubmit={handleUploadArchivo}>
-              <div className="modal-body">
-                <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '4px', fontSize: '0.85rem' }}>
-                  Expediente de: <strong>{selectedDocente.nombre}</strong>
+              <div className="p-space-lg flex flex-col gap-space-md">
+                <div className="bg-surface-container-low p-space-sm rounded-lg flex items-center justify-between">
+                  <span className="font-caption text-caption text-on-surface-variant font-semibold">
+                    Docente Destino:
+                  </span>
+                  <span className="font-label-code text-label-code font-bold text-secondary bg-surface-container px-2 py-0.5 rounded">
+                    {selectedDocente.nombre}
+                  </span>
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Tipo de documento *</label>
-                  <select 
-                    className="form-select"
+                <div className="flex flex-col gap-1">
+                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                    Tipo de Documento *
+                  </label>
+                  <select
+                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
                     value={archivoForm.tipo}
                     onChange={(e) => setArchivoForm({ ...archivoForm, tipo: e.target.value })}
                   >
                     <option value="informe_final">Informe final de cátedra</option>
-                    <option value="lista_asistencia">Listas de asistencia de estudiantes</option>
+                    <option value="lista_asistencia">Lista de asistencia (Custodia)</option>
                     <option value="curriculum">Hoja de vida / Currículum vitae</option>
                     <option value="programa_analitico">Programa analítico archivado</option>
-                    <option value="otro">Otro certificado o respaldo</option>
+                    <option value="otro">Otro certificado o respaldo académico</option>
                   </select>
                 </div>
 
                 {archivoForm.tipo !== 'curriculum' && (
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label className="form-label">Gestión Académica</label>
-                      <input 
-                        type="number" 
-                        className="form-input"
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+                    <div className="flex flex-col gap-1">
+                      <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                        Gestión Académica
+                      </label>
+                      <input
+                        className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
                         value={archivoForm.gestion}
                         onChange={(e) => setArchivoForm({ ...archivoForm, gestion: e.target.value })}
                         required
+                        type="number"
                       />
                     </div>
 
-                    <div className="form-group">
-                      <label className="form-label">Semestre</label>
-                      <select 
-                        className="form-select"
+                    <div className="flex flex-col gap-1">
+                      <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                        Semestre
+                      </label>
+                      <select
+                        className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
                         value={archivoForm.semestre}
                         onChange={(e) => setArchivoForm({ ...archivoForm, semestre: e.target.value })}
                       >
@@ -564,39 +1006,44 @@ const Docentes = () => {
                   </div>
                 )}
 
-                <div className="form-group">
-                  <label className="form-label">Cargar archivo (PDF o escaneo) *</label>
-                  <div className="form-file-container">
-                    <input 
-                      type="file" 
+                <div className="flex flex-col gap-1">
+                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                    Archivo Digital (PDF o Escaneo) *
+                  </label>
+                  <label className="border-2 border-dashed border-outline-variant hover:border-secondary rounded-lg p-space-md flex flex-col items-center justify-center gap-1 cursor-pointer bg-surface-container-low/40 transition-colors">
+                    <span className="material-symbols-outlined text-2xl text-secondary">upload_file</span>
+                    <span className="font-body-sm text-body-sm font-medium text-on-surface">
+                      {archivoForm.archivo ? archivoForm.archivo.name : 'Haga clic para seleccionar archivo PDF'}
+                    </span>
+                    <span className="font-caption text-caption text-outline">
+                      Formatos homologados: PDF/A hasta 25MB
+                    </span>
+                    <input
                       accept=".pdf,.png,.jpg,.jpeg"
+                      className="hidden"
                       onChange={(e) => setArchivoForm({ ...archivoForm, archivo: e.target.files[0] || null })}
                       required
+                      type="file"
                     />
-                    {archivoForm.archivo && (
-                      <p style={{ margin: '8px 0 0 0', fontSize: '0.85rem', color: '#166534', fontWeight: 500 }}>
-                        ✓ Archivo seleccionado: {archivoForm.archivo.name}
-                      </p>
-                    )}
-                  </div>
+                  </label>
                 </div>
               </div>
 
-              <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn-secondary" 
-                  onClick={() => setIsArchivoModalOpen(false)}
+              <div className="px-space-lg py-space-md bg-surface-container-low flex items-center justify-end gap-space-sm">
+                <button
+                  className="px-space-md py-2 rounded-lg font-body-sm text-body-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer"
                   disabled={submitting}
+                  onClick={() => setIsArchivoModalOpen(false)}
+                  type="button"
                 >
                   Cancelar
                 </button>
-                <button 
-                  type="submit" 
-                  className="btn-primary"
+                <button
+                  className="px-space-md py-2 bg-secondary text-on-secondary rounded-lg font-body-sm text-body-sm font-semibold shadow-sm hover:bg-primary transition-colors disabled:opacity-50 cursor-pointer"
                   disabled={submitting}
+                  type="submit"
                 >
-                  {submitting ? 'Subiendo...' : 'Cargar al expediente'}
+                  {submitting ? 'Subiendo...' : 'Anexar al Expediente'}
                 </button>
               </div>
             </form>

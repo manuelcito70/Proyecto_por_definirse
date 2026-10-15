@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useGestion } from '../context/GestionContext';
-import { getExpedidos, getNextExpedidoNumber, createExpedido, deleteExpedido, downloadFile } from '../services/api';
-import './Modules.css';
+import { 
+  getExpedidos, 
+  getNextExpedidoNumber, 
+  createExpedido, 
+  updateExpedido,
+  deleteExpedido, 
+  downloadFile 
+} from '../services/api';
 
 const Expedidos = () => {
   const { gestion } = useGestion();
@@ -9,10 +15,15 @@ const Expedidos = () => {
   const [nextNumber, setNextNumber] = useState(1);
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState('');
-  const [filterEstado, setFilterEstado] = useState('todos');
+  const [filterEstado, setFilterEstado] = useState('all');
 
-  // Modal State
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
+  // Modal State (Create / Edit)
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     destinatario: '',
@@ -30,12 +41,12 @@ const Expedidos = () => {
         getExpedidos({
           gestion,
           busqueda: busqueda || undefined,
-          estado: filterEstado !== 'todos' ? filterEstado : undefined
+          estado: filterEstado !== 'all' ? filterEstado : undefined
         }),
         getNextExpedidoNumber(gestion)
       ]);
       setExpedidos(list);
-      setNextNumber(nextData.next);
+      setNextNumber(nextData.next || 1);
     } catch (err) {
       console.error('Error cargando expedidos:', err);
     } finally {
@@ -45,6 +56,7 @@ const Expedidos = () => {
 
   useEffect(() => {
     fetchData();
+    setCurrentPage(1);
   }, [gestion, filterEstado]);
 
   const handleSearchSubmit = (e) => {
@@ -52,13 +64,27 @@ const Expedidos = () => {
     fetchData();
   };
 
-  const handleOpenModal = () => {
+  const handleOpenCreateModal = () => {
+    setEditingId(null);
     setFormData({
       destinatario: '',
       asunto: '',
       descripcion: '',
       fecha: new Date().toISOString().split('T')[0],
       estado: 'completado',
+      archivo: null
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleOpenEditModal = (doc) => {
+    setEditingId(doc.id);
+    setFormData({
+      destinatario: doc.destinatario || '',
+      asunto: doc.asunto || '',
+      descripcion: doc.descripcion || '',
+      fecha: doc.fecha || new Date().toISOString().split('T')[0],
+      estado: doc.estado || 'completado',
       archivo: null
     });
     setIsModalOpen(true);
@@ -73,17 +99,26 @@ const Expedidos = () => {
 
     try {
       setSubmitting(true);
-      const data = new FormData();
-      data.append('destinatario', formData.destinatario);
-      data.append('asunto', formData.asunto);
-      data.append('descripcion', formData.descripcion || '');
-      data.append('fecha', formData.fecha);
-      data.append('estado', formData.estado);
-      if (formData.archivo) {
-        data.append('archivo', formData.archivo);
+      if (editingId) {
+        await updateExpedido(editingId, {
+          destinatario: formData.destinatario,
+          asunto: formData.asunto,
+          descripcion: formData.descripcion,
+          fecha: formData.fecha,
+          estado: formData.estado
+        });
+      } else {
+        const data = new FormData();
+        data.append('destinatario', formData.destinatario);
+        data.append('asunto', formData.asunto);
+        data.append('descripcion', formData.descripcion || '');
+        data.append('fecha', formData.fecha);
+        data.append('estado', formData.estado);
+        if (formData.archivo) {
+          data.append('archivo', formData.archivo);
+        }
+        await createExpedido(data);
       }
-
-      await createExpedido(data);
       setIsModalOpen(false);
       await fetchData();
     } catch (err) {
@@ -103,278 +138,493 @@ const Expedidos = () => {
     }
   };
 
+  // Pagination calculation
+  const totalItems = expedidos.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentExpedidos = expedidos.slice(startIndex, startIndex + itemsPerPage);
+
   const getStatusBadge = (estado) => {
     switch (estado) {
       case 'completado':
-        return <span className="status-dot status-green">Completado</span>;
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            Completado
+          </span>
+        );
       case 'en_curso':
-        return <span className="status-dot status-yellow">En curso</span>;
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+            En curso
+          </span>
+        );
       case 'pendiente':
       default:
-        return <span className="status-dot status-red">Pendiente</span>;
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800">
+            <span className="w-1.5 h-1.5 rounded-full bg-error"></span>
+            Pendiente
+          </span>
+        );
     }
   };
 
   return (
-    <div className="module-container">
-      <div className="module-header-container">
-        <div className="module-breadcrumbs">DIRECCIÓN DE CARRERA / SISTEMAS</div>
-        <div className="module-header-main">
-          <div>
-            <h2 className="module-title">Documentos expedidos</h2>
-            <p className="module-subtitle">Oficios elaborados en dirección y remitidos a otras oficinas.</p>
+    <div className="flex flex-col w-full gap-y-space-lg">
+      {/* Breadcrumb & Top Bar Meta */}
+      <div className="flex flex-wrap items-center justify-between gap-space-sm">
+        <nav className="flex items-center gap-space-xs text-on-surface-variant font-caption text-caption">
+          <span className="hover:text-primary transition-colors cursor-pointer">Gestión documental</span>
+          <span className="material-symbols-outlined text-sm">chevron_right</span>
+          <span className="font-bold text-secondary">Documentos expedidos</span>
+        </nav>
+        <div className="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1 rounded-full text-on-surface-variant font-caption text-caption">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Base de datos activa</span>
+          <span className="text-outline-variant">•</span>
+          <span className="font-mono text-on-surface font-semibold">FINI-UAGRM</span>
+        </div>
+      </div>
+
+      {/* Page Header Title & Main Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md">
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-space-xs">
+            <span className="font-label-badge text-label-badge tracking-wider text-secondary uppercase font-bold">
+              Dirección de Carrera / Sistemas
+            </span>
           </div>
-          <button className="btn-primary" onClick={handleOpenModal}>
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-            + Nuevo oficio
+          <h1 className="font-display text-display text-primary tracking-tight">Documentos expedidos</h1>
+          <p className="font-body-md text-body-md text-on-surface-variant">
+            Oficios elaborados en dirección y remitidos a otras oficinas y dependencias facultativas.
+          </p>
+        </div>
+
+        {/* Quick Action Modal Trigger */}
+        <div className="flex items-center gap-space-sm self-start sm:self-auto">
+          <button 
+            className="inline-flex items-center gap-space-xs bg-secondary text-on-secondary px-space-md py-2.5 rounded-lg font-body-sm text-body-sm font-semibold shadow-md hover:bg-primary transition-all duration-200" 
+            onClick={handleOpenCreateModal}
+          >
+            <span className="material-symbols-outlined text-base">add</span>
+            <span>Nuevo oficio</span>
           </button>
         </div>
       </div>
 
-      <div className="info-banner">
-        <span>ARCHIVADO OFICIAL · Gestión {gestion} · Correlativo estricto y único por año.</span>
-        <span style={{ color: 'var(--text-muted)' }}>{expedidos.length} oficios registrados</span>
-      </div>
+      {/* Correlative Running Tracker Card */}
+      <div className="relative overflow-hidden bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg">
+        <div className="absolute -right-8 -top-12 w-48 h-48 bg-secondary/5 rounded-full blur-2xl pointer-events-none"></div>
+        <div className="flex items-center gap-space-lg min-w-0">
+          {/* Big Correlative Block */}
+          <div className="flex flex-col items-center justify-center bg-surface-container-low px-space-lg py-space-sm rounded-xl min-w-[110px]">
+            <span className="font-caption text-caption uppercase tracking-wider text-on-surface-variant font-semibold">Próximo oficio</span>
+            <span className="font-correlative-counter text-correlative-counter text-secondary font-extrabold tracking-tight">
+              {String(nextNumber).padStart(2, '0')}
+            </span>
+            <span className="font-label-code text-label-code text-on-surface-variant font-mono">FINI-SIS/{gestion}</span>
+          </div>
 
-      <div className="info-box">
-        <div className="big-number">{String(nextNumber).padStart(2, '0')}</div>
-        <div className="info-text">
-          <h4>Siguiente oficio · Gestión {gestion}</h4>
-          <p>Asignación automática y secuencial. Último expedido: {nextNumber > 1 ? nextNumber - 1 : 'Ninguno'}.</p>
+          {/* Descriptive Information */}
+          <div className="flex flex-col gap-1 min-w-0">
+            <div className="flex items-center gap-space-xs flex-wrap">
+              <span className="font-headline-md text-headline-md text-on-surface font-bold">
+                Gestión {gestion} · Numeración correlativa automática
+              </span>
+              <span className="inline-flex items-center gap-1 bg-surface-container px-2 py-0.5 rounded text-xs font-semibold text-secondary">
+                <span className="material-symbols-outlined text-xs">lock</span>
+                Consecutivo estricto
+              </span>
+            </div>
+            <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed max-w-xl">
+              Correlativo único, ordenado de uno en uno y sin repeticiones ni duplicidad. Último oficio expedido registrado legalmente: {' '}
+              <span className="font-mono font-bold text-on-surface">
+                #{nextNumber > 1 ? String(nextNumber - 1).padStart(2, '0') : '00'}
+              </span>.
+            </p>
+          </div>
         </div>
-        <div className="info-extra">
-          <h5>Cierre de gestión {gestion - 1}</h5>
-          <p>La numeración histórica se conserva de forma independiente.</p>
+
+        {/* Historical Reference Box */}
+        <div className="w-full lg:w-auto flex flex-col justify-between bg-surface-container-low/70 p-space-md rounded-xl max-w-xs">
+          <div className="flex items-center justify-between gap-space-xs text-on-surface-variant mb-1">
+            <span className="font-caption text-caption uppercase tracking-wider font-bold">Cierre de gestión {gestion - 1}</span>
+            <span className="material-symbols-outlined text-sm text-secondary">inventory_2</span>
+          </div>
+          <p className="font-caption text-caption text-on-surface-variant leading-snug">
+            El histórico documental se preserva cerrado e inmutable. Cada ciclo anual restablece la serie numérica correlativa en <span className="font-mono font-bold text-on-surface">001</span>.
+          </p>
         </div>
       </div>
 
-      <div className="filters-bar">
-        <form onSubmit={handleSearchSubmit} className="search-input-container">
-          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input 
-            type="text" 
-            placeholder="Buscar por asunto, destinatario o descripción... (Enter)" 
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-        </form>
+      {/* Main Document Table Container */}
+      <div className="flex flex-col bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+        {/* Card Head: Title, Search & Filters */}
+        <div className="p-space-lg flex flex-col gap-space-md border-b border-outline-variant/20">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+            <div className="flex items-center gap-space-xs">
+              <span className="material-symbols-outlined text-secondary text-xl">folder_shared</span>
+              <h2 className="font-headline-md text-headline-md font-bold text-on-surface">Archivo oficial de correspondencia</h2>
+            </div>
+            <div className="flex items-center gap-space-xs text-on-surface-variant font-caption text-caption">
+              <span className="material-symbols-outlined text-sm">schedule</span>
+              <span>{expedidos.length} oficios registrados en Gestión {gestion}</span>
+            </div>
+          </div>
 
-        <select 
-          className="filter-select"
-          value={filterEstado}
-          onChange={(e) => setFilterEstado(e.target.value)}
-        >
-          <option value="todos">Todos los estados</option>
-          <option value="completado">Completado (Verde)</option>
-          <option value="en_curso">En curso (Amarillo)</option>
-          <option value="pendiente">Pendiente (Rojo)</option>
-        </select>
-      </div>
+          {/* Filter Controls Bar */}
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-space-sm">
+            {/* Search Input */}
+            <form onSubmit={handleSearchSubmit} className="relative flex-1">
+              <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-on-surface-variant">
+                <span className="material-symbols-outlined text-lg">search</span>
+              </span>
+              <input 
+                className="w-full pl-10 pr-12 py-2.5 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary/20 focus:outline-none transition-all" 
+                placeholder="Buscar por asunto, destinatario o descripción..." 
+                type="text"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+              <span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-outline-variant font-label-code text-caption">
+                Enter ↵
+              </span>
+            </form>
 
-      <div className="minimal-table-container">
-        <table className="minimal-table">
-          <thead>
-            <tr>
-              <th style={{ width: '80px' }}>OFICIO</th>
-              <th style={{ width: '90px' }}>GESTIÓN</th>
-              <th style={{ width: '110px' }}>FECHA</th>
-              <th>ASUNTO</th>
-              <th>DESTINATARIO</th>
-              <th>ESTADO</th>
-              <th>DOCUMENTO</th>
-              <th style={{ width: '60px' }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="8" style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
-                  Cargando expedidos...
-                </td>
+            {/* Filter Controls */}
+            <div className="flex items-center gap-space-xs">
+              <div className="relative">
+                <select 
+                  className="appearance-none bg-surface-container-low pl-3 pr-8 py-2.5 rounded-lg font-body-sm text-body-sm font-medium text-on-surface hover:bg-surface-container focus:outline-none focus:ring-2 focus:ring-secondary/20 cursor-pointer"
+                  value={filterEstado}
+                  onChange={(e) => setFilterEstado(e.target.value)}
+                >
+                  <option value="all">Todos los estados</option>
+                  <option value="completado">Completado</option>
+                  <option value="en_curso">En curso</option>
+                  <option value="pendiente">Pendiente</option>
+                </select>
+                <span className="material-symbols-outlined pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-on-surface-variant">
+                  filter_list
+                </span>
+              </div>
+              <button 
+                onClick={fetchData}
+                className="p-2.5 bg-surface-container-low hover:bg-surface-container text-on-surface-variant rounded-lg transition-colors flex items-center justify-center" 
+                title="Refrescar lista"
+              >
+                <span className="material-symbols-outlined text-lg leading-none">refresh</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Responsive Table Wrapper */}
+        <div className="overflow-x-auto w-full">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-surface-container-low text-on-surface-variant font-caption text-caption uppercase tracking-wider">
+                <th className="py-3 px-space-md font-bold">N.° de oficio</th>
+                <th className="py-3 px-space-sm font-bold">Gestión</th>
+                <th className="py-3 px-space-sm font-bold">Fecha</th>
+                <th className="py-3 px-space-md font-bold min-w-[280px]">Asunto</th>
+                <th className="py-3 px-space-md font-bold">Destinatario</th>
+                <th className="py-3 px-space-sm font-bold">Estado</th>
+                <th className="py-3 px-space-md font-bold">Documento</th>
+                <th className="py-3 px-space-md font-bold text-center">Acciones</th>
               </tr>
-            ) : expedidos.length === 0 ? (
-              <tr>
-                <td colSpan="8" className="empty-state">
-                  <p>No se encontraron oficios expedidos en la gestión {gestion}.</p>
-                  <button className="btn-secondary" onClick={handleOpenModal} style={{ marginTop: '10px' }}>
-                    Registrar el primero
-                  </button>
-                </td>
-              </tr>
-            ) : (
-              expedidos.map((doc) => (
-                <tr key={doc.id}>
-                  <td className="cell-bold">#{String(doc.nro_oficio).padStart(2, '0')}</td>
-                  <td>{doc.gestion}</td>
-                  <td style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{doc.fecha}</td>
-                  <td>
-                    <span className="cell-bold">{doc.asunto}</span>
-                    {doc.descripcion && <span className="cell-subtitle">{doc.descripcion}</span>}
+            </thead>
+            <tbody className="divide-y divide-surface-container-low text-on-surface font-body-sm text-body-sm">
+              {loading ? (
+                <tr>
+                  <td colSpan="8" className="py-8 text-center text-on-surface-variant">
+                    Cargando correspondencia oficial...
                   </td>
-                  <td>
-                    <span className="cell-bold">{doc.destinatario}</span>
-                  </td>
-                  <td>{getStatusBadge(doc.estado)}</td>
-                  <td>
-                    {doc.archivo_path ? (
-                      <button 
-                        onClick={() => downloadFile(`/expedidos/${doc.id}/download`, doc.nombre_archivo)} 
-                        className="action-link"
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                        title={doc.nombre_archivo}
-                      >
-                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                          <polyline points="7 10 12 15 17 10"></polyline>
-                          <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        Descargar PDF ↗
-                      </button>
-                    ) : (
-                      <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Sin archivo</span>
-                    )}
-                  </td>
-                  <td>
+                </tr>
+              ) : currentExpedidos.length === 0 ? (
+                <tr>
+                  <td colSpan="8" className="py-12 text-center text-on-surface-variant">
+                    <p className="mb-2">No se encontraron oficios expedidos en la gestión {gestion}.</p>
                     <button 
-                      onClick={() => handleDelete(doc.id, doc.nro_oficio)}
-                      className="btn-danger-outline"
-                      title="Eliminar registro"
+                      onClick={handleOpenCreateModal}
+                      className="px-3 py-1.5 bg-secondary text-white rounded-lg text-xs font-semibold"
                     >
-                      ✕
+                      Registrar el primero
                     </button>
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                currentExpedidos.map((doc) => (
+                  <tr key={doc.id} className="hover:bg-surface-container-low/60 transition-colors group">
+                    <td className="py-3.5 px-space-md font-label-code text-label-code font-bold text-secondary">
+                      #{String(doc.nro_oficio).padStart(2, '0')}
+                    </td>
+                    <td className="py-3.5 px-space-sm font-label-code text-label-code text-on-surface-variant">
+                      {doc.gestion}
+                    </td>
+                    <td className="py-3.5 px-space-sm font-mono text-xs text-on-surface-variant">
+                      {doc.fecha}
+                    </td>
+                    <td className="py-3.5 px-space-md">
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-on-surface group-hover:text-secondary transition-colors">
+                          {doc.asunto}
+                        </span>
+                        {doc.descripcion && (
+                          <span className="font-caption text-caption text-on-surface-variant line-clamp-1">
+                            {doc.descripcion}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-space-md font-medium text-on-surface">
+                      {doc.destinatario}
+                    </td>
+                    <td className="py-3.5 px-space-sm">
+                      {getStatusBadge(doc.estado)}
+                    </td>
+                    <td className="py-3.5 px-space-md">
+                      {doc.archivo_path ? (
+                        <button 
+                          onClick={() => downloadFile(`/expedidos/${doc.id}/download`, doc.nombre_archivo || 'oficio.pdf')}
+                          className="inline-flex items-center gap-1.5 text-secondary hover:text-primary font-body-sm text-body-sm font-semibold transition-colors"
+                          title="Descargar o abrir escaneo digital"
+                        >
+                          <span className="material-symbols-outlined text-base">download</span>
+                          <span>Descargar PDF</span>
+                        </button>
+                      ) : (
+                        <span className="font-caption text-caption text-outline italic">Sin archivo</span>
+                      )}
+                    </td>
+                    <td className="py-3.5 px-space-md text-center">
+                      <div className="inline-flex items-center justify-center gap-1">
+                        <button 
+                          onClick={() => handleOpenEditModal(doc)}
+                          className="p-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-secondary transition-colors" 
+                          title="Editar oficio"
+                        >
+                          <span className="material-symbols-outlined text-base">edit</span>
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(doc.id, doc.nro_oficio)}
+                          className="p-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-error transition-colors" 
+                          title="Eliminar oficio"
+                        >
+                          <span className="material-symbols-outlined text-base">delete</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
 
-        <div className="table-footer">
-          <span>{expedidos.length} registros en gestión {gestion}</span>
-          <div className="pagination">
-            <span>Gestión activa: {gestion}</span>
+        {/* Table Footer: Pagination & Records Tracker */}
+        <div className="p-space-md bg-surface-container-low/40 flex flex-col sm:flex-row items-center justify-between gap-space-sm border-t border-outline-variant/20">
+          <span className="font-body-sm text-body-sm text-on-surface-variant">
+            Mostrando <span className="font-semibold text-on-surface">{totalItems > 0 ? startIndex + 1 : 0}–{Math.min(startIndex + itemsPerPage, totalItems)}</span> de <span className="font-semibold text-on-surface">{totalItems}</span> oficios registrados
+          </span>
+          
+          {/* Pagination Buttons */}
+          <div className="flex items-center gap-1">
+            <button 
+              disabled={currentPage <= 1}
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-40"
+            >
+              <span className="material-symbols-outlined text-base">chevron_left</span>
+            </button>
+            
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`w-8 h-8 flex items-center justify-center rounded-lg font-body-sm text-body-sm font-bold transition-colors ${
+                  currentPage === page 
+                    ? 'bg-secondary text-on-secondary shadow-sm' 
+                    : 'text-on-surface hover:bg-surface-container-high'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+
+            <button 
+              disabled={currentPage >= totalPages}
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-40"
+            >
+              <span className="material-symbols-outlined text-base">chevron_right</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* MODAL REGISTRAR NUEVO OFICIO */}
+      {/* Status Legend Bar */}
+      <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-space-md">
+        <div className="flex items-center gap-space-xs text-on-surface-variant font-caption text-caption uppercase tracking-wider font-bold">
+          <span className="material-symbols-outlined text-base text-secondary">info</span>
+          <span>Seguimiento de estados:</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-space-lg font-body-sm text-body-sm">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800">
+              <span className="material-symbols-outlined text-xs">check_circle</span>
+              Completado
+            </span>
+            <span className="text-on-surface-variant font-caption text-caption">Trámite concluido / archivado</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800">
+              <span className="material-symbols-outlined text-xs">sync</span>
+              En curso
+            </span>
+            <span className="text-on-surface-variant font-caption text-caption">En revisión / tratamiento</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-800">
+              <span className="material-symbols-outlined text-xs">error</span>
+              Pendiente
+            </span>
+            <span className="text-on-surface-variant font-caption text-caption">Aún se espera respuesta</span>
+          </div>
+        </div>
+      </div>
+
+      {/* MODAL: REGISTRO DE NUEVO OFICIO */}
       {isModalOpen && (
-        <div className="modal-overlay" onClick={() => !submitting && setIsModalOpen(false)}>
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>+ Registrar Nuevo Oficio Expedido</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-primary-container/60 backdrop-blur-sm" onClick={() => !submitting && setIsModalOpen(false)}>
+          <div className="bg-surface-container-lowest rounded-xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* Modal Header */}
+            <div className="bg-primary text-on-primary px-space-lg py-space-md flex items-center justify-between">
+              <div className="flex items-center gap-space-xs">
+                <span className="material-symbols-outlined text-secondary-fixed">post_add</span>
+                <span className="font-headline-md text-headline-md font-bold">
+                  {editingId ? 'Modificar Oficio Expedido' : 'Registro de Nuevo Oficio'}
+                </span>
+              </div>
               <button 
-                className="modal-close-btn" 
+                className="text-on-primary/70 hover:text-on-primary" 
                 onClick={() => !submitting && setIsModalOpen(false)}
               >
-                ✕
+                <span className="material-symbols-outlined">close</span>
               </button>
             </div>
 
+            {/* Modal Body */}
             <form onSubmit={handleSubmit}>
-              <div className="modal-body">
-                <div style={{ background: '#f0fdf4', padding: '10px 14px', borderRadius: '4px', fontSize: '0.85rem', color: '#166534', border: '1px solid #bbf7d0' }}>
-                  ℹ️ Se asignará automáticamente el número correlativo: <strong>#{String(nextNumber).padStart(2, '0')}</strong> para la gestión <strong>{gestion}</strong>.
+              <div className="p-space-lg flex flex-col gap-space-md">
+                <div className="bg-surface-container-low p-space-sm rounded-lg flex items-center justify-between">
+                  <span className="font-caption text-caption text-on-surface-variant font-semibold">Correlativo Asignado:</span>
+                  <span className="font-correlative-counter text-base text-secondary font-bold font-mono">
+                    Oficio N.° {editingId ? String(formData.nro_oficio || editingId).padStart(2, '0') : String(nextNumber).padStart(2, '0')} / {gestion}
+                  </span>
                 </div>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label className="form-label">Destinatario *</label>
-                    <input 
-                      type="text" 
-                      className="form-input" 
-                      placeholder="Ej. CPD, Decanato, Consejo Facultativo"
-                      value={formData.destinatario}
-                      onChange={(e) => setFormData({ ...formData, destinatario: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Fecha de emisión</label>
-                    <input 
-                      type="date" 
-                      className="form-input"
-                      value={formData.fecha}
-                      onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Asunto del oficio *</label>
+                <div className="flex flex-col gap-1">
+                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">Destinatario *</label>
                   <input 
-                    type="text" 
-                    className="form-input" 
-                    placeholder="Ej. Acta de graduación, Ratificación de auxiliares..."
+                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20" 
+                    placeholder="Ej: DADSA, Decanato FINI, Consejo Facultativo..." 
+                    type="text"
+                    value={formData.destinatario}
+                    onChange={(e) => setFormData({ ...formData, destinatario: e.target.value })}
+                    required
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">Asunto principal *</label>
+                  <input 
+                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20" 
+                    placeholder="Título o referencia del documento..." 
+                    type="text"
                     value={formData.asunto}
                     onChange={(e) => setFormData({ ...formData, asunto: e.target.value })}
                     required
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Descripción o notas adicionales</label>
-                  <textarea 
-                    className="form-textarea" 
-                    placeholder="Detalles sobre el trámite, resolución o expediente..."
-                    value={formData.descripcion}
-                    onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Estado del trámite</label>
-                  <select 
-                    className="form-select"
-                    value={formData.estado}
-                    onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-                  >
-                    <option value="completado">🟢 Completado (Proceso cerrado/enviado)</option>
-                    <option value="en_curso">🟡 En curso (Espera de tratamiento en consejo)</option>
-                    <option value="pendiente">🔴 Pendiente (Requiere seguimiento)</option>
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Adjuntar copia digital (PDF o escaneo)</label>
-                  <div className="form-file-container">
+                <div className="grid grid-cols-2 gap-space-sm">
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">Fecha de emisión</label>
                     <input 
-                      type="file" 
-                      accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
-                      onChange={(e) => setFormData({ ...formData, archivo: e.target.files[0] || null })}
+                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none" 
+                      type="date"
+                      value={formData.fecha}
+                      onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
+                      required
                     />
-                    {formData.archivo && (
-                      <p style={{ margin: '8px 0 0 0', fontSize: '0.85rem', color: '#166534', fontWeight: 500 }}>
-                        ✓ Archivo seleccionado: {formData.archivo.name}
-                      </p>
-                    )}
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">Estado del trámite</label>
+                    <select 
+                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none"
+                      value={formData.estado}
+                      onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+                    >
+                      <option value="completado">Completado</option>
+                      <option value="en_curso">En curso</option>
+                      <option value="pendiente">Pendiente</option>
+                    </select>
                   </div>
                 </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">Detalle / Resumen</label>
+                  <textarea 
+                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20 resize-none" 
+                    placeholder="Descripción adicional del documento remitido..." 
+                    rows="3"
+                    value={formData.descripcion}
+                    onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
+                  ></textarea>
+                </div>
+
+                {!editingId && (
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">Digitalización (PDF Opcional)</label>
+                    <label className="border-2 border-dashed border-outline-variant hover:border-secondary rounded-lg p-space-md flex flex-col items-center justify-center gap-1 cursor-pointer bg-surface-container-low/40 transition-colors">
+                      <span className="material-symbols-outlined text-2xl text-secondary">upload_file</span>
+                      <span className="font-body-sm text-body-sm font-medium text-on-surface">
+                        {formData.archivo ? formData.archivo.name : 'Arrastre el PDF del oficio firmado o haga clic para seleccionar'}
+                      </span>
+                      <span className="font-caption text-caption text-outline">Formato permitido: PDF/A hasta 20MB</span>
+                      <input 
+                        type="file" 
+                        accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
+                        className="hidden"
+                        onChange={(e) => setFormData({ ...formData, archivo: e.target.files[0] || null })}
+                      />
+                    </label>
+                  </div>
+                )}
               </div>
 
-              <div className="modal-footer">
+              {/* Modal Footer */}
+              <div className="px-space-lg py-space-md bg-surface-container-low flex items-center justify-end gap-space-sm border-t border-outline-variant/20">
                 <button 
-                  type="button" 
-                  className="btn-secondary" 
+                  type="button"
+                  className="px-space-md py-2 rounded-lg font-body-sm text-body-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-colors" 
                   onClick={() => setIsModalOpen(false)}
                   disabled={submitting}
                 >
                   Cancelar
                 </button>
                 <button 
-                  type="submit" 
-                  className="btn-primary"
+                  type="submit"
+                  className="px-space-md py-2 bg-secondary text-on-secondary rounded-lg font-body-sm text-body-sm font-semibold shadow-sm hover:bg-primary transition-colors" 
                   disabled={submitting}
                 >
-                  {submitting ? 'Guardando...' : 'Guardar y expedir oficio'}
+                  {submitting ? 'Guardando...' : editingId ? 'Guardar Cambios' : `Guardar y Asignar #${String(nextNumber).padStart(2, '0')}`}
                 </button>
               </div>
             </form>

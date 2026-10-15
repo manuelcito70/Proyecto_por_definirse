@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthPage from './components/AuthPage';
 import Layout from './components/Layout';
+import PanelControl from './components/PanelControl';
 import Recibidos from './components/Recibidos';
 import Expedidos from './components/Expedidos';
 import Actas from './components/Actas';
@@ -46,13 +47,14 @@ function App() {
     return (
       <Layout user={user} onLogout={handleLogout}>
         <Routes>
-          <Route path="/" element={<Navigate to="/recibidos" replace />} />
+          <Route path="/" element={<Navigate to="/panel" replace />} />
+          <Route path="/panel" element={<PanelControl />} />
           <Route path="/recibidos" element={<Recibidos />} />
           <Route path="/expedidos" element={<Expedidos />} />
           <Route path="/actas" element={<Actas />} />
           <Route path="/auxiliares" element={<Auxiliares />} />
           <Route path="/docentes" element={<Docentes />} />
-          <Route path="*" element={<Navigate to="/recibidos" replace />} />
+          <Route path="*" element={<Navigate to="/panel" replace />} />
         </Routes>
       </Layout>
     );

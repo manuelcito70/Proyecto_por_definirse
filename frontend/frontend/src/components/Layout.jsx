@@ -5,7 +5,7 @@ import { getRecibidos } from '../services/api';
 import GlobalDock from './GlobalDock';
 
 const Layout = ({ user, onLogout, children }) => {
-  const { gestion, setGestion } = useGestion();
+  const { gestion, setGestion, currentSystemYear } = useGestion();
   const [pendientesCount, setPendientesCount] = useState(0);
   const [modoEnfoque, setModoEnfoque] = useState(false);
 
@@ -79,10 +79,17 @@ const Layout = ({ user, onLogout, children }) => {
                 value={gestion}
                 onChange={(e) => setGestion(e.target.value)}
               >
-                <option className="text-on-surface" value="2026">2026 - Actual</option>
-                <option className="text-on-surface" value="2025">2025 - Archivo</option>
-                <option className="text-on-surface" value="2024">2024 - Histórico</option>
-                <option className="text-on-surface" value="2027">2027 - Proyección</option>
+                {[
+                  { val: (currentSystemYear || new Date().getFullYear()) + 1, label: `${(currentSystemYear || new Date().getFullYear()) + 1} - Proyección` },
+                  { val: currentSystemYear || new Date().getFullYear(), label: `${currentSystemYear || new Date().getFullYear()} - Actual` },
+                  { val: (currentSystemYear || new Date().getFullYear()) - 1, label: `${(currentSystemYear || new Date().getFullYear()) - 1} - Archivo` },
+                  { val: (currentSystemYear || new Date().getFullYear()) - 2, label: `${(currentSystemYear || new Date().getFullYear()) - 2} - Histórico` },
+                  { val: (currentSystemYear || new Date().getFullYear()) - 3, label: `${(currentSystemYear || new Date().getFullYear()) - 3} - Histórico` }
+                ].map(item => (
+                  <option key={item.val} className="text-on-surface" value={item.val}>
+                    {item.label}
+                  </option>
+                ))}
               </select>
             </div>
 

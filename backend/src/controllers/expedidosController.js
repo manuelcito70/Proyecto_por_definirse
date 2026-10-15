@@ -43,7 +43,7 @@ const getNextNumber = async (req, res) => {
 const create = async (req, res) => {
   try {
     const { destinatario, asunto, descripcion, estado, requiere_respuesta, fecha } = req.body;
-    const gestion = new Date().getFullYear();
+    const gestion = req.body.gestion ? parseInt(req.body.gestion) : (fecha ? new Date(fecha).getFullYear() : new Date().getFullYear());
 
     // Auto-assign nro_oficio
     const last = await Expedido.findOne({ where: { gestion }, order: [['nro_oficio', 'DESC']] });

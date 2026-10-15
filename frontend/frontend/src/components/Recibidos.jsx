@@ -82,6 +82,7 @@ const Recibidos = () => {
       data.append('fecha', formData.fecha);
       data.append('estado', formData.tipo_atencion.includes('Requiere') ? 'pendiente' : 'completado');
       data.append('tipo_respuesta', formData.tipo_atencion.includes('Requiere') ? 'requiere_respuesta' : 'para_conocimiento');
+      data.append('gestion', gestion);
       if (formData.archivo) {
         data.append('archivo', formData.archivo);
       }

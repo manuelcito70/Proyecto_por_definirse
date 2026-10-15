@@ -115,6 +115,7 @@ const Expedidos = () => {
         data.append('descripcion', formData.descripcion || '');
         data.append('fecha', formData.fecha);
         data.append('estado', formData.estado);
+        data.append('gestion', gestion);
         if (formData.archivo) {
           data.append('archivo', formData.archivo);
         }

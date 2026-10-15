@@ -28,7 +28,7 @@ const getAll = async (req, res) => {
 const create = async (req, res) => {
   try {
     const { remitente, asunto, descripcion, estado, tipo_respuesta, fecha } = req.body;
-    const gestion = new Date().getFullYear();
+    const gestion = req.body.gestion ? parseInt(req.body.gestion) : (fecha ? new Date(fecha).getFullYear() : new Date().getFullYear());
     const last = await Recibido.findOne({ where: { gestion }, order: [['nro_recibido', 'DESC']] });
     const nro_recibido = last ? last.nro_recibido + 1 : 1;
     const archivo_path = req.file ? req.file.path : null;

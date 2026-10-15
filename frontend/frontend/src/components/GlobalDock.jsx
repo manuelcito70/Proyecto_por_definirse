@@ -130,19 +130,24 @@ const GlobalDock = ({
       label: `Gestión ${gestion}`,
       menu: [
         { 
-          label: '📅 Gestión 2026 (Actual)', 
-          checked: String(gestion) === '2026', 
-          onClick: () => setGestion && setGestion('2026') 
+          label: `📅 Gestión ${new Date().getFullYear()} (Actual)`, 
+          checked: String(gestion) === String(new Date().getFullYear()), 
+          onClick: () => setGestion && setGestion(String(new Date().getFullYear())) 
         },
         { 
-          label: '📁 Gestión 2025 (Archivo)', 
-          checked: String(gestion) === '2025', 
-          onClick: () => setGestion && setGestion('2025') 
+          label: `📁 Gestión ${new Date().getFullYear() - 1} (Archivo)`, 
+          checked: String(gestion) === String(new Date().getFullYear() - 1), 
+          onClick: () => setGestion && setGestion(String(new Date().getFullYear() - 1)) 
         },
         { 
-          label: '🏛️ Gestión 2024 (Histórico)', 
-          checked: String(gestion) === '2024', 
-          onClick: () => setGestion && setGestion('2024') 
+          label: `🏛️ Gestión ${new Date().getFullYear() - 2} (Histórico)`, 
+          checked: String(gestion) === String(new Date().getFullYear() - 2), 
+          onClick: () => setGestion && setGestion(String(new Date().getFullYear() - 2)) 
+        },
+        { 
+          label: `🏛️ Gestión ${new Date().getFullYear() - 3} (Histórico)`, 
+          checked: String(gestion) === String(new Date().getFullYear() - 3), 
+          onClick: () => setGestion && setGestion(String(new Date().getFullYear() - 3)) 
         },
         { separator: true },
         { 

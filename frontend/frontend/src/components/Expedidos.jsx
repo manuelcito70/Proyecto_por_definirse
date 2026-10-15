@@ -500,136 +500,331 @@ const Expedidos = () => {
         </div>
       </div>
 
-      {/* MODAL: REGISTRO DE NUEVO OFICIO */}
+      {/* MODAL: REGISTRO DE NUEVO OFICIO (HIGH-FIDELITY UAGRM FINI) */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-primary-container/60 backdrop-blur-sm" onClick={() => !submitting && setIsModalOpen(false)}>
-          <div className="bg-surface-container-lowest rounded-xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
-            {/* Modal Header */}
-            <div className="bg-primary text-on-primary px-space-lg py-space-md flex items-center justify-between">
-              <div className="flex items-center gap-space-xs">
-                <span className="material-symbols-outlined text-secondary-fixed">post_add</span>
-                <span className="font-headline-md text-headline-md font-bold">
-                  {editingId ? 'Modificar Oficio Expedido' : 'Registro de Nuevo Oficio'}
-                </span>
+        <div 
+          className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-3 sm:p-5 bg-[#07162c]/75 backdrop-blur-md transition-all duration-300" 
+          onClick={() => !submitting && setIsModalOpen(false)}
+        >
+          <div 
+            aria-labelledby="modal-title" 
+            aria-modal="true" 
+            className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-white/20 overflow-hidden transform transition-all flex flex-col my-auto animate-in fade-in zoom-in-95 duration-200" 
+            onClick={(e) => e.stopPropagation()} 
+            role="dialog"
+          >
+            {/* Modal Top Branding Bar (Navy Blue Gradient) */}
+            <div className="bg-gradient-to-r from-[#07162c] via-[#0b2545] to-[#134074] px-6 py-4 border-b border-white/10 flex items-center justify-between text-white relative">
+              {/* Visual Glow Effect */}
+              <div className="absolute -top-12 -left-12 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl pointer-events-none"></div>
+              <div className="flex items-center space-x-3 z-10">
+                <div className="w-9 h-9 rounded-xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center text-blue-300 shadow-inner">
+                  <span className="material-symbols-outlined text-xl">description</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-bold text-base tracking-wide text-white" id="modal-title">
+                      {editingId ? 'Modificar Oficio Expedido' : 'Registro de Nuevo Oficio'}
+                    </h2>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/30 tracking-wider">
+                      GESTIÓN {gestion}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-blue-200/80">Dirección de Ingeniería de Sistemas — Sede Ichilo</p>
+                </div>
               </div>
+
+              {/* Close Button */}
               <button 
-                className="text-on-primary/70 hover:text-on-primary" 
+                aria-label="Cerrar modal" 
+                className="text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-xl border border-white/10 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer" 
                 onClick={() => !submitting && setIsModalOpen(false)}
+                type="button"
               >
-                <span className="material-symbols-outlined">close</span>
+                <span className="material-symbols-outlined text-base leading-none block">close</span>
               </button>
             </div>
 
             {/* Modal Body */}
-            <form onSubmit={handleSubmit}>
-              <div className="p-space-lg flex flex-col gap-space-md">
-                <div className="bg-surface-container-low p-space-sm rounded-lg flex items-center justify-between">
-                  <span className="font-caption text-caption text-on-surface-variant font-semibold">Correlativo Asignado:</span>
-                  <span className="font-correlative-counter text-base text-secondary font-bold font-mono">
-                    Oficio N.° {editingId ? String(formData.nro_oficio || editingId).padStart(2, '0') : String(nextNumber).padStart(2, '0')} / {gestion}
-                  </span>
-                </div>
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5 bg-gradient-to-b from-slate-50/50 to-white">
+              {/* Correlative Assigned Banner (Official Folio Ticket) */}
+              <div className="relative overflow-hidden bg-gradient-to-r from-blue-50/90 via-indigo-50/50 to-slate-50 border border-blue-200/80 rounded-2xl p-4 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center space-x-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-md shrink-0 font-bold font-mono">
+                      #
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
+                        {editingId ? 'Oficio Registrado' : 'Correlativo Oficial Reservado'}
+                      </span>
+                      <span className="text-xl font-mono font-extrabold text-blue-900 tracking-tight">
+                        Oficio N.° {editingId ? String(formData.nro_oficio || editingId).padStart(2, '0') : String(nextNumber).padStart(2, '0')}{' '}
+                        <span className="text-blue-500 font-light">/</span> {gestion}
+                      </span>
+                    </div>
+                  </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">Destinatario *</label>
-                  <input 
-                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20" 
-                    placeholder="Ej: DADSA, Decanato FINI, Consejo Facultativo..." 
-                    type="text"
-                    value={formData.destinatario}
-                    onChange={(e) => setFormData({ ...formData, destinatario: e.target.value })}
-                    required
-                  />
+                  {/* Auto-Assignment Status Pill */}
+                  <div className="inline-flex items-center self-start sm:self-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-xs">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="material-symbols-outlined text-xs text-emerald-600">lock</span>
+                    <span>Asignación Automática e Inmutable</span>
+                  </div>
                 </div>
+              </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">Asunto principal *</label>
-                  <input 
-                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20" 
-                    placeholder="Título o referencia del documento..." 
-                    type="text"
-                    value={formData.asunto}
-                    onChange={(e) => setFormData({ ...formData, asunto: e.target.value })}
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-space-sm">
-                  <div className="flex flex-col gap-1">
-                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">Fecha de emisión</label>
+              {/* Main Form Elements */}
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                {/* Field: Destinatario with quick suggestions chips */}
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1" htmlFor="destinatario-input">
+                      Destinatario <span className="text-rose-500">*</span>
+                    </label>
+                    <span className="text-[11px] text-slate-400 font-medium">Autoridad o Unidad</span>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <span className="material-symbols-outlined text-lg">corporate_fare</span>
+                    </div>
                     <input 
-                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none" 
-                      type="date"
-                      value={formData.fecha}
-                      onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-                      required
+                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs" 
+                      id="destinatario-input" 
+                      placeholder="Ej: DADSA, Decanato FINI, Consejo Facultativo..." 
+                      required 
+                      type="text"
+                      value={formData.destinatario}
+                      onChange={(e) => setFormData({ ...formData, destinatario: e.target.value })}
                     />
                   </div>
 
-                  <div className="flex flex-col gap-1">
-                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">Estado del trámite</label>
-                    <select 
-                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none"
-                      value={formData.estado}
-                      onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
-                    >
-                      <option value="completado">Completado</option>
-                      <option value="en_curso">En curso</option>
-                      <option value="pendiente">Pendiente</option>
-                    </select>
+                  {/* Quick Selection Tags */}
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                    <span className="text-[11px] font-semibold text-slate-400 mr-1">Frecuentes:</span>
+                    {['DADSA', 'Decanato FINI', 'Consejo Facultativo', 'Vicedecanatura', 'CPD'].map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, destinatario: item })}
+                        className={`text-[11px] px-2.5 py-1 rounded-md border transition-colors font-medium cursor-pointer ${
+                          formData.destinatario === item
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border-slate-200'
+                        }`}
+                      >
+                        {item}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">Detalle / Resumen</label>
+                {/* Field: Asunto Principal */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="asunto-input">
+                    Asunto Principal <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <span className="material-symbols-outlined text-lg">description</span>
+                    </div>
+                    <input 
+                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 placeholder-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs" 
+                      id="asunto-input" 
+                      placeholder="Título descriptivo o referencia resumida del trámite..." 
+                      required 
+                      type="text"
+                      value={formData.asunto}
+                      onChange={(e) => setFormData({ ...formData, asunto: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                {/* Row: Two columns for Date & Status */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Date Picker Element */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="fecha-input">
+                      Fecha de Emisión <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-blue-600">
+                        <span className="material-symbols-outlined text-lg">calendar_today</span>
+                      </div>
+                      <input 
+                        className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs" 
+                        id="fecha-input" 
+                        type="date"
+                        value={formData.fecha}
+                        onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Status Selector */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="estado-select">
+                      Estado del Trámite <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-600">
+                        <span className="material-symbols-outlined text-lg">check_circle</span>
+                      </div>
+                      <select 
+                        className="w-full pl-10 pr-8 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs appearance-none cursor-pointer" 
+                        id="estado-select"
+                        value={formData.estado}
+                        onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
+                      >
+                        <option value="completado">Completado (Listo para despacho)</option>
+                        <option value="en_curso">En curso / Revisión preliminar</option>
+                        <option value="pendiente">Pendiente de firma directiva</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                        <span className="material-symbols-outlined text-base">expand_more</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Field: Detalle / Resumen */}
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700" htmlFor="resumen-textarea">
+                      Detalle / Resumen del Contenido
+                    </label>
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      {formData.descripcion ? `${formData.descripcion.length}/500 car.` : 'Max. 500 car.'}
+                    </span>
+                  </div>
                   <textarea 
-                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20 resize-none" 
-                    placeholder="Descripción adicional del documento remitido..." 
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs resize-none" 
+                    id="resumen-textarea" 
+                    placeholder="Descripción adicional del documento remitido, antecedentes, códigos de seguimiento o referencias anexas..." 
                     rows="3"
+                    maxLength={500}
                     value={formData.descripcion}
                     onChange={(e) => setFormData({ ...formData, descripcion: e.target.value })}
                   ></textarea>
                 </div>
 
-                {!editingId && (
-                  <div className="flex flex-col gap-1">
-                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">Digitalización (PDF Opcional)</label>
-                    <label className="border-2 border-dashed border-outline-variant hover:border-secondary rounded-lg p-space-md flex flex-col items-center justify-center gap-1 cursor-pointer bg-surface-container-low/40 transition-colors">
-                      <span className="material-symbols-outlined text-2xl text-secondary">upload_file</span>
-                      <span className="font-body-sm text-body-sm font-medium text-on-surface">
-                        {formData.archivo ? formData.archivo.name : 'Arrastre el PDF del oficio firmado o haga clic para seleccionar'}
-                      </span>
-                      <span className="font-caption text-caption text-outline">Formato permitido: PDF/A hasta 20MB</span>
+                {/* Field: Digitalización (PDF Respaldatorio) */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-base text-blue-600">cloud_upload</span>
+                      <span>Digitalización (PDF Respaldo)</span>
+                    </label>
+                    <span className="text-[11px] text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                      PDF/A hasta 20 MB
+                    </span>
+                  </div>
+
+                  {formData.archivo ? (
+                    /* File Info Card State */
+                    <div className="border border-blue-200/90 bg-gradient-to-b from-blue-50/40 via-white to-slate-50/30 rounded-2xl p-3 shadow-xs flex items-center justify-between">
+                      <div className="flex items-center space-x-3 truncate">
+                        <div className="w-10 h-10 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+                          <span className="material-symbols-outlined text-xl">picture_as_pdf</span>
+                        </div>
+                        <div className="truncate text-left">
+                          <p className="text-xs font-bold text-slate-800 truncate" title={formData.archivo.name}>
+                            {formData.archivo.name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500">
+                            <span className="inline-flex items-center text-emerald-600 font-semibold gap-1">
+                              <span className="material-symbols-outlined text-xs">check_circle</span> PDF/A Seleccionado
+                            </span>
+                            <span>•</span>
+                            <span>{(formData.archivo.size / (1024 * 1024)).toFixed(2)} MB</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-1.5 shrink-0 pl-2">
+                        <button 
+                          className="p-2 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 transition cursor-pointer" 
+                          onClick={() => {
+                            const blobUrl = URL.createObjectURL(formData.archivo);
+                            window.open(blobUrl, '_blank');
+                          }}
+                          title="Vista previa del documento" 
+                          type="button"
+                        >
+                          <span className="material-symbols-outlined text-base">visibility</span>
+                        </button>
+                        <label 
+                          className="p-2 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 transition cursor-pointer" 
+                          title="Reemplazar archivo"
+                        >
+                          <span className="material-symbols-outlined text-base">sync</span>
+                          <input 
+                            accept=".pdf,.png,.jpg,.jpeg" 
+                            className="hidden" 
+                            onChange={(e) => setFormData({ ...formData, archivo: e.target.files[0] || null })} 
+                            type="file" 
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Drag and drop prompt dropzone */
+                    <label className="group relative border-2 border-dashed border-blue-300 hover:border-blue-500 bg-gradient-to-b from-blue-50/40 via-white to-slate-50/30 rounded-2xl p-5 transition-all duration-200 flex flex-col items-center justify-center gap-1.5 cursor-pointer">
+                      <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <span className="material-symbols-outlined text-2xl">upload_file</span>
+                      </div>
+                      <p className="text-xs font-semibold text-slate-700 text-center">
+                        Arrastra un archivo nuevo o <span className="text-blue-600 hover:underline">examinar desde tu equipo</span>
+                      </p>
+                      <p className="text-[11px] text-slate-400">PDF firmado, escaneado o digitalizado (máx. 20 MB)</p>
                       <input 
+                        accept=".pdf,.png,.jpg,.jpeg" 
+                        className="hidden" 
+                        onChange={(e) => setFormData({ ...formData, archivo: e.target.files[0] || null })} 
                         type="file" 
-                        accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
-                        className="hidden"
-                        onChange={(e) => setFormData({ ...formData, archivo: e.target.files[0] || null })}
                       />
                     </label>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
 
-              {/* Modal Footer */}
-              <div className="px-space-lg py-space-md bg-surface-container-low flex items-center justify-end gap-space-sm border-t border-outline-variant/20">
-                <button 
-                  type="button"
-                  className="px-space-md py-2 rounded-lg font-body-sm text-body-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-colors" 
-                  onClick={() => setIsModalOpen(false)}
-                  disabled={submitting}
-                >
-                  Cancelar
-                </button>
-                <button 
-                  type="submit"
-                  className="px-space-md py-2 bg-secondary text-on-secondary rounded-lg font-body-sm text-body-sm font-semibold shadow-sm hover:bg-primary transition-colors" 
-                  disabled={submitting}
-                >
-                  {submitting ? 'Guardando...' : editingId ? 'Guardar Cambios' : `Guardar y Asignar #${String(nextNumber).padStart(2, '0')}`}
-                </button>
-              </div>
-            </form>
+                {/* Institutional Trust Badge / Legal Notification */}
+                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/80 text-amber-900 text-xs">
+                  <span className="material-symbols-outlined text-amber-600 mt-0.5 text-base">shield</span>
+                  <p className="text-[11px] leading-relaxed text-amber-900/90 font-medium">
+                    Al confirmar, este oficio se registrará en el libro digital de correspondencia de la <b>UAGRM - Sede Ichilo</b> con folio legal único <b>#{editingId ? String(formData.nro_oficio || editingId).padStart(2, '0') : String(nextNumber).padStart(2, '0')}</b>. Los correlativos guardados no se pueden reiniciar.
+                  </p>
+                </div>
+
+                {/* Modal Footer inside form to trigger submit */}
+                <footer className="pt-4 border-t border-slate-200 flex items-center justify-between gap-space-sm">
+                  <button 
+                    className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold uppercase tracking-wider transition duration-150 focus:outline-none focus:ring-2 focus:ring-slate-300 active:scale-95 cursor-pointer" 
+                    disabled={submitting}
+                    onClick={() => setIsModalOpen(false)}
+                    type="button"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    className="group relative inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 hover:from-blue-800 hover:to-indigo-700 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-98 transition-all duration-150 cursor-pointer disabled:opacity-50" 
+                    disabled={submitting}
+                    type="submit"
+                  >
+                    <span className="material-symbols-outlined text-base group-hover:scale-110 transition-transform duration-150">
+                      done_all
+                    </span>
+                    <span>
+                      {submitting 
+                        ? 'Guardando...' 
+                        : editingId 
+                          ? 'Guardar Cambios' 
+                          : `Guardar y Asignar #${String(nextNumber).padStart(2, '0')}`}
+                    </span>
+                  </button>
+                </footer>
+              </form>
+            </div>
           </div>
         </div>
       )}

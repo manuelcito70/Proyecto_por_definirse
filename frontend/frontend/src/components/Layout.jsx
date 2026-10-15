@@ -26,7 +26,22 @@ const Layout = ({ user, onLogout, children }) => {
       : 'flex items-center gap-space-xs px-space-md py-3 text-on-surface-variant hover:text-primary hover:border-b-2 hover:border-outline-variant font-body-sm text-body-sm font-medium transition-all whitespace-nowrap';
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-[#f8fafc] relative">
+      {/* SUTIL RETÍCULA DE INGENIERÍA CON MÁSCARA RADIAL (TECH GRID SPOTLIGHT) */}
+      <div 
+        className="fixed inset-0 pointer-events-none z-0" 
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(203, 213, 225, 0.55) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(203, 213, 225, 0.55) 1px, transparent 1px)
+          `,
+          backgroundSize: '24px 28px',
+          maskImage: 'radial-gradient(ellipse 80% 65% at 50% 0%, #000 55%, transparent 100%)',
+          WebkitMaskImage: 'radial-gradient(ellipse 80% 65% at 50% 0%, #000 55%, transparent 100%)'
+        }}
+        aria-hidden="true"
+      />
+
       {/* HEADER INSTITUCIONAL */}
       <header className={`sticky top-0 z-40 w-full bg-surface-container-lowest border-b border-outline-variant/30 shadow-[0_1px_8px_rgba(11,37,69,0.04)] transition-all duration-300 ${modoEnfoque ? '-translate-y-full max-h-0 opacity-0 overflow-hidden pointer-events-none' : 'translate-y-0 max-h-[300px] opacity-100'}`}>
         {/* Top Navbar */}
@@ -150,14 +165,14 @@ const Layout = ({ user, onLogout, children }) => {
       )}
 
       {/* CONTENIDO PRINCIPAL */}
-      <main className="w-full flex-1 px-gutter-desktop py-space-lg pb-32 bg-background">
+      <main className="w-full flex-1 px-gutter-desktop py-space-lg pb-32 relative z-10 bg-transparent">
         <div className="max-w-[1440px] mx-auto w-full">
           {children}
         </div>
       </main>
 
       {/* PIE DE PÁGINA INSTITUCIONAL */}
-      <footer className="w-full bg-surface-container-lowest shadow-[0_-1px_6px_rgba(11,37,69,0.03)] py-space-lg border-t border-outline-variant/20 mt-auto pb-24">
+      <footer className="w-full bg-surface-container-lowest/80 backdrop-blur-md shadow-[0_-1px_6px_rgba(11,37,69,0.03)] py-space-lg border-t border-outline-variant/20 mt-auto pb-24 relative z-10">
         <div className="max-w-[1440px] mx-auto px-gutter-desktop flex flex-col md:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-caption text-caption">
           <div>
             <span className="font-semibold text-on-surface">UAGRM — Facultad Integral del Ichilo</span> · Sistema de Gestión Documental y Archivo Institucional

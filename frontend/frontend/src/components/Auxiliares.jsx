@@ -33,12 +33,14 @@ const Auxiliares = () => {
         semestre: semestreFiltro !== 'todos' ? parseInt(semestreFiltro) : undefined,
         busqueda: busqueda || undefined
       });
-      setAuxiliares(list);
-      if (list.length > 0 && (!selectedAuxId || !list.find(a => a.id === selectedAuxId))) {
-        setSelectedAuxId(list[0].id);
+      const safeList = Array.isArray(list) ? list : [];
+      setAuxiliares(safeList);
+      if (safeList.length > 0 && (!selectedAuxId || !safeList.find(a => a.id === selectedAuxId))) {
+        setSelectedAuxId(safeList[0].id);
       }
     } catch (err) {
       console.error('Error cargando auxiliares:', err);
+      setAuxiliares([]);
     } finally {
       setLoading(false);
     }
@@ -51,30 +53,33 @@ const Auxiliares = () => {
   // Extract unique subjects for the filter dropdown
   const materiasDisponibles = useMemo(() => {
     const set = new Set();
-    auxiliares.forEach(a => {
-      if (a.materia) set.add(a.materia);
+    const list = Array.isArray(auxiliares) ? auxiliares : [];
+    list.forEach(a => {
+      if (a && a.materia) set.add(a.materia);
     });
     return Array.from(set);
   }, [auxiliares]);
 
-  // Client filtered
+  // Client filtered with string safety
   const filteredAuxiliares = useMemo(() => {
+    if (!Array.isArray(auxiliares)) return [];
     return auxiliares.filter((item) => {
+      if (!item) return false;
       const matchMateria = materiaFiltro === 'todas' || item.materia === materiaFiltro;
-      const q = busqueda.toLowerCase().trim();
+      const q = (busqueda || '').toLowerCase().trim();
+      if (!q) return matchMateria;
       const matchSearch =
-        !q ||
-        (item.nombre && item.nombre.toLowerCase().includes(q)) ||
-        (item.materia && item.materia.toLowerCase().includes(q)) ||
-        (item.nro_registro && item.nro_registro.toLowerCase().includes(q)) ||
-        (item.nro_convocatoria && item.nro_convocatoria.toLowerCase().includes(q));
+        String(item.nombre || '').toLowerCase().includes(q) ||
+        String(item.materia || '').toLowerCase().includes(q) ||
+        String(item.nro_registro || '').toLowerCase().includes(q) ||
+        String(item.nro_convocatoria || '').toLowerCase().includes(q);
       return matchMateria && matchSearch;
     });
   }, [auxiliares, materiaFiltro, busqueda]);
 
   const selectedAux = useMemo(() => {
     if (!filteredAuxiliares.length) return null;
-    return filteredAuxiliares.find(a => a.id === selectedAuxId) || filteredAuxiliares[0];
+    return filteredAuxiliares.find(a => a && a.id === selectedAuxId) || filteredAuxiliares[0] || null;
   }, [filteredAuxiliares, selectedAuxId]);
 
   const getInitials = (name) => {
@@ -767,7 +772,7 @@ const Auxiliares = () => {
                   <span className="material-symbols-outlined text-xl">verified_user</span>
                 </div>
                 <span className="px-2 py-0.5 rounded bg-surface-container-lowest text-secondary font-label-code text-caption font-bold">
-                  RES-CC-09/{selectedAux.gestion.slice(-2)}
+                  RES-CC-09/{String(selectedAux.gestion || gestion).slice(-2)}
                 </span>
               </div>
               <div>

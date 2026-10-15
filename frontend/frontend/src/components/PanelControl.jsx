@@ -42,7 +42,7 @@ const PanelControl = () => {
     const loadDashboard = async () => {
       try {
         setLoading(true);
-        const [expList, nextOf, recList, actList, auxList, docList] = await Promise.all([
+        const [expListRaw, nextOfRaw, recListRaw, actListRaw, auxListRaw, docListRaw] = await Promise.all([
           getExpedidos({ gestion }).catch(() => []),
           getNextExpedidoNumber(gestion).catch(() => ({ next: 1 })),
           getRecibidos({ gestion }).catch(() => []),
@@ -51,7 +51,14 @@ const PanelControl = () => {
           getDocentes().catch(() => [])
         ]);
 
-        const pendRec = recList.filter(r => r.estado === 'pendiente').length;
+        const expList = Array.isArray(expListRaw) ? expListRaw : [];
+        const recList = Array.isArray(recListRaw) ? recListRaw : [];
+        const actList = Array.isArray(actListRaw) ? actListRaw : [];
+        const auxList = Array.isArray(auxListRaw) ? auxListRaw : [];
+        const docList = Array.isArray(docListRaw) ? docListRaw : [];
+        const nextOf = (nextOfRaw && typeof nextOfRaw === 'object') ? nextOfRaw : { next: 1 };
+
+        const pendRec = recList.filter(r => r && r.estado === 'pendiente').length;
 
         setMetrics({
           expedidos: expList.length,

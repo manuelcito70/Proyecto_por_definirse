@@ -40,9 +40,11 @@ const Recibidos = () => {
         gestion,
         busqueda: busqueda || undefined
       });
-      setRecibidos(list);
+      const safeList = Array.isArray(list) ? list : [];
+      setRecibidos(safeList);
     } catch (err) {
       console.error('Error cargando recibidos:', err);
+      setRecibidos([]);
     } finally {
       setLoading(false);
     }
@@ -128,19 +130,21 @@ const Recibidos = () => {
     }
   };
 
-  // Next number calculation
-  const highestNumber = recibidos.reduce((max, r) => Math.max(max, r.nro_recibido || 0), 0);
+  // Next number calculation with full array safety
+  const safeRecibidos = Array.isArray(recibidos) ? recibidos : [];
+  const highestNumber = safeRecibidos.reduce((max, r) => Math.max(max, r?.nro_recibido || 0), 0);
   const nextRecibidoNumber = highestNumber + 1;
 
   // Filtered & Paginated records
-  const filteredRecibidos = recibidos.filter(doc => {
+  const filteredRecibidos = safeRecibidos.filter(doc => {
+    if (!doc) return false;
     if (!busqueda) return true;
-    const term = busqueda.toLowerCase();
+    const term = (busqueda || '').toLowerCase().trim();
     return (
-      (doc.remitente && doc.remitente.toLowerCase().includes(term)) ||
-      (doc.asunto && doc.asunto.toLowerCase().includes(term)) ||
-      (doc.descripcion && doc.descripcion.toLowerCase().includes(term)) ||
-      String(doc.nro_recibido).includes(term)
+      (doc.remitente && String(doc.remitente).toLowerCase().includes(term)) ||
+      (doc.asunto && String(doc.asunto).toLowerCase().includes(term)) ||
+      (doc.descripcion && String(doc.descripcion).toLowerCase().includes(term)) ||
+      String(doc.nro_recibido || '').includes(term)
     );
   });
 

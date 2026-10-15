@@ -41,12 +41,14 @@ const Actas = () => {
     try {
       setLoading(true);
       const list = await getActas({ gestion });
-      setActas(list);
-      if (list.length > 0 && (!selectedActaId || !list.find(a => a.id === selectedActaId))) {
-        setSelectedActaId(list[0].id);
+      const safeList = Array.isArray(list) ? list : [];
+      setActas(safeList);
+      if (safeList.length > 0 && (!selectedActaId || !safeList.find(a => a.id === selectedActaId))) {
+        setSelectedActaId(safeList[0].id);
       }
     } catch (err) {
       console.error('Error cargando actas:', err);
+      setActas([]);
     } finally {
       setLoading(false);
     }
@@ -56,39 +58,44 @@ const Actas = () => {
     fetchData();
   }, [gestion]);
 
-  // Client-side filtering for fast response
+  // Client-side filtering for fast response with full string/array safety
   const filteredActas = useMemo(() => {
+    if (!Array.isArray(actas)) return [];
     return actas.filter((item) => {
+      if (!item) return false;
       const matchMod = !modalidadSeleccionada || item.modalidad === modalidadSeleccionada;
-      const q = busqueda.toLowerCase().trim();
+      const q = (busqueda || '').toLowerCase().trim();
+      if (!q) return matchMod;
       const matchSearch =
-        !q ||
-        (item.nombre_estudiante && item.nombre_estudiante.toLowerCase().includes(q)) ||
-        (item.nro_acta && item.nro_acta.toLowerCase().includes(q)) ||
-        (item.codigo_cpd && item.codigo_cpd.toLowerCase().includes(q)) ||
-        (item.nro_registro && item.nro_registro.toLowerCase().includes(q)) ||
-        (item.ci && item.ci.toLowerCase().includes(q));
+        String(item.nombre_estudiante || '').toLowerCase().includes(q) ||
+        String(item.nro_acta || '').toLowerCase().includes(q) ||
+        String(item.codigo_cpd || '').toLowerCase().includes(q) ||
+        String(item.nro_registro || '').toLowerCase().includes(q) ||
+        String(item.ci || '').toLowerCase().includes(q);
       return matchMod && matchSearch;
     });
   }, [actas, modalidadSeleccionada, busqueda]);
 
   const selectedActa = useMemo(() => {
     if (!filteredActas.length) return null;
-    return filteredActas.find(a => a.id === selectedActaId) || filteredActas[0];
+    return filteredActas.find(a => a && a.id === selectedActaId) || filteredActas[0] || null;
   }, [filteredActas, selectedActaId]);
 
-  // Statistics
+  // Statistics with full safety
   const stats = useMemo(() => {
-    const total = actas.length;
-    const conNota = actas.filter(a => a.nota != null && a.nota !== '');
+    const list = Array.isArray(actas) ? actas : [];
+    const total = list.length;
+    const conNota = list.filter(a => a && a.nota != null && a.nota !== '');
     const avgNota = conNota.length
-      ? (conNota.reduce((sum, a) => sum + parseFloat(a.nota), 0) / conNota.length).toFixed(1)
+      ? (conNota.reduce((sum, a) => sum + (parseFloat(a.nota) || 0), 0) / conNota.length).toFixed(1)
       : '93.2';
 
     // Modalidad líder
     const counts = {};
-    actas.forEach(a => {
-      counts[a.modalidad] = (counts[a.modalidad] || 0) + 1;
+    list.forEach(a => {
+      if (a && a.modalidad) {
+        counts[a.modalidad] = (counts[a.modalidad] || 0) + 1;
+      }
     });
     let lider = 'Tesis / Directa';
     let maxCount = 0;
@@ -105,7 +112,7 @@ const Actas = () => {
 
   const getModalidadLabel = (modId) => {
     const found = MODALIDADES.find(m => m.id === modId);
-    return found ? found.label : modId;
+    return found ? found.label : (modId || 'No especificada');
   };
 
   const handleOpenModal = () => {
@@ -364,9 +371,10 @@ const Actas = () => {
         <div className="flex items-center gap-space-xs overflow-x-auto pb-1 scrollbar-none" id="modalityChips">
           {MODALIDADES.map((m) => {
             const isActive = modalidadSeleccionada === m.id;
+            const list = Array.isArray(actas) ? actas : [];
             const count = m.id === '' 
-              ? actas.length 
-              : actas.filter(a => a.modalidad === m.id).length;
+              ? list.length 
+              : list.filter(a => a && a.modalidad === m.id).length;
 
             return (
               <button

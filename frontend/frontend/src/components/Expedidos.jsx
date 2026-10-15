@@ -45,10 +45,11 @@ const Expedidos = () => {
         }),
         getNextExpedidoNumber(gestion)
       ]);
-      setExpedidos(list);
-      setNextNumber(nextData.next || 1);
+      setExpedidos(Array.isArray(list) ? list : []);
+      setNextNumber((nextData && nextData.next) || 1);
     } catch (err) {
       console.error('Error cargando expedidos:', err);
+      setExpedidos([]);
     } finally {
       setLoading(false);
     }
@@ -138,11 +139,12 @@ const Expedidos = () => {
     }
   };
 
-  // Pagination calculation
-  const totalItems = expedidos.length;
+  // Pagination calculation with full array safety
+  const safeExpedidos = Array.isArray(expedidos) ? expedidos : [];
+  const totalItems = safeExpedidos.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentExpedidos = expedidos.slice(startIndex, startIndex + itemsPerPage);
+  const currentExpedidos = safeExpedidos.slice(startIndex, startIndex + itemsPerPage);
 
   const getStatusBadge = (estado) => {
     switch (estado) {

@@ -47,12 +47,14 @@ const Docentes = () => {
     try {
       setLoading(true);
       const list = await getDocentes({ busqueda: busqueda || undefined });
-      setDocentes(list);
-      if (list.length > 0 && (!selectedDocenteId || !list.find(d => d.id === selectedDocenteId))) {
-        setSelectedDocenteId(list[0].id);
+      const safeList = Array.isArray(list) ? list : [];
+      setDocentes(safeList);
+      if (safeList.length > 0 && (!selectedDocenteId || !safeList.find(d => d.id === selectedDocenteId))) {
+        setSelectedDocenteId(safeList[0].id);
       }
     } catch (err) {
       console.error('Error cargando docentes:', err);
+      setDocentes([]);
     } finally {
       setLoading(false);
     }
@@ -63,9 +65,11 @@ const Docentes = () => {
     try {
       setLoadingArchivos(true);
       const docs = await getDocenteArchivos(docenteId);
-      setArchivos(docs);
+      const safeDocs = Array.isArray(docs) ? docs : [];
+      setArchivos(safeDocs);
     } catch (err) {
       console.error('Error cargando archivos del docente:', err);
+      setArchivos([]);
     } finally {
       setLoadingArchivos(false);
     }
@@ -84,17 +88,21 @@ const Docentes = () => {
   }, [selectedDocenteId]);
 
   const selectedDocente = useMemo(() => {
-    return docentes.find(d => d.id === selectedDocenteId) || docentes[0] || null;
+    const list = Array.isArray(docentes) ? docentes : [];
+    return list.find(d => d && d.id === selectedDocenteId) || list[0] || null;
   }, [docentes, selectedDocenteId]);
 
   // General documents (CV, programa analitico, anexos)
   const generalDocs = useMemo(() => {
-    return archivos.filter(a => a.tipo === 'curriculum' || a.tipo === 'programa_analitico');
+    const list = Array.isArray(archivos) ? archivos : [];
+    return list.filter(a => a && (a.tipo === 'curriculum' || a.tipo === 'programa_analitico'));
   }, [archivos]);
 
   // Semestral documents (informes, listas de asistencia)
   const semestralDocs = useMemo(() => {
-    return archivos.filter(a => {
+    const list = Array.isArray(archivos) ? archivos : [];
+    return list.filter(a => {
+      if (!a) return false;
       const matchTipo = a.tipo === 'informe_final' || a.tipo === 'lista_asistencia' || a.tipo === 'informe_cathedra' || a.tipo === 'otro';
       const matchGestion = !filtroGestionSemestre || String(a.gestion) === String(filtroGestionSemestre);
       const matchSemestre = !filtroSemestre || String(a.semestre) === String(filtroSemestre);

@@ -306,7 +306,7 @@ const Auxiliares = () => {
             type="button"
           >
             <span className="material-symbols-outlined text-lg">add</span>
-            <span className="font-body-sm text-body-sm font-semibold">+ Registrar antecedente</span>
+            <span className="font-body-sm text-body-sm font-semibold">Registrar antecedente</span>
           </button>
         </div>
       </div>

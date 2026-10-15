@@ -21,6 +21,9 @@ const Recibidos = () => {
   // Preview Modal
   const [previewDoc, setPreviewDoc] = useState(null);
 
+  // Create Modal State
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
   // Form State
   const [submitting, setSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
@@ -97,6 +100,7 @@ const Recibidos = () => {
         `Documento recibido #${String(res.nro_recibido || 1).padStart(2, '0')}/${gestion} registrado`,
         'Guardado con respaldo digital indexado en Sistemas.'
       );
+      setIsCreateModalOpen(false);
       await fetchData();
     } catch (err) {
       alert('Error al registrar documento: ' + err.message);
@@ -176,15 +180,22 @@ const Recibidos = () => {
 
         <div className="flex items-center gap-space-sm">
           <button 
-            className="inline-flex items-center gap-space-xs bg-secondary text-on-secondary px-space-lg py-2.5 rounded-lg shadow-sm hover:bg-secondary-container transition-all font-body-sm text-body-sm font-semibold" 
+            className="inline-flex items-center gap-space-xs bg-secondary text-on-secondary px-space-lg py-2.5 rounded-lg shadow-sm hover:bg-secondary-container transition-all font-body-sm text-body-sm font-semibold cursor-pointer active:scale-95" 
             onClick={() => {
-              const el = document.getElementById('form-registro-section');
-              if (el) el.scrollIntoView({ behavior: 'smooth' });
+              setFormData({
+                remitente: '',
+                oficio_original: '',
+                asunto: '',
+                fecha: new Date().toISOString().split('T')[0],
+                tipo_atencion: 'Requiere respuesta',
+                archivo: null
+              });
+              setIsCreateModalOpen(true);
             }}
             type="button"
           >
             <span className="material-symbols-outlined text-lg">add</span>
-            <span>+ Registrar recibido</span>
+            <span>Registrar recibido</span>
           </button>
         </div>
       </div>
@@ -610,6 +621,322 @@ const Recibidos = () => {
           </div>
         </form>
       </div>
+
+      {/* MODAL REGISTRO DE NUEVO DOCUMENTO RECIBIDO (HIGH-FIDELITY UAGRM FINI) */}
+      {isCreateModalOpen && (
+        <div 
+          className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-3 sm:p-5 bg-[#07162c]/80 backdrop-blur-md transition-all duration-300"
+          onClick={() => setIsCreateModalOpen(false)}
+        >
+          <div 
+            className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-white/20 overflow-hidden transform transition-all flex flex-col my-auto"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
+            {/* Modal Top Branding Bar (Navy Blue Gradient) */}
+            <div className="bg-gradient-to-r from-[#07162c] via-[#0b2545] to-[#134074] px-6 py-4 border-b border-white/10 flex items-center justify-between text-white relative">
+              <div className="absolute -top-12 -left-12 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl pointer-events-none"></div>
+              <div className="flex items-center space-x-3 z-10">
+                <div className="w-9 h-9 rounded-xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center text-blue-300 shadow-inner">
+                  <span className="material-symbols-outlined text-xl">mark_email_read</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-bold text-base tracking-wide text-white">
+                      Registro de Correspondencia Recibida
+                    </h2>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/30 tracking-wider">
+                      GESTIÓN {gestion}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-blue-200/80">Dirección de Ingeniería de Sistemas - Sede Ichilo</p>
+                </div>
+              </div>
+
+              {/* Close Button */}
+              <button 
+                className="text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-xl border border-white/10 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer" 
+                onClick={() => setIsCreateModalOpen(false)}
+                type="button"
+                aria-label="Cerrar modal"
+              >
+                <span className="material-symbols-outlined text-base block">close</span>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5 bg-gradient-to-b from-slate-50/50 to-white">
+              {/* Correlative Ticket Banner */}
+              <div className="relative overflow-hidden bg-gradient-to-r from-blue-50/90 via-indigo-50/50 to-slate-50 border border-blue-200/80 rounded-2xl p-4 shadow-sm">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center space-x-3.5">
+                    <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-md shrink-0">
+                      <span className="material-symbols-outlined text-xl">tag</span>
+                    </div>
+                    <div>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
+                        Correlativo Interno Reservado
+                      </span>
+                      <span className="text-xl font-mono font-extrabold text-blue-900 tracking-tight">
+                        Recibido N.° {String(nextRecibidoNumber).padStart(2, '0')}{' '}
+                        <span className="text-blue-500 font-light">/</span> {gestion}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="inline-flex items-center self-start sm:self-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-xs">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span className="material-symbols-outlined text-xs text-emerald-600">lock</span>
+                    <span>Asignación Automática e Inmutable</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleFormSubmit} className="space-y-4">
+                {/* Remitente con Chips */}
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1">
+                      Origen / Remitente <span className="text-rose-500">*</span>
+                    </label>
+                    <span className="text-[11px] text-slate-400 font-medium">Autoridad o Dependencia</span>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <span className="material-symbols-outlined text-lg">corporate_fare</span>
+                    </div>
+                    <input 
+                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs" 
+                      placeholder="Ej: Decanato FINI, DADSA, Consejo Facultativo..." 
+                      required 
+                      type="text"
+                      value={formData.remitente}
+                      onChange={(e) => setFormData({ ...formData, remitente: e.target.value })}
+                    />
+                  </div>
+
+                  {/* Chips frecuentes */}
+                  <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                    <span className="text-[11px] font-semibold text-slate-400 mr-1">Frecuentes:</span>
+                    {['Decanato FINI', 'DADSA', 'Consejo Facultativo', 'Vicedecanatura', 'CPD', 'Jefatura de Carrera'].map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, remitente: item })}
+                        className={`text-[11px] px-2.5 py-1 rounded-md border transition-colors font-medium cursor-pointer ${
+                          formData.remitente === item
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border-slate-200'
+                        }`}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Oficio Original */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                    N.° de Oficio Original / CITE <span className="text-rose-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                      <span className="material-symbols-outlined text-lg">numbers</span>
+                    </div>
+                    <input 
+                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-mono font-semibold text-slate-800 placeholder-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs" 
+                      placeholder="Ej: OF-EXT-A/028, CITE-DEC-045/2026..." 
+                      required 
+                      type="text"
+                      value={formData.oficio_original}
+                      onChange={(e) => setFormData({ ...formData, oficio_original: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                {/* Row: Fecha y Tipo de Atención */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Fecha */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                      Fecha de Recepción <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-blue-600">
+                        <span className="material-symbols-outlined text-lg">calendar_today</span>
+                      </div>
+                      <input 
+                        className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs" 
+                        type="date"
+                        value={formData.fecha}
+                        onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  {/* Tipo de atención */}
+                  <div>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">
+                      Tipo de Atención <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-blue-600">
+                        <span className="material-symbols-outlined text-lg">tune</span>
+                      </div>
+                      <select 
+                        className="w-full pl-10 pr-8 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs appearance-none cursor-pointer"
+                        value={formData.tipo_atencion}
+                        onChange={(e) => setFormData({ ...formData, tipo_atencion: e.target.value })}
+                      >
+                        <option value="Requiere respuesta">Requiere respuesta (En trámite)</option>
+                        <option value="Solo conocimiento">Solo conocimiento (Para archivo institucional)</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                        <span className="material-symbols-outlined text-base">expand_more</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Asunto / Referencia */}
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Asunto / Referencia Documental <span className="text-rose-500">*</span>
+                    </label>
+                    <span className="text-[11px] text-slate-400 font-mono">
+                      {formData.asunto ? `${formData.asunto.length}/500 car.` : 'Max. 500 car.'}
+                    </span>
+                  </div>
+                  <textarea 
+                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs resize-none" 
+                    placeholder="Sintetice el contenido del documento, solicitud o antecedente..." 
+                    rows="3"
+                    maxLength={500}
+                    value={formData.asunto}
+                    onChange={(e) => setFormData({ ...formData, asunto: e.target.value })}
+                    required
+                  ></textarea>
+                </div>
+
+                {/* Digitalización (PDF Respaldatorio) */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                      <span className="material-symbols-outlined text-base text-blue-600">cloud_upload</span>
+                      <span>Digitalización (PDF Respaldo)</span>
+                    </label>
+                    <span className="text-[11px] text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                      PDF/A hasta 25 MB
+                    </span>
+                  </div>
+
+                  {formData.archivo ? (
+                    <div className="border border-blue-200/90 bg-gradient-to-b from-blue-50/40 via-white to-slate-50/30 rounded-2xl p-3 shadow-xs flex items-center justify-between">
+                      <div className="flex items-center space-x-3 truncate">
+                        <div className="w-10 h-10 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+                          <span className="material-symbols-outlined text-xl">picture_as_pdf</span>
+                        </div>
+                        <div className="truncate text-left">
+                          <p className="text-xs font-bold text-slate-800 truncate" title={formData.archivo.name}>
+                            {formData.archivo.name}
+                          </p>
+                          <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500">
+                            <span className="inline-flex items-center text-emerald-600 font-semibold gap-1">
+                              <span className="material-symbols-outlined text-xs">check_circle</span> PDF/A Seleccionado
+                            </span>
+                            <span>•</span>
+                            <span>{(formData.archivo.size / (1024 * 1024)).toFixed(2)} MB</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-1.5 shrink-0 pl-2">
+                        <button 
+                          className="p-2 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 transition cursor-pointer" 
+                          onClick={() => {
+                            const blobUrl = URL.createObjectURL(formData.archivo);
+                            window.open(blobUrl, '_blank');
+                          }}
+                          title="Vista previa del documento" 
+                          type="button"
+                        >
+                          <span className="material-symbols-outlined text-base">visibility</span>
+                        </button>
+                        <label 
+                          className="p-2 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 transition cursor-pointer" 
+                          title="Reemplazar archivo"
+                        >
+                          <span className="material-symbols-outlined text-base">sync</span>
+                          <input 
+                            accept=".pdf,.png,.jpg,.jpeg" 
+                            className="hidden" 
+                            onChange={(e) => setFormData({ ...formData, archivo: e.target.files[0] || null })} 
+                            type="file" 
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  ) : (
+                    <label className="group relative border-2 border-dashed border-blue-300 hover:border-blue-500 bg-gradient-to-b from-blue-50/40 via-white to-slate-50/30 rounded-2xl p-5 transition-all duration-200 flex flex-col items-center justify-center gap-1.5 cursor-pointer">
+                      <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                        <span className="material-symbols-outlined text-2xl">upload_file</span>
+                      </div>
+                      <p className="text-xs font-semibold text-slate-700 text-center">
+                        Arrastra el documento escaneado o <span className="text-blue-600 hover:underline">examinar desde tu equipo</span>
+                      </p>
+                      <p className="text-[11px] text-slate-400">PDF firmado, escaneado o digitalizado (máx. 25 MB)</p>
+                      <input 
+                        accept=".pdf,.png,.jpg,.jpeg" 
+                        className="hidden" 
+                        onChange={(e) => setFormData({ ...formData, archivo: e.target.files[0] || null })} 
+                        type="file" 
+                      />
+                    </label>
+                  )}
+                </div>
+
+                {/* Institutional Trust Badge */}
+                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/80 text-amber-900 text-xs">
+                  <span className="material-symbols-outlined text-amber-600 mt-0.5 text-base">shield</span>
+                  <p className="text-[11px] leading-relaxed text-amber-900/90 font-medium">
+                    Al confirmar, este documento recibido se registrará en el libro digital de correspondencia externa de la <b>UAGRM - Sede Ichilo</b> con folio legal único <b>#{String(nextRecibidoNumber).padStart(2, '0')}</b>.
+                  </p>
+                </div>
+
+                {/* Modal Footer */}
+                <footer className="pt-4 border-t border-slate-200 flex items-center justify-between gap-space-sm">
+                  <button 
+                    className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold uppercase tracking-wider transition duration-150 focus:outline-none focus:ring-2 focus:ring-slate-300 active:scale-95 cursor-pointer" 
+                    disabled={submitting}
+                    onClick={() => setIsCreateModalOpen(false)}
+                    type="button"
+                  >
+                    Cancelar
+                  </button>
+                  <button 
+                    className="group relative inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 hover:from-blue-800 hover:to-indigo-700 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-98 transition-all duration-150 cursor-pointer disabled:opacity-50" 
+                    disabled={submitting}
+                    type="submit"
+                  >
+                    <span className="material-symbols-outlined text-base group-hover:scale-110 transition-transform duration-150">
+                      done_all
+                    </span>
+                    <span>
+                      {submitting 
+                        ? 'Guardando...' 
+                        : `Guardar y Asignar #${String(nextRecibidoNumber).padStart(2, '0')}`}
+                    </span>
+                  </button>
+                </footer>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MODAL PREVIEW DE DOCUMENTO */}
       {previewDoc && (

@@ -216,7 +216,7 @@ const Docentes = () => {
             type="button"
           >
             <span className="material-symbols-outlined text-lg leading-none">person_add</span>
-            <span>+ Registrar docente</span>
+            <span>Registrar docente</span>
           </button>
         </div>
       </div>

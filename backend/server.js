@@ -9,19 +9,7 @@ const { sequelize } = require('./src/models');
 
 const app = express();
 
-// Seguridad
-app.use(helmet());
-app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 500,
-  message: { mensaje: 'Demasiadas peticiones, intenta más tarde.' }
-});
-app.use('/api', limiter);
-
-// CORS
+// CORS (Debe ejecutarse antes que cualquier middleware o limitador)
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   'http://localhost:5173',
@@ -35,6 +23,19 @@ app.use(cors({
   },
   credentials: true
 }));
+
+// Seguridad
+app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }));
+
+// Rate limiting (ignora OPTIONS y eleva el límite para desarrollo)
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 2500,
+  skip: (req) => req.method === 'OPTIONS',
+  message: { mensaje: 'Demasiadas peticiones, intenta más tarde.' }
+});
+app.use('/api', limiter);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

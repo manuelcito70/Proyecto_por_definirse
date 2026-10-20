@@ -10,6 +10,8 @@ import {
   getDocentes,
   createExpedido
 } from '../services/api';
+import EmptyState from './EmptyState';
+import SuccessModal from './SuccessModal';
 
 const PanelControl = () => {
   const { gestion } = useGestion();
@@ -37,6 +39,7 @@ const PanelControl = () => {
     clasificacion: 'Nota Interna'
   });
   const [submitting, setSubmitting] = useState(false);
+  const [successModalData, setSuccessModalData] = useState(null);
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -129,8 +132,11 @@ const PanelControl = () => {
 
       await createExpedido(data);
       setIsQuickEmitOpen(false);
-      alert(`Oficio N.° ${metrics.nextOficio} generado exitosamente en gestión ${gestion}.`);
-      navigate('/expedidos');
+      setSuccessModalData({
+        badge: `OFICIO Nº ${String(metrics.nextOficio).padStart(2, '0')} / ${gestion}`,
+        title: '¡Oficio Emitido con Éxito!',
+        message: `El oficio dirigido a "${quickForm.destinatario}" con asunto "${quickForm.asunto}" ha sido generado y reservado en el libro oficial.`
+      });
     } catch (err) {
       alert('Error al generar oficio: ' + err.message);
     } finally {
@@ -754,9 +760,13 @@ const PanelControl = () => {
             </span>
             
             {recentActivity.length === 0 ? (
-              <p className="font-body-sm text-on-surface-variant py-4 text-center">
-                No hay actividad reciente registrada en {gestion}.
-              </p>
+              <div className="py-2">
+                <EmptyState
+                  title="Sin movimientos registrados"
+                  message={`No hay actividad documental reciente en la gestión ${gestion}.`}
+                  iconSize={44}
+                />
+              </div>
             ) : (
               <ol className="space-y-space-md">
                 {recentActivity.map((act) => (
@@ -896,6 +906,19 @@ const PanelControl = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de Éxito con Animación Lordicon */}
+      <SuccessModal
+        isOpen={!!successModalData}
+        onClose={() => {
+          setSuccessModalData(null);
+          navigate('/expedidos');
+        }}
+        title={successModalData?.title}
+        badge={successModalData?.badge}
+        message={successModalData?.message}
+        actionText="Ver en Expedidos"
+      />
     </div>
   );
 };

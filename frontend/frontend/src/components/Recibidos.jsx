@@ -8,12 +8,18 @@ import {
   downloadFile,
   getFileBlob
 } from '../services/api';
+import EmptyState from './EmptyState';
+import LoadingState from './LoadingState';
+import SuccessModal from './SuccessModal';
+import FileDropzone from './FileDropzone';
+import LordIcon from './LordIcon';
 
 const Recibidos = () => {
   const { gestion } = useGestion();
   const [recibidos, setRecibidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState('');
+  const [successModalData, setSuccessModalData] = useState(null);
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -149,6 +155,7 @@ const Recibidos = () => {
       }
 
       const res = await createRecibido(data);
+      const newNro = res?.nro_recibido || highestNumber + 1;
       setFormData({
         remitente: '',
         oficio_original: '',
@@ -158,8 +165,14 @@ const Recibidos = () => {
         archivo: null
       });
 
+      setSuccessModalData({
+        badge: `RECIBIDO Nº ${String(newNro).padStart(2, '0')} / ${gestion}`,
+        title: '¡Documento Registrado con Éxito!',
+        message: `El documento enviado por "${formData.remitente}" ha sido indexado y custodiado en el archivo institucional.`
+      });
+
       showToast(
-        `Documento recibido #${String(res.nro_recibido || 1).padStart(2, '0')}/${gestion} registrado`,
+        `Documento recibido #${String(newNro).padStart(2, '0')}/${gestion} registrado`,
         'Guardado con respaldo digital indexado en Sistemas.'
       );
       await fetchData();
@@ -419,23 +432,22 @@ const Recibidos = () => {
             <tbody className="divide-y divide-slate-100 font-body-sm text-body-sm text-on-surface">
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="py-8 text-center text-on-surface-variant">
-                    Cargando correspondencia recibida...
+                  <td colSpan="6" className="py-6 px-4">
+                    <LoadingState message={`Sincronizando correspondencia recibida (${gestion})...`} />
                   </td>
                 </tr>
               ) : currentRecibidos.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="py-12 text-center text-on-surface-variant">
-                    <p className="mb-2">No se encontraron documentos recibidos en la gestión {gestion}.</p>
-                    <button 
-                      onClick={() => {
+                  <td colSpan="6" className="py-6 px-4">
+                    <EmptyState
+                      title={`No se encontraron documentos en ${gestion}`}
+                      message={busqueda ? `No hay documentos que coincidan con la búsqueda "${busqueda}".` : "No existen registros de correspondencia externa para esta gestión."}
+                      actionText="Registrar documento recibido"
+                      onAction={() => {
                         const el = document.getElementById('form-registro-section');
                         if (el) el.scrollIntoView({ behavior: 'smooth' });
                       }}
-                      className="px-4 py-2 bg-gradient-to-r from-[#c1121f] to-[#9e0c18] text-white rounded-lg text-xs font-bold shadow-sm cursor-pointer"
-                    >
-                      Registrar recibido
-                    </button>
+                    />
                   </td>
                 </tr>
               ) : (
@@ -709,57 +721,13 @@ const Recibidos = () => {
             ></textarea>
           </div>
 
-          <div className="md:col-span-12 flex flex-col gap-1.5">
-            <label className="font-body-sm text-body-sm font-semibold text-[#0b2545] flex items-center justify-between">
-              <span className="flex items-center gap-1">
-                <span>Archivo escaneado (PDF digitalizado)</span>
-              </span>
-              <span className="font-caption text-caption text-on-surface-variant">Formatos admitidos: PDF, JPG, PNG / Máx 25 MB</span>
-            </label>
-
-            <div className="bg-surface-container-low p-space-md rounded-xl flex flex-col sm:flex-row items-center justify-between gap-space-md border border-slate-200/70">
-              <div className="flex items-center gap-space-md">
-                <div className="w-12 h-12 rounded-lg bg-surface-container-highest text-[#c1121f] flex items-center justify-center border border-red-200/50">
-                  <span className="material-symbols-outlined text-2xl">picture_as_pdf</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="font-label-code text-body-sm font-bold text-[#0b2545]">
-                    {formData.archivo ? formData.archivo.name : 'Ningún archivo seleccionado'}
-                  </span>
-                  <span className="font-caption text-caption text-on-surface-variant">
-                    {formData.archivo 
-                      ? `${(formData.archivo.size / 1024 / 1024).toFixed(2)} MB · Respaldo digital adjunto` 
-                      : 'Cargue el escaneo del oficio original'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                {formData.archivo && (
-                  <button 
-                    className="inline-flex items-center gap-1 bg-white text-[#0b2545] hover:bg-surface-container px-space-md py-1.5 rounded-lg font-caption text-caption font-semibold transition-colors border border-slate-200 cursor-pointer" 
-                    onClick={() => {
-                      const blobUrl = URL.createObjectURL(formData.archivo);
-                      window.open(blobUrl, '_blank');
-                    }}
-                    type="button"
-                  >
-                    <span className="material-symbols-outlined text-sm">visibility</span> Previsualizar
-                  </button>
-                )}
-
-                <label className="inline-flex items-center gap-1 bg-gradient-to-r from-[#0b2545] to-[#15418c] text-white hover:opacity-95 px-space-md py-1.5 rounded-lg font-caption text-caption font-semibold cursor-pointer transition-colors shadow-2xs">
-                  <span className="material-symbols-outlined text-sm">upload_file</span> 
-                  {formData.archivo ? 'Reemplazar archivo' : 'Seleccionar archivo'}
-                  <input 
-                    accept=".pdf,.png,.jpg,.jpeg" 
-                    className="hidden" 
-                    type="file"
-                    onChange={(e) => setFormData({ ...formData, archivo: e.target.files[0] || null })}
-                  />
-                </label>
-              </div>
-            </div>
+          <div className="md:col-span-12">
+            <FileDropzone
+              file={formData.archivo}
+              onFileChange={(f) => setFormData({ ...formData, archivo: f })}
+              label="Archivo escaneado (PDF digitalizado o Imagen)"
+              hint="Formatos admitidos: PDF, JPG, PNG / Máx 25 MB"
+            />
           </div>
 
           <div className="md:col-span-12 flex flex-col sm:flex-row items-center justify-end gap-space-sm pt-space-sm border-t border-slate-100">
@@ -803,9 +771,17 @@ const Recibidos = () => {
             <div className="px-5 py-3.5 bg-gradient-to-r from-[#07162b] via-[#0b2545] to-[#15418c] text-white flex items-center justify-between border-b border-[#c5a059]/30 shrink-0">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center text-[#c5a059] shrink-0 shadow-inner">
-                  <span className="material-symbols-outlined text-xl">
-                    {previewFileType === 'image' ? 'image' : previewFileType === 'pdf' ? 'picture_as_pdf' : 'description'}
-                  </span>
+                  <LordIcon
+                    src="https://cdn.lordicon.com/lbjtvqiv.json"
+                    trigger="hover"
+                    colors="primary:#c5a059,secondary:#ffffff"
+                    size={26}
+                    fallback={
+                      <span className="material-symbols-outlined text-xl">
+                        {previewFileType === 'image' ? 'image' : previewFileType === 'pdf' ? 'picture_as_pdf' : 'description'}
+                      </span>
+                    }
+                  />
                 </div>
                 <div className="flex flex-col min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -847,14 +823,12 @@ const Recibidos = () => {
             {/* Modal Body: Visor Interactivo */}
             <div className="flex-1 overflow-y-auto bg-slate-100/90 p-4 flex flex-col items-center justify-center min-h-[350px]">
               {previewLoading ? (
-                <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-500">
-                  <div className="w-10 h-10 border-4 border-[#0b2545]/20 border-t-[#0b2545] rounded-full animate-spin"></div>
-                  <span className="font-institutional-serif text-sm font-bold text-[#0b2545]">
-                    Cargando previsualización digital del archivo...
-                  </span>
-                  <span className="font-caption text-xs text-slate-400 font-mono">
-                    {previewDoc.nombre_archivo}
-                  </span>
+                <div className="py-12 w-full flex justify-center">
+                  <LoadingState
+                    message="Cargando previsualización digital del archivo..."
+                    submessage={previewDoc.nombre_archivo}
+                    size={52}
+                  />
                 </div>
               ) : previewError ? (
                 <div className="p-8 text-center max-w-md bg-white rounded-xl border border-red-200 shadow-sm flex flex-col items-center gap-3">
@@ -1009,7 +983,16 @@ const Recibidos = () => {
         </div>
       )}
 
-      {/* 5. Floating Toast Notification */}
+      {/* 5. Modal de Confirmación Exitosa */}
+      <SuccessModal
+        isOpen={!!successModalData}
+        onClose={() => setSuccessModalData(null)}
+        title={successModalData?.title}
+        badge={successModalData?.badge}
+        message={successModalData?.message}
+      />
+
+      {/* 6. Floating Toast Notification */}
       {toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 animate-in fade-in slide-in-from-bottom-5 duration-300">
           <div className="bg-[#07162b] text-white px-space-lg py-space-md rounded-xl shadow-xl flex items-center gap-space-md border border-[#c5a059]/30">

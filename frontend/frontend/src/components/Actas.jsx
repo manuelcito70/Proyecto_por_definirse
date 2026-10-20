@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useGestion } from '../context/GestionContext';
 import { getActas, createActa, deleteActa, downloadFile } from '../services/api';
+import EmptyState from './EmptyState';
+import LoadingState from './LoadingState';
+import SuccessModal from './SuccessModal';
+import FileDropzone from './FileDropzone';
 
 const MODALIDADES = [
   { id: '', label: 'Todas las modalidades' },
@@ -22,6 +26,7 @@ const Actas = () => {
   const [modalidadSeleccionada, setModalidadSeleccionada] = useState('');
   const [selectedActaId, setSelectedActaId] = useState(null);
   const [isCompactView, setIsCompactView] = useState(false);
+  const [successModalData, setSuccessModalData] = useState(null);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -152,6 +157,11 @@ const Actas = () => {
       }
 
       const nueva = await createActa(data);
+      setSuccessModalData({
+        badge: `ACTA Nº ${formData.nro_acta} · CPD ${formData.codigo_cpd || 'CPD-FINI'}`,
+        title: '¡Acta de Titulación Registrada!',
+        message: `El acta de graduación de "${formData.nombre_estudiante}" ha sido protocolizada y archivada correctamente.`
+      });
       setIsModalOpen(false);
       await fetchData();
       if (nueva && nueva.id) {
@@ -485,14 +495,19 @@ const Actas = () => {
                 <tbody className="divide-y divide-surface-container-low font-body-sm text-body-sm text-on-surface">
                   {loading ? (
                     <tr>
-                      <td colSpan="5" className="py-8 text-center text-on-surface-variant">
-                        Cargando actas de graduación...
+                      <td colSpan="5" className="py-6 px-4">
+                        <LoadingState message={`Sincronizando actas de graduación (${gestion})...`} />
                       </td>
                     </tr>
                   ) : filteredActas.length === 0 ? (
                     <tr>
-                      <td colSpan="5" className="py-8 text-center text-on-surface-variant">
-                        No se encontraron actas para los criterios seleccionados en Gestión {gestion}.
+                      <td colSpan="5" className="py-6 px-4">
+                        <EmptyState
+                          title="No se encontraron actas de titulación"
+                          message={busqueda ? `No existen actas que coincidan con "${busqueda}".` : `No existen actas registradas para la gestión ${gestion}.`}
+                          actionText="Registrar acta"
+                          onAction={handleOpenModal}
+                        />
                       </td>
                     </tr>
                   ) : (
@@ -973,25 +988,13 @@ const Actas = () => {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
-                    Digitalización de Acta (PDF Escaneado)
-                  </label>
-                  <label className="border-2 border-dashed border-outline-variant hover:border-secondary rounded-lg p-space-md flex flex-col items-center justify-center gap-1 cursor-pointer bg-surface-container-low/40 transition-colors">
-                    <span className="material-symbols-outlined text-2xl text-secondary">upload_file</span>
-                    <span className="font-body-sm text-body-sm font-medium text-on-surface">
-                      {formData.archivo ? formData.archivo.name : 'Haga clic para adjuntar escaneo en PDF'}
-                    </span>
-                    <span className="font-caption text-caption text-outline">
-                      Formato oficial admitido: PDF hasta 25MB
-                    </span>
-                    <input
-                      accept=".pdf,.png,.jpg,.jpeg"
-                      className="hidden"
-                      onChange={(e) => setFormData({ ...formData, archivo: e.target.files[0] || null })}
-                      type="file"
-                    />
-                  </label>
+                <div>
+                  <FileDropzone
+                    file={formData.archivo}
+                    onFileChange={(file) => setFormData({ ...formData, archivo: file })}
+                    label="Digitalización de Acta (PDF Escaneado)"
+                    hint="Formato oficial admitido: PDF hasta 25MB"
+                  />
                 </div>
               </div>
 
@@ -1017,6 +1020,15 @@ const Actas = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de Éxito con Animación Lordicon */}
+      <SuccessModal
+        isOpen={!!successModalData}
+        onClose={() => setSuccessModalData(null)}
+        title={successModalData?.title}
+        badge={successModalData?.badge}
+        message={successModalData?.message}
+      />
     </div>
   );
 };

@@ -4,10 +4,14 @@ import {
   getExpedidos, 
   getNextExpedidoNumber, 
   createExpedido, 
-  updateExpedido,
+  updateExpedido, 
   deleteExpedido, 
   downloadFile 
 } from '../services/api';
+import EmptyState from './EmptyState';
+import LoadingState from './LoadingState';
+import SuccessModal from './SuccessModal';
+import FileDropzone from './FileDropzone';
 
 const Expedidos = () => {
   const { gestion } = useGestion();
@@ -16,6 +20,7 @@ const Expedidos = () => {
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState('');
   const [filterEstado, setFilterEstado] = useState('all');
+  const [successModalData, setSuccessModalData] = useState(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -109,6 +114,11 @@ const Expedidos = () => {
           fecha: formData.fecha,
           estado: formData.estado
         });
+        setSuccessModalData({
+          badge: `OFICIO Nº ${String(formData.nro_oficio || editingId).padStart(2, '0')} / ${gestion}`,
+          title: '¡Oficio Actualizado con Éxito!',
+          message: `Los cambios realizados al oficio dirigido a "${formData.destinatario}" se guardaron correctamente.`
+        });
       } else {
         const data = new FormData();
         data.append('destinatario', formData.destinatario);
@@ -121,6 +131,11 @@ const Expedidos = () => {
           data.append('archivo', formData.archivo);
         }
         await createExpedido(data);
+        setSuccessModalData({
+          badge: `OFICIO Nº ${String(nextNumber).padStart(2, '0')} / ${gestion}`,
+          title: '¡Oficio Emitido y Registrado!',
+          message: `El oficio oficial dirigido a "${formData.destinatario}" fue registrado con correlativo asignado y custodia digital.`
+        });
       }
       setIsModalOpen(false);
       await fetchData();
@@ -375,21 +390,19 @@ const Expedidos = () => {
             <tbody className="divide-y divide-slate-100 text-on-surface font-body-sm text-body-sm">
               {loading ? (
                 <tr>
-                  <td colSpan="8" className="py-8 text-center text-on-surface-variant">
-                    Cargando correspondencia oficial...
+                  <td colSpan="8" className="py-6 px-4">
+                    <LoadingState message={`Sincronizando oficios expedidos (${gestion})...`} />
                   </td>
                 </tr>
               ) : currentExpedidos.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="py-12 text-center text-on-surface-variant">
-                    <p className="mb-2">No se encontraron oficios expedidos en la gestión {gestion}.</p>
-                    <button 
-                      onClick={handleOpenCreateModal}
-                      className="px-4 py-2 bg-gradient-to-r from-[#c1121f] to-[#9e0c18] text-white rounded-lg text-xs font-bold shadow-sm cursor-pointer"
-                      type="button"
-                    >
-                      Registrar el primero
-                    </button>
+                  <td colSpan="8" className="py-6 px-4">
+                    <EmptyState
+                      title={`No se encontraron oficios expedidos en ${gestion}`}
+                      message={busqueda ? `No hay oficios que coincidan con la búsqueda "${busqueda}".` : "No existen oficios registrados para la gestión seleccionada."}
+                      actionText="Emitir nuevo oficio"
+                      onAction={handleOpenCreateModal}
+                    />
                   </td>
                 </tr>
               ) : (
@@ -758,70 +771,14 @@ const Expedidos = () => {
                   ></textarea>
                 </div>
 
-                {/* Field: Digitalización (PDF Respaldatorio) */}
+                {/* Field: Digitalización con FileDropzone */}
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-base text-[#c1121f]">cloud_upload</span>
-                      <span>Digitalización (PDF Opcional)</span>
-                    </label>
-                    <span className="text-[11px] text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                      PDF/A hasta 20 MB
-                    </span>
-                  </div>
-
-                  {formData.archivo ? (
-                    <div className="border border-slate-200 bg-slate-50 rounded-xl p-3 shadow-2xs flex items-center justify-between">
-                      <div className="flex items-center space-x-3 truncate">
-                        <div className="w-10 h-10 rounded-lg bg-red-100 border border-red-200 text-[#c1121f] flex items-center justify-center shrink-0">
-                          <span className="material-symbols-outlined text-xl">picture_as_pdf</span>
-                        </div>
-                        <div className="truncate text-left">
-                          <p className="text-xs font-bold text-slate-800 truncate" title={formData.archivo.name}>
-                            {formData.archivo.name}
-                          </p>
-                          <div className="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500">
-                            <span className="inline-flex items-center text-emerald-600 font-semibold gap-1">
-                              <span className="material-symbols-outlined text-xs">check_circle</span> PDF/A Seleccionado
-                            </span>
-                            <span>•</span>
-                            <span>{(formData.archivo.size / (1024 * 1024)).toFixed(2)} MB</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-1.5 shrink-0 pl-2">
-                        <label 
-                          className="p-2 rounded-lg text-slate-500 hover:text-[#c1121f] hover:bg-slate-200 border border-transparent transition cursor-pointer" 
-                          title="Reemplazar archivo"
-                        >
-                          <span className="material-symbols-outlined text-base">sync</span>
-                          <input 
-                            accept=".pdf,.png,.jpg,.jpeg" 
-                            className="hidden" 
-                            onChange={(e) => setFormData({ ...formData, archivo: e.target.files[0] || null })} 
-                            type="file" 
-                          />
-                        </label>
-                      </div>
-                    </div>
-                  ) : (
-                    <label className="group relative border-2 border-dashed border-slate-300 hover:border-[#0b2545] bg-slate-50/60 hover:bg-slate-50 rounded-xl p-5 transition-all flex flex-col items-center justify-center gap-1.5 cursor-pointer">
-                      <div className="w-10 h-10 rounded-full bg-blue-50 text-[#0b2545] flex items-center justify-center">
-                        <span className="material-symbols-outlined text-2xl">upload_file</span>
-                      </div>
-                      <p className="text-xs font-semibold text-slate-700 text-center">
-                        Arrastre el PDF del oficio firmado o <span className="text-[#c1121f] hover:underline">examinar archivos</span>
-                      </p>
-                      <p className="text-[11px] text-slate-400">Formato permitido: PDF/A hasta 15MB</p>
-                      <input 
-                        accept=".pdf,.png,.jpg,.jpeg" 
-                        className="hidden" 
-                        onChange={(e) => setFormData({ ...formData, archivo: e.target.files[0] || null })} 
-                        type="file" 
-                      />
-                    </label>
-                  )}
+                  <FileDropzone
+                    file={formData.archivo}
+                    onFileChange={(file) => setFormData({ ...formData, archivo: file })}
+                    label="Digitalización (PDF Opcional)"
+                    hint="PDF/A hasta 25 MB"
+                  />
                 </div>
 
                 {/* Institutional Trust Badge */}
@@ -864,6 +821,15 @@ const Expedidos = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de Éxito con Animación Lordicon */}
+      <SuccessModal
+        isOpen={!!successModalData}
+        onClose={() => setSuccessModalData(null)}
+        title={successModalData?.title}
+        badge={successModalData?.badge}
+        message={successModalData?.message}
+      />
     </div>
   );
 };

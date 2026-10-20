@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useGestion } from '../context/GestionContext';
 import { getAuxiliares, createAuxiliar, deleteAuxiliar } from '../services/api';
+import EmptyState from './EmptyState';
+import LoadingState from './LoadingState';
+import SuccessModal from './SuccessModal';
 
 const Auxiliares = () => {
   const { gestion, setGestion } = useGestion();
@@ -10,6 +13,7 @@ const Auxiliares = () => {
   const [semestreFiltro, setSemestreFiltro] = useState('todos');
   const [materiaFiltro, setMateriaFiltro] = useState('todas');
   const [selectedAuxId, setSelectedAuxId] = useState(null);
+  const [successModalData, setSuccessModalData] = useState(null);
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -119,6 +123,11 @@ const Auxiliares = () => {
         gestion,
         semestre: parseInt(formData.semestre),
         nota_examen: formData.nota_examen ? parseFloat(formData.nota_examen) : null
+      });
+      setSuccessModalData({
+        badge: `AUXILIAR · ${formData.materia}`,
+        title: '¡Auxiliar de Cátedra Registrado!',
+        message: `El registro de docencia auxiliar para "${formData.nombre}" en la materia "${formData.materia}" fue asentado con éxito.`
       });
       setIsModalOpen(false);
       await fetchData();
@@ -559,14 +568,19 @@ const Auxiliares = () => {
             <tbody className="divide-y divide-slate-100 text-body-sm font-body-sm">
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="py-8 text-center text-on-surface-variant">
-                    Cargando antecedentes de cátedra...
+                  <td colSpan="6" className="py-6 px-4">
+                    <LoadingState message={`Sincronizando antecedentes de cátedra (${gestion})...`} />
                   </td>
                 </tr>
               ) : filteredAuxiliares.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="py-8 text-center text-on-surface-variant">
-                    No se encontraron antecedentes para la gestión {gestion}.
+                  <td colSpan="6" className="py-6 px-4">
+                    <EmptyState
+                      title="No se encontraron auxiliares"
+                      message={busqueda ? `Sin registros para "${busqueda}".` : `No existen auxiliares registrados para la gestión ${gestion}.`}
+                      actionText="Registrar auxiliar"
+                      onAction={handleOpenModal}
+                    />
                   </td>
                 </tr>
               ) : (
@@ -1027,6 +1041,15 @@ const Auxiliares = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de Éxito con Animación Lordicon */}
+      <SuccessModal
+        isOpen={!!successModalData}
+        onClose={() => setSuccessModalData(null)}
+        title={successModalData?.title}
+        badge={successModalData?.badge}
+        message={successModalData?.message}
+      />
     </div>
   );
 };

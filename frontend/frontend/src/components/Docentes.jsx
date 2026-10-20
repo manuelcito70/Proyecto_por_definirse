@@ -8,6 +8,10 @@ import {
   deleteDocenteArchivo,
   downloadFile 
 } from '../services/api';
+import EmptyState from './EmptyState';
+import LoadingState from './LoadingState';
+import SuccessModal from './SuccessModal';
+import FileDropzone from './FileDropzone';
 
 const Docentes = () => {
   const { gestion } = useGestion();
@@ -17,6 +21,7 @@ const Docentes = () => {
   const [loading, setLoading] = useState(true);
   const [loadingArchivos, setLoadingArchivos] = useState(false);
   const [busqueda, setBusqueda] = useState('');
+  const [successModalData, setSuccessModalData] = useState(null);
 
   // Semestral filter controls for Section 2
   const [filtroGestionSemestre, setFiltroGestionSemestre] = useState('2026');
@@ -132,6 +137,11 @@ const Docentes = () => {
         ...docenteForm,
         gestion_ingreso: parseInt(docenteForm.gestion_ingreso) || gestion
       });
+      setSuccessModalData({
+        badge: `DOCENTE · ${docenteForm.materia_principal || 'FINI'}`,
+        title: '¡Docente Registrado con Éxito!',
+        message: `El docente "${docenteForm.nombre}" ha sido dado de alta en la nómina oficial de la Carrera.`
+      });
       setIsDocenteModalOpen(false);
       await fetchDocentes();
       if (nuevo && nuevo.id) {
@@ -163,6 +173,11 @@ const Docentes = () => {
       data.append('archivo', archivoForm.archivo);
 
       await uploadDocenteArchivo(selectedDocente.id, data);
+      setSuccessModalData({
+        badge: `${archivoForm.tipo.toUpperCase().replace(/_/g, ' ')} · ${selectedDocente.nombre}`,
+        title: '¡Documento Académico Anexado!',
+        message: `El archivo fue incorporado con éxito al legajo y archivo de custodia del docente.`
+      });
       setIsArchivoModalOpen(false);
       await fetchArchivos(selectedDocente.id);
     } catch (err) {
@@ -340,12 +355,18 @@ const Docentes = () => {
             {/* Lista Selectora de Docentes */}
             <div className="flex flex-col gap-2" id="docentes-list">
               {loading ? (
-                <div className="p-4 text-center text-slate-500 text-sm">
-                  Cargando nómina docente...
+                <div className="py-2">
+                  <LoadingState message="Sincronizando nómina docente..." size={44} />
                 </div>
               ) : docentes.length === 0 ? (
-                <div className="p-4 text-center text-slate-500 text-sm">
-                  No se encontraron docentes registrados.
+                <div className="py-2">
+                  <EmptyState
+                    title="No se encontraron docentes"
+                    message={busqueda ? `Sin coincidencias para "${busqueda}".` : "No existen docentes registrados en el sistema."}
+                    actionText="Registrar docente"
+                    onAction={() => setIsDocenteModalOpen(true)}
+                    iconSize={48}
+                  />
                 </div>
               ) : (
                 docentes.map((doc) => {
@@ -1083,26 +1104,13 @@ const Docentes = () => {
                   </div>
                 )}
 
-                <div className="flex flex-col gap-1">
-                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-slate-600">
-                    Archivo Digital (PDF o Escaneo) *
-                  </label>
-                  <label className="border-2 border-dashed border-slate-300 hover:border-[#0B2545] rounded-xl p-space-md flex flex-col items-center justify-center gap-1 cursor-pointer bg-slate-50/70 hover:bg-slate-50 transition-colors">
-                    <span className="material-symbols-outlined text-2xl text-[#C1121F]">upload_file</span>
-                    <span className="font-body-sm text-sm font-medium text-slate-800">
-                      {archivoForm.archivo ? archivoForm.archivo.name : 'Haga clic para seleccionar archivo PDF'}
-                    </span>
-                    <span className="font-caption text-xs text-slate-400">
-                      Formatos homologados: PDF/A hasta 25MB
-                    </span>
-                    <input
-                      accept=".pdf,.png,.jpg,.jpeg"
-                      className="hidden"
-                      onChange={(e) => setArchivoForm({ ...archivoForm, archivo: e.target.files[0] || null })}
-                      required
-                      type="file"
-                    />
-                  </label>
+                <div>
+                  <FileDropzone
+                    file={archivoForm.archivo}
+                    onFileChange={(file) => setArchivoForm({ ...archivoForm, archivo: file })}
+                    label="Archivo Digital (PDF o Escaneo) *"
+                    hint="Formatos homologados: PDF/A hasta 25MB"
+                  />
                 </div>
               </div>
 
@@ -1127,6 +1135,15 @@ const Docentes = () => {
           </div>
         </div>
       )}
+
+      {/* Modal de Éxito con Animación Lordicon */}
+      <SuccessModal
+        isOpen={!!successModalData}
+        onClose={() => setSuccessModalData(null)}
+        title={successModalData?.title}
+        badge={successModalData?.badge}
+        message={successModalData?.message}
+      />
     </div>
   );
 };

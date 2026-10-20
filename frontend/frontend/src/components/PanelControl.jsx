@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import LordIcon from './LordIcon';
 import { useGestion } from '../context/GestionContext';
 import { 
   getExpedidos, 
@@ -224,13 +223,7 @@ const PanelControl = () => {
             className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all"
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#091a32] to-[#15418c] text-white shadow-sm ring-1 ring-[#c5a059]/40">
-              <LordIcon
-                src="https://cdn.lordicon.com/nocovwne.json"
-                trigger="hover"
-                currentColor={true}
-                size={28}
-                fallback={<span className="material-symbols-outlined text-2xl">outbox</span>}
-              />
+              <span className="material-symbols-outlined text-2xl">outbox</span>
             </div>
             <div>
               <span className="block font-caption text-[11px] uppercase text-on-surface-variant font-bold tracking-wider">
@@ -253,13 +246,7 @@ const PanelControl = () => {
             className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group"
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-amber-600 to-amber-700 text-white shadow-sm">
-              <LordIcon
-                src="https://cdn.lordicon.com/wzwygmng.json"
-                trigger="hover"
-                colors="primary:#ffffff,secondary:#ffffff"
-                size={28}
-                fallback={<span className="material-symbols-outlined text-2xl">move_to_inbox</span>}
-              />
+              <span className="material-symbols-outlined text-2xl">move_to_inbox</span>
             </div>
             <div>
               <span className="block font-caption text-[11px] uppercase text-on-surface-variant font-bold tracking-wider">
@@ -286,13 +273,7 @@ const PanelControl = () => {
             className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group"
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#0b2545] to-[#1d4ed8] text-white shadow-sm ring-1 ring-[#c5a059]/40">
-              <LordIcon
-                src="https://cdn.lordicon.com/zpxybbhl.json"
-                trigger="hover"
-                currentColor={true}
-                size={28}
-                fallback={<span className="material-symbols-outlined text-2xl">school</span>}
-              />
+              <span className="material-symbols-outlined text-2xl">school</span>
             </div>
             <div>
               <span className="block font-caption text-[11px] uppercase text-on-surface-variant font-bold tracking-wider">
@@ -315,13 +296,7 @@ const PanelControl = () => {
             className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group"
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#c1121f] to-[#9e0c18] text-white shadow-sm">
-              <LordIcon
-                src="https://cdn.lordicon.com/kdduutaw.json"
-                trigger="hover"
-                colors="primary:#ffffff,secondary:#ffffff"
-                size={28}
-                fallback={<span className="material-symbols-outlined text-2xl">group_work</span>}
-              />
+              <span className="material-symbols-outlined text-2xl">group_work</span>
             </div>
             <div>
               <span className="block font-caption text-[11px] uppercase text-on-surface-variant font-bold tracking-wider">
@@ -380,14 +355,7 @@ const PanelControl = () => {
             <div>
               <div className="flex items-start justify-between mb-space-md">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#091a32] to-[#15418c] text-white shadow-md ring-2 ring-[#c5a059]/30 group-hover:scale-105 transition-transform">
-                  <LordIcon
-                    src="https://cdn.lordicon.com/nocovwne.json"
-                    trigger="hover"
-                    target=".group"
-                    currentColor={true}
-                    size={30}
-                    fallback={<span className="material-symbols-outlined text-2xl">forward_to_inbox</span>}
-                  />
+                  <span className="material-symbols-outlined text-2xl">forward_to_inbox</span>
                 </div>
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 px-space-sm py-0.5 font-label-badge text-caption font-bold mr-6">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-pulse"></span> Consecutivo Estricto
@@ -445,14 +413,7 @@ const PanelControl = () => {
             <div>
               <div className="flex items-start justify-between mb-space-md">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 text-amber-800 border border-amber-200/80 shadow-md group-hover:scale-105 transition-transform">
-                  <LordIcon
-                    src="https://cdn.lordicon.com/wzwygmng.json"
-                    trigger="hover"
-                    target=".group"
-                    colors="primary:#b45309,secondary:#d97706"
-                    size={30}
-                    fallback={<span className="material-symbols-outlined text-2xl">mark_email_unread</span>}
-                  />
+                  <span className="material-symbols-outlined text-2xl">mark_email_unread</span>
                 </div>
                 <span className={`inline-flex items-center gap-1.5 rounded-full px-space-sm py-0.5 font-label-badge text-caption font-bold mr-6 border ${
                   metrics.recibidosPendientes > 0
@@ -515,14 +476,7 @@ const PanelControl = () => {
             <div>
               <div className="flex items-start justify-between mb-space-md">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#0b2545] to-[#15418c] text-white shadow-md ring-2 ring-[#c5a059]/30 group-hover:scale-105 transition-transform">
-                  <LordIcon
-                    src="https://cdn.lordicon.com/zpxybbhl.json"
-                    trigger="hover"
-                    target=".group"
-                    currentColor={true}
-                    size={30}
-                    fallback={<span className="material-symbols-outlined text-2xl">school</span>}
-                  />
+                  <span className="material-symbols-outlined text-2xl">school</span>
                 </div>
                 <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 text-blue-900 border border-blue-200 px-space-sm py-0.5 font-label-badge text-caption font-bold mr-6">
                   Acreditación FINI
@@ -576,14 +530,7 @@ const PanelControl = () => {
             <div>
               <div className="flex items-start justify-between mb-space-md">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-50 to-emerald-100 text-emerald-800 border border-emerald-200 shadow-md group-hover:scale-105 transition-transform">
-                  <LordIcon
-                    src="https://cdn.lordicon.com/kthelypq.json"
-                    trigger="hover"
-                    target=".group"
-                    colors="primary:#047857,secondary:#10b981"
-                    size={30}
-                    fallback={<span className="material-symbols-outlined text-2xl">badge</span>}
-                  />
+                  <span className="material-symbols-outlined text-2xl">badge</span>
                 </div>
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 px-space-sm py-0.5 font-label-badge text-caption font-bold mr-6">
                   Convocatoria ICU
@@ -641,14 +588,7 @@ const PanelControl = () => {
             <div>
               <div className="flex items-start justify-between mb-space-md">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#091a32] to-[#15418c] text-white shadow-md ring-2 ring-[#c5a059]/30 group-hover:scale-105 transition-transform">
-                  <LordIcon
-                    src="https://cdn.lordicon.com/kdduutaw.json"
-                    trigger="hover"
-                    target=".group"
-                    currentColor={true}
-                    size={30}
-                    fallback={<span className="material-symbols-outlined text-2xl">supervisor_account</span>}
-                  />
+                  <span className="material-symbols-outlined text-2xl">supervisor_account</span>
                 </div>
                 <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 text-[#0b2545] border border-slate-200 px-space-sm py-0.5 font-label-badge text-caption font-bold mr-6">
                   Cuerpo Docente
@@ -699,13 +639,7 @@ const PanelControl = () => {
             <div>
               <div className="flex items-center justify-between mb-space-md">
                 <div className="flex items-center gap-2">
-                  <LordIcon
-                    src="https://cdn.lordicon.com/lbjtvqiv.json"
-                    trigger="hover"
-                    colors="primary:#c5a059,secondary:#ffffff"
-                    size={26}
-                    fallback={<span className="material-symbols-outlined text-2xl text-[#c5a059]">verified</span>}
-                  />
+                  <span className="material-symbols-outlined text-2xl text-[#c5a059]">verified</span>
                   <span className="font-label-code text-[11px] uppercase tracking-wider text-[#f1e5cf] bg-white/10 px-2 py-0.5 rounded border border-white/10">
                     Servidor FINI
                   </span>

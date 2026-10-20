@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useCallback } from 'react';
 import { NavLink } from 'react-router-dom';
-import LordIcon from './LordIcon';
 import './TopNavDockTabs.css';
 
 /**
@@ -8,6 +7,7 @@ import './TopNavDockTabs.css';
  * Barra de pestañas superiores con efecto de magnificación dock elástico tipo macOS.
  * Las pestañas aumentan de escala y se elevan suavemente al pasar el cursor (efecto lupa/onda),
  * con diseño institucional premium, bordes redondeados tipo píldora de vidrio y alta nitidez.
+ * Íconos perfectamente centrados y alineados verticalmente con el texto.
  */
 const TopNavDockTabs = ({ pendientesCount = 0 }) => {
   const navRef = useRef(null);
@@ -19,39 +19,33 @@ const TopNavDockTabs = ({ pendientesCount = 0 }) => {
     {
       to: '/panel',
       label: 'Panel de control',
-      icon: 'dashboard',
-      lordIcon: 'https://cdn.lordicon.com/qhgmphtg.json'
+      icon: 'dashboard'
     },
     {
       to: '/expedidos',
       label: 'Documentos expedidos',
-      icon: 'outgoing_mail',
-      lordIcon: 'https://cdn.lordicon.com/nocovwne.json'
+      icon: 'outgoing_mail'
     },
     {
       to: '/recibidos',
       label: 'Documentos recibidos',
       icon: 'move_to_inbox',
-      lordIcon: 'https://cdn.lordicon.com/wzwygmng.json',
       badge: pendientesCount > 0 ? pendientesCount : null
     },
     {
       to: '/actas',
       label: 'Actas de graduación',
-      icon: 'school',
-      lordIcon: 'https://cdn.lordicon.com/zpxybbhl.json'
+      icon: 'school'
     },
     {
       to: '/auxiliares',
       label: 'Auxiliares de cátedra',
-      icon: 'badge',
-      lordIcon: 'https://cdn.lordicon.com/kthelypq.json'
+      icon: 'badge'
     },
     {
       to: '/docentes',
       label: 'Docentes',
-      icon: 'supervised_user_circle',
-      lordIcon: 'https://cdn.lordicon.com/kdduutaw.json'
+      icon: 'supervised_user_circle'
     }
   ];
 
@@ -131,41 +125,26 @@ const TopNavDockTabs = ({ pendientesCount = 0 }) => {
               `dock-tab-item ${isActive ? 'dock-tab-item--active' : ''}`
             }
           >
-            {({ isActive }) => (
-              <>
-                {/* Cápsula de fondo interactiva tipo glassmorphism */}
-                <span className="dock-tab-glass" aria-hidden="true" />
+            {/* Cápsula de fondo interactiva tipo glassmorphism */}
+            <span className="dock-tab-glass" aria-hidden="true" />
 
-                {/* Ícono animado Lordicon con fallback de alta disponibilidad */}
-                <span className="dock-tab-icon-wrap">
-                  <LordIcon
-                    src={tab.lordIcon}
-                    trigger="hover"
-                    target=".dock-tab-item"
-                    colors={isActive ? "primary:#c1121f,secondary:#0b2545" : "primary:#475569,secondary:#c5a059"}
-                    size={20}
-                    fallback={
-                      <span className="material-symbols-outlined dock-tab-icon">
-                        {tab.icon}
-                      </span>
-                    }
-                  />
-                </span>
+            {/* Ícono institucional perfectamente centrado con zoom focal */}
+            <span className="material-symbols-outlined dock-tab-icon" aria-hidden="true">
+              {tab.icon}
+            </span>
 
-                {/* Etiqueta textual */}
-                <span className="dock-tab-label">{tab.label}</span>
+            {/* Etiqueta textual alineada al centro óptico */}
+            <span className="dock-tab-label">{tab.label}</span>
 
-                {/* Contador de pendientes dinámico */}
-                {tab.badge && (
-                  <span className="dock-tab-badge">
-                    {tab.badge}
-                  </span>
-                )}
-
-                {/* Indicador de pestaña activa (línea luminosa tipo Apple) */}
-                <span className="dock-tab-active-indicator" aria-hidden="true" />
-              </>
+            {/* Contador de pendientes dinámico */}
+            {tab.badge && (
+              <span className="dock-tab-badge">
+                {tab.badge}
+              </span>
             )}
+
+            {/* Indicador de pestaña activa (línea luminosa tipo Apple) */}
+            <span className="dock-tab-active-indicator" aria-hidden="true" />
           </NavLink>
         ))}
       </div>

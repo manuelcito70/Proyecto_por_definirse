@@ -760,11 +760,11 @@ const Recibidos = () => {
       {/* 4. Modal Preview de Documento (Visor Interactivo para Imágenes y PDFs) */}
       {previewDoc && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-md animate-in fade-in duration-200" 
+          className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-3 sm:p-5 pt-16 sm:pt-20 pb-12 bg-black/75 backdrop-blur-md animate-in fade-in duration-200" 
           onClick={() => setPreviewDoc(null)}
         >
           <div 
-            className="bg-white w-full max-w-4xl max-h-[92vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-[#c5a059]/40" 
+            className="bg-white w-full max-w-4xl max-h-[calc(100vh-100px)] rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-[#c5a059]/40 mt-2 sm:mt-4" 
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}

@@ -843,10 +843,10 @@ const Actas = () => {
 
       {/* Modal: Nuevo Registro de Acta */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-primary-container/60 backdrop-blur-sm">
-          <div className="bg-surface-container-lowest rounded-xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 bg-black/60 backdrop-blur-md">
+          <div className="bg-surface-container-lowest rounded-xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-100px)] animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
             {/* Header */}
-            <div className="bg-primary text-on-primary px-space-lg py-space-md flex items-center justify-between">
+            <div className="bg-primary text-on-primary px-space-lg py-space-md flex items-center justify-between shrink-0">
               <div className="flex items-center gap-space-xs">
                 <span className="material-symbols-outlined text-secondary-fixed">school</span>
                 <span className="font-headline-md text-headline-md font-bold">Registrar Acta de Graduación</span>

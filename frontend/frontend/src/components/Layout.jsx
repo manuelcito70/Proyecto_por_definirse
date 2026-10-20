@@ -151,7 +151,7 @@ const Layout = ({ user, onLogout, children }) => {
       </header>
 
       {/* CONTENIDO PRINCIPAL */}
-      <main className="w-full flex-1 px-gutter-desktop py-space-lg pb-12 relative z-10 bg-transparent">
+      <main className="w-full flex-1 px-gutter-desktop py-space-lg pb-12 relative bg-transparent">
         <div className="max-w-[1440px] mx-auto w-full">
           {children}
         </div>

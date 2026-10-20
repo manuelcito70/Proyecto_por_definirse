@@ -798,11 +798,11 @@ const PanelControl = () => {
       {/* QUICK ACTION SLIDE-OVER / MODAL TEMPLATE */}
       {isQuickEmitOpen && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-space-md animate-in fade-in zoom-in-95 duration-200" 
+          className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center bg-black/60 backdrop-blur-sm p-4 pt-16 sm:pt-20 pb-12 animate-in fade-in zoom-in-95 duration-200" 
           onClick={() => !submitting && setIsQuickEmitOpen(false)}
         >
           <div 
-            className="bg-white w-full max-w-lg rounded-2xl p-space-xl shadow-2xl relative border border-[#c5a059]/40 overflow-hidden" 
+            className="bg-white w-full max-w-lg rounded-2xl p-space-xl shadow-2xl relative border border-[#c5a059]/40 overflow-hidden max-h-[calc(100vh-100px)] mt-2 sm:mt-4" 
             onClick={(e) => e.stopPropagation()}
           >
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#c1121f] via-[#c5a059] to-[#0b2545]"></div>

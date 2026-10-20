@@ -932,9 +932,9 @@ const Docentes = () => {
 
       {/* MODAL REGISTRAR NUEVO DOCENTE */}
       {isDocenteModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col border border-[#c5a059]/40 animate-in fade-in zoom-in-95 duration-200">
-            <div className="bg-gradient-to-r from-[#07162b] via-[#0B2545] to-[#15418c] text-white px-space-lg py-4 flex items-center justify-between border-b border-[#c5a059]/30">
+        <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 bg-black/60 backdrop-blur-md">
+          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-100px)] border border-[#c5a059]/40 animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
+            <div className="bg-gradient-to-r from-[#07162b] via-[#0B2545] to-[#15418c] text-white px-space-lg py-4 flex items-center justify-between border-b border-[#c5a059]/30 shrink-0">
               <div className="flex items-center gap-space-xs">
                 <span className="material-symbols-outlined text-[#c5a059]">person_add</span>
                 <span className="font-institutional-serif text-base font-bold">Registrar Nuevo Docente</span>
@@ -1029,9 +1029,9 @@ const Docentes = () => {
 
       {/* MODAL CARGAR ARCHIVO AL EXPEDIENTE */}
       {isArchivoModalOpen && selectedDocente && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-black/60 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col border border-[#c5a059]/40 animate-in fade-in zoom-in-95 duration-200">
-            <div className="bg-gradient-to-r from-[#07162b] via-[#0B2545] to-[#15418c] text-white px-space-lg py-4 flex items-center justify-between border-b border-[#c5a059]/30">
+        <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 bg-black/60 backdrop-blur-md">
+          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-100px)] border border-[#c5a059]/40 animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
+            <div className="bg-gradient-to-r from-[#07162b] via-[#0B2545] to-[#15418c] text-white px-space-lg py-4 flex items-center justify-between border-b border-[#c5a059]/30 shrink-0">
               <div className="flex items-center gap-space-xs">
                 <span className="material-symbols-outlined text-[#c5a059]">upload_file</span>
                 <span className="font-institutional-serif text-base font-bold">Cargar Documento al Expediente</span>

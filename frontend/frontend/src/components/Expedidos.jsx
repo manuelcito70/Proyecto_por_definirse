@@ -568,18 +568,18 @@ const Expedidos = () => {
       {/* MODAL: REGISTRO DE NUEVO OFICIO (HIGH-FIDELITY UAGRM FINI) */}
       {isModalOpen && (
         <div 
-          className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-md transition-all duration-300" 
+          className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-3 sm:p-5 pt-16 sm:pt-20 pb-12 bg-black/60 backdrop-blur-md transition-all duration-300" 
           onClick={() => !submitting && setIsModalOpen(false)}
         >
           <div 
             aria-labelledby="modal-title" 
             aria-modal="true" 
-            className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#c5a059]/40 overflow-hidden transform transition-all flex flex-col my-auto animate-in fade-in zoom-in-95 duration-200" 
+            className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#c5a059]/40 overflow-hidden transform transition-all flex flex-col max-h-[calc(100vh-100px)] animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4" 
             onClick={(e) => e.stopPropagation()} 
             role="dialog"
           >
             {/* Modal Top Branding Bar (Navy Blue Gradient) */}
-            <div className="bg-gradient-to-r from-[#07162b] via-[#0b2545] to-[#134074] px-6 py-4 border-b border-[#c5a059]/30 flex items-center justify-between text-white relative">
+            <div className="bg-gradient-to-r from-[#07162b] via-[#0b2545] to-[#134074] px-6 py-4 border-b border-[#c5a059]/30 flex items-center justify-between text-white relative shrink-0">
               <div className="flex items-center space-x-3 z-10">
                 <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-[#c5a059] shadow-inner">
                   <span className="material-symbols-outlined text-xl">description</span>
@@ -609,7 +609,7 @@ const Expedidos = () => {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5 bg-white">
+            <div className="p-6 overflow-y-auto flex-1 space-y-5 bg-white">
               {/* Correlative Assigned Banner */}
               <div className="relative overflow-hidden bg-gradient-to-r from-slate-50 via-blue-50/40 to-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

@@ -169,18 +169,21 @@ export default function FileDropzone({
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`cursor-pointer rounded-xl border-2 border-dashed transition-all p-5 sm:p-6 flex flex-col items-center justify-center text-center group ${
-            isDragging
-              ? 'border-[#0b2545] bg-blue-50/50 shadow-md scale-[1.005]'
-              : 'border-slate-300 bg-surface-container-low hover:bg-surface-container hover:border-[#c5a059]'
-          }`}
+          className={`cursor-pointer rounded-xl border-2 border-dashed transition-all p-5 sm:p-6 flex flex-col items-center justify-center text-center group ${isDragging
+            ? 'border-[#0b2545] bg-blue-50/50 shadow-md scale-[1.005]'
+            : 'border-slate-300 bg-surface-container-low hover:bg-surface-container hover:border-[#c5a059]'
+            }`}
         >
-          <div className="p-2.5 bg-white rounded-2xl border border-slate-200 shadow-2xs group-hover:scale-105 transition-transform mb-2">
+          {/* CONTENEDOR DEL ICONO: Centrado con flexbox y ajustable */}
+          <div className="w-14 h-14 flex items-center justify-center bg-white rounded-2xl border border-slate-200 shadow-2xs group-hover:scale-105 transition-transform mb-2 overflow-hidden">
             <LordIcon
               src="https://cdn.lordicon.com/wzwygmng.json"
               trigger="hover"
               colors="primary:#0b2545,secondary:#c5a059"
               size={48}
+              // MODIFICAR POSICIÓN: cambia los valores en píxeles aquí (X, Y)
+              // Ejemplo: translate(0px, -2px) lo sube 2 píxeles
+              style={{ transform: 'translate(-25px, -25px)' }}
               fallback={<span className="material-symbols-outlined text-3xl text-[#0b2545]">cloud_upload</span>}
             />
           </div>

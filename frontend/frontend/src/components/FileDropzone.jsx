@@ -17,7 +17,7 @@ export default function FileDropzone({
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isImage, setIsImage] = useState(false);
-  const [isFlipped, setIsFlipped] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const fileInputRef = useRef(null);
 
   // Generar URL de previsualización para imágenes y documentos
@@ -25,7 +25,7 @@ export default function FileDropzone({
     if (!file) {
       setPreviewUrl(null);
       setIsImage(false);
-      setIsFlipped(false);
+      setIsExpanded(false);
       return;
     }
 
@@ -83,7 +83,7 @@ export default function FileDropzone({
   };
 
   const handleRemove = (e) => {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -93,7 +93,7 @@ export default function FileDropzone({
   };
 
   const handleOpenPreview = (e) => {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     if (previewUrl) {
       window.open(previewUrl, '_blank');
     }
@@ -139,140 +139,112 @@ export default function FileDropzone({
       />
 
       {file ? (
-        /* TARJETA 3D FLIP: CONFIRMACIÓN Y PREVISUALIZACIÓN AL PASAR EL CURSOR */
-        <div className="w-full flex justify-center py-1">
-          <div 
-            className={`dropzone-card group cursor-pointer ${isFlipped ? 'flipped' : ''}`}
-            onClick={() => setIsFlipped(f => !f)}
-            title="Haz clic o pasa el cursor para voltear y previsualizar"
+        /* TARJETA GLASSMORPHISM CON SKEW Y EXPANSIÓN AL HOVER (Uiverse Fcodingx) */
+        <div className="file-card-wrapper">
+          <div
+            className={`file-preview-card ${isExpanded ? 'is-expanded' : ''}`}
+            onClick={() => setIsExpanded(prev => !prev)}
+            title="Pasa el cursor o haz clic para ver la vista previa"
           >
-            <div className="dropzone-content">
-              
-              {/* 1. CARA FRONTAL: CONFIRMACIÓN DE SUBIDA CON BORDE GIRATORIO LUMINOSO */}
-              <div className="dropzone-front">
-                <div className="dropzone-front-content">
-                  {/* Top Bar Status */}
-                  <div className="w-full flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-label-code text-[11px] font-bold">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                      ✓ ARCHIVO CARGADO CON ÉXITO
-                    </span>
-                    <span className="font-label-code text-[11px] text-[#c5a059] bg-white/10 px-2 py-0.5 rounded border border-[#c5a059]/30">
-                      .{getFileExtension(file.name)}
-                    </span>
-                  </div>
+            {/* Barra superior estilo MacOS: 3 puntos (Red, Yellow, Green) + Insignia */}
+            <div className="file-card-align">
+              <div className="file-card-dots">
+                <span 
+                  className="file-card-dot red cursor-pointer hover:scale-125 transition-transform" 
+                  title="Eliminar archivo" 
+                  onClick={handleRemove}
+                />
+                <span 
+                  className="file-card-dot yellow cursor-pointer hover:scale-125 transition-transform" 
+                  title="Cambiar archivo" 
+                  onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                />
+                <span 
+                  className="file-card-dot green cursor-pointer hover:scale-125 transition-transform" 
+                  title="Ver completo" 
+                  onClick={handleOpenPreview}
+                />
+              </div>
+              <span className="file-card-badge">
+                <span className="material-symbols-outlined text-[11px] text-emerald-400">check_circle</span>
+                .{getFileExtension(file.name)} · {formatFileSize(file.size)}
+              </span>
+            </div>
 
-                  {/* Middle: Icon & File Details */}
-                  <div className="flex flex-col items-center text-center my-auto gap-2">
-                    <div className="relative">
-                      <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0b2545] to-[#15418c] border border-[#c5a059]/50 flex items-center justify-center text-[#c5a059] shadow-lg shadow-black/40 group-hover:scale-105 transition-transform">
-                        <span className="material-symbols-outlined text-3xl">
-                          {isImage ? 'image' : 'picture_as_pdf'}
-                        </span>
-                      </div>
-                      <span className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-[#07162b] flex items-center justify-center text-white text-xs">
-                        ✓
-                      </span>
-                    </div>
-
-                    <div className="max-w-[320px]">
-                      <p className="font-label-code text-sm font-bold text-white truncate" title={file.name}>
-                        {file.name}
-                      </p>
-                      <p className="font-caption text-xs text-slate-300 mt-0.5">
-                        {formatFileSize(file.size)} · Listo para custodia institucional
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Bottom: Hover Prompt with Flip Icon */}
-                  <div className="w-full flex items-center justify-center gap-1.5 py-1 px-3 rounded-lg bg-white/10 border border-white/15 text-slate-200 font-caption text-xs">
-                    <span className="material-symbols-outlined text-sm text-[#c5a059] animate-spin" style={{ animationDuration: '6s' }}>
-                      sync
-                    </span>
-                    <span>Pasa el cursor o haz clic para ver la <strong>previsualización</strong></span>
-                    <span className="material-symbols-outlined text-sm text-emerald-400">touch_app</span>
-                  </div>
+            {/* Encabezado compacto: siempre visible */}
+            <div className="file-card-compact">
+              <div className="file-card-icon-badge">
+                <span className="material-symbols-outlined text-2xl">
+                  {isImage ? 'image' : 'picture_as_pdf'}
+                </span>
+              </div>
+              <div className="file-card-meta">
+                <p className="file-card-title" title={file.name}>
+                  {file.name}
+                </p>
+                <div className="file-card-subtitle">
+                  <span>{isImage ? 'Imagen digital' : 'Documento PDF'} oficial</span>
+                  <span className="file-card-hint ml-auto">
+                    <span className="material-symbols-outlined text-xs">visibility</span>
+                    <span>Pasa el cursor</span>
+                  </span>
                 </div>
               </div>
+            </div>
 
-              {/* 2. CARA TRASERA: PREVISUALIZACIÓN REAL Y BOTONES DE ACCIÓN */}
-              <div className="dropzone-back">
-                {/* Visual Background for Image or PDF */}
+            {/* Sección expandida: Vista previa del documento/imagen y Botones de Acción */}
+            <div className="file-card-expanded-body">
+              {/* Área de Previsualización */}
+              <div className="file-preview-display">
                 {isImage && previewUrl ? (
-                  <>
-                    <img src={previewUrl} alt={file.name} className="preview-bg-image" />
-                    <div className="preview-overlay"></div>
-                  </>
+                  <img src={previewUrl} alt={file.name} />
                 ) : (
-                  <>
-                    <div className="dropzone-circle dropzone-circle-top"></div>
-                    <div className="dropzone-circle dropzone-circle-bottom"></div>
-                    <div className="dropzone-circle dropzone-circle-right"></div>
-                  </>
+                  <div className="pdf-preview-canvas">
+                    <div className="pdf-preview-icon">
+                      <span className="material-symbols-outlined text-xl">picture_as_pdf</span>
+                    </div>
+                    <div className="pdf-preview-text">
+                      <span className="pdf-preview-text-name">{file.name}</span>
+                      <span className="pdf-preview-text-desc">Respaldo digital verificado para expediente</span>
+                    </div>
+                  </div>
                 )}
-
-                <div className="dropzone-back-content">
-                  {/* Top Bar */}
-                  <div className="flex items-center justify-between">
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md border border-white/20 text-white font-label-code text-[11px] font-bold">
-                      <span className="material-symbols-outlined text-xs text-[#c5a059]">visibility</span>
-                      VISTA PREVIA
-                    </span>
-                    <span className="px-2 py-0.5 rounded bg-white/20 backdrop-blur-md text-[10px] text-white font-mono">
-                      {isImage ? 'IMAGEN' : 'DOCUMENTO PDF'}
-                    </span>
-                  </div>
-
-                  {/* Central Preview Content */}
-                  <div className="flex flex-col items-center justify-center text-center my-auto p-2">
-                    {!isImage && (
-                      <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur-md border border-white/25 flex items-center justify-center text-white mb-2 shadow-md">
-                        <span className="material-symbols-outlined text-3xl text-red-400">picture_as_pdf</span>
-                      </div>
-                    )}
-                    <p className="font-institutional-serif text-sm font-bold text-white drop-shadow-md truncate max-w-[320px]">
-                      {file.name}
-                    </p>
-                    <p className="font-label-code text-xs text-slate-300 drop-shadow">
-                      {formatFileSize(file.size)} · Respaldo digital
-                    </p>
-                  </div>
-
-                  {/* Action Toolbar on the Back Side */}
-                  <div className="flex items-center justify-between gap-2 bg-black/70 backdrop-blur-md p-1.5 rounded-xl border border-white/20">
-                    <button
-                      type="button"
-                      onClick={handleOpenPreview}
-                      className="flex-1 inline-flex items-center justify-center gap-1 py-1.5 px-2.5 rounded-lg bg-gradient-to-r from-[#0b2545] to-[#15418c] hover:opacity-95 text-white text-xs font-bold transition-all border border-[#c5a059]/40 cursor-pointer shadow-sm"
-                      title="Abrir en pestaña nueva"
-                    >
-                      <span className="material-symbols-outlined text-sm">open_in_new</span>
-                      <span>Ver completo</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="inline-flex items-center justify-center gap-1 py-1.5 px-2.5 rounded-lg bg-white/15 hover:bg-white/25 text-white text-xs font-semibold transition-all border border-white/20 cursor-pointer"
-                      title="Seleccionar otro archivo"
-                    >
-                      <span className="material-symbols-outlined text-sm">sync</span>
-                      <span>Cambiar</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleRemove}
-                      className="inline-flex items-center justify-center p-1.5 rounded-lg bg-red-500/25 hover:bg-red-500/40 text-red-300 hover:text-white transition-all border border-red-500/30 cursor-pointer"
-                      title="Quitar archivo"
-                    >
-                      <span className="material-symbols-outlined text-sm">delete</span>
-                    </button>
-                  </div>
-                </div>
               </div>
 
+              {/* Botones de Acción interactivos */}
+              <div className="file-card-actions">
+                <button
+                  type="button"
+                  onClick={handleOpenPreview}
+                  className="file-btn file-btn-primary"
+                  title="Abrir vista completa en nueva pestaña"
+                >
+                  <span className="material-symbols-outlined text-sm">open_in_new</span>
+                  <span>Ver completo</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    fileInputRef.current?.click();
+                  }}
+                  className="file-btn file-btn-secondary"
+                  title="Seleccionar otro archivo"
+                >
+                  <span className="material-symbols-outlined text-sm">sync</span>
+                  <span>Cambiar</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleRemove}
+                  className="file-btn file-btn-danger"
+                  title="Eliminar archivo"
+                >
+                  <span className="material-symbols-outlined text-sm">delete</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>

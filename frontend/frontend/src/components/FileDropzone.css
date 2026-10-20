@@ -1,164 +1,338 @@
-/* Animación 3D Flip Card y Borde Giratorio Institucional (UAGRM FINI) 
-   Adaptado del diseño interactivo de Uiverse.io para FileDropzone */
+/* ==========================================================================
+   FileDropzone - Animación Glassmorphism con Skew y Expansión al Hover
+   Adaptado del diseño interactivo de Uiverse.io by Fcodingx para FINI UAGRM
+   ========================================================================== */
 
-.dropzone-card {
-  perspective: 1200px;
+/* Contenedor exterior centrado con espacio para la sombra y el skew */
+.file-card-wrapper {
   width: 100%;
-  max-width: 460px;
-  height: 230px;
-  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  padding: 12px 16px 20px 16px;
+  perspective: 1000px;
 }
 
-.dropzone-content {
+/* Tarjeta principal estilo terminal glassmorphism con efecto skew */
+.file-preview-card {
   width: 100%;
-  height: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 600ms cubic-bezier(0.34, 1.4, 0.64, 1);
-  box-shadow: 0px 10px 25px -5px rgba(7, 22, 43, 0.35);
-  border-radius: 16px;
-}
-
-.dropzone-card:hover .dropzone-content,
-.dropzone-card.flipped .dropzone-content {
-  transform: rotateY(180deg);
-}
-
-.dropzone-front,
-.dropzone-back {
-  background-color: #07162b;
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  border-radius: 16px;
+  max-width: 440px;
+  height: 128px;
+  padding: 0.5rem;
+  background: linear-gradient(135deg, rgba(11, 37, 69, 0.90) 0%, rgba(7, 22, 43, 0.96) 100%);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 3px solid rgba(197, 160, 89, 0.5);
+  border-left: 2px solid rgba(255, 255, 255, 0.45);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: -25px 30px 25px rgba(0, 0, 0, 0.28), 0 8px 20px rgba(7, 22, 43, 0.35);
+  transform: skewX(7deg);
+  transition: height 0.42s cubic-bezier(0.2, 0.8, 0.2, 1),
+              transform 0.42s cubic-bezier(0.2, 0.8, 0.2, 1),
+              box-shadow 0.42s ease,
+              border-color 0.3s ease;
   overflow: hidden;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  user-select: none;
 }
 
-/* CARA FRONTAL (Confirmación de subido con borde giratorio tricolor UAGRM FINI) */
-.dropzone-front {
+/* Al pasar el cursor o al fijar expansión: se endereza y expande para revelar la vista previa y botones */
+.file-preview-card:hover,
+.file-preview-card.is-expanded {
+  height: 268px;
+  transform: skewX(0deg) scale(1.01);
+  box-shadow: 0 20px 35px rgba(0, 0, 0, 0.35), 0 0 25px rgba(197, 160, 89, 0.25);
+  border-bottom-color: rgba(197, 160, 89, 0.8);
+}
+
+/* Barra superior estilo ventana MacOS con los 3 puntos (Red, Yellow, Green) */
+.file-card-align {
+  padding: 0.4rem 0.6rem 0.5rem 0.6rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.file-card-dots {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+}
+
+.file-card-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+}
+
+.file-card-preview:hover .file-card-dot {
+  transform: scale(1.1);
+}
+
+.file-card-dot.red {
+  background-color: #ff605c;
+  box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.28);
+}
+
+.file-card-dot.yellow {
+  background-color: #ffbd44;
+  box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.28);
+}
+
+.file-card-dot.green {
+  background-color: #00ca4e;
+  box-shadow: -2px 2px 4px rgba(0, 0, 0, 0.28);
+}
+
+/* Insignia de estado en la barra superior */
+.file-card-badge {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #c5a059;
+  background: rgba(197, 160, 89, 0.15);
+  border: 1px solid rgba(197, 160, 89, 0.35);
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Contenido Principal Compacto (siempre visible arriba) */
+.file-card-compact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 10px 6px 10px;
+  flex-shrink: 0;
+}
+
+.file-card-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c5a059;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease;
+}
+
+.file-preview-card:hover .file-card-icon-badge {
+  transform: scale(1.05);
+  border-color: rgba(197, 160, 89, 0.5);
+}
+
+.file-card-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-card-title {
+  font-family: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: #daf4ed;
+  text-shadow: -1px 2px 5px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.file-card-subtitle {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.65);
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Indicador de "Pasa el cursor" cuando la tarjeta está compacta */
+.file-card-hint {
+  font-size: 10px;
+  color: #c5a059;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: opacity 0.3s ease;
+}
+
+.file-preview-card:hover .file-card-hint,
+.file-preview-card.is-expanded .file-card-hint {
+  opacity: 0;
+  display: none;
+}
+
+/* ==========================================================================
+   SECCIÓN EXPANDIDA: VISTA PREVIA Y BOTONES (se revela con el hover / expand)
+   ========================================================================== */
+.file-card-expanded-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 6px 10px 8px 10px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.35s ease 0.08s, transform 0.35s ease 0.08s;
+  pointer-events: none;
+}
+
+.file-preview-card:hover .file-card-expanded-body,
+.file-preview-card.is-expanded .file-card-expanded-body {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Contenedor de la vista previa */
+.file-preview-display {
+  width: 100%;
+  height: 82px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border: 1px solid rgba(197, 160, 89, 0.3);
+  position: relative;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
-.dropzone-front::before {
-  position: absolute;
-  content: ' ';
-  display: block;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(90deg, transparent, #c5a059, #10b981, #0b2545, #c1121f, #c5a059, transparent);
-  animation: dropzone_rotation_border 5000ms infinite linear;
-}
-
-@keyframes dropzone_rotation_border {
-  0% {
-    transform: rotateZ(0deg);
-  }
-  100% {
-    transform: rotateZ(360deg);
-  }
-}
-
-.dropzone-front-content {
-  position: absolute;
-  inset: 2.5px;
-  background: radial-gradient(ellipse at 50% 10%, #0d2e56 0%, #07162b 70%, #040c17 100%);
-  border-radius: 14px;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
-  z-index: 2;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
-}
-
-/* CARA TRASERA (Previsualización al rotar en hover) */
-.dropzone-back {
-  transform: rotateY(180deg);
-  background: #091a32;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border: 1px solid rgba(197, 160, 89, 0.4);
-  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
-}
-
-.dropzone-back .preview-bg-image {
-  position: absolute;
-  inset: 0;
+.file-preview-display img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
-  filter: brightness(0.65) contrast(1.05);
-  z-index: 0;
+  filter: brightness(0.9) contrast(1.05);
 }
 
-.dropzone-back .preview-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(7, 22, 43, 0.8) 0%, rgba(7, 22, 43, 0.5) 50%, rgba(7, 22, 43, 0.95) 100%);
-  z-index: 1;
-}
-
-/* Círculos flotantes luminosos inspirados en el diseño de Uiverse */
-.dropzone-circle {
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
-  background-color: rgba(197, 160, 89, 0.2);
-  position: absolute;
-  filter: blur(25px);
-  animation: dropzone_floating 3500ms infinite ease-in-out;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.dropzone-circle-bottom {
-  background-color: rgba(193, 18, 31, 0.25);
-  left: 60%;
-  bottom: -20px;
-  width: 140px;
-  height: 140px;
-  animation-delay: -1000ms;
-}
-
-.dropzone-circle-right {
-  background-color: rgba(16, 185, 129, 0.25);
-  right: -20px;
-  top: -20px;
-  width: 90px;
-  height: 90px;
-  animation-delay: -2000ms;
-}
-
-@keyframes dropzone_floating {
-  0% {
-    transform: translateY(0px) scale(1);
-  }
-  50% {
-    transform: translateY(12px) scale(1.06);
-  }
-  100% {
-    transform: translateY(0px) scale(1);
-  }
-}
-
-.dropzone-back-content {
-  position: relative;
-  z-index: 2;
+/* Vista previa elegante para documentos PDF */
+.pdf-preview-canvas {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 16px;
   width: 100%;
-  height: 100%;
-  padding: 14px 16px;
+  background: radial-gradient(ellipse at center, rgba(193, 18, 31, 0.18) 0%, rgba(7, 22, 43, 0.4) 100%);
+}
+
+.pdf-preview-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(220, 38, 38, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f87171;
+  flex-shrink: 0;
+}
+
+.pdf-preview-text {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  overflow: hidden;
+}
+
+.pdf-preview-text-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pdf-preview-text-desc {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* Barra de botones de acción interactivos */
+.file-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.file-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+  outline: none;
+}
+
+.file-btn:active {
+  transform: scale(0.97);
+}
+
+/* Botón "Ver completo" */
+.file-btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, #0b2545 0%, #15418c 100%);
+  color: #ffffff;
+  border-color: rgba(197, 160, 89, 0.5);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.file-btn-primary:hover {
+  background: linear-gradient(135deg, #103463 0%, #1c52b0 100%);
+  border-color: #c5a059;
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.3);
+}
+
+/* Botón "Cambiar" */
+.file-btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.file-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+/* Botón "Eliminar" */
+.file-btn-danger {
+  background: rgba(220, 38, 38, 0.18);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.35);
+  padding: 6px 10px;
+}
+
+.file-btn-danger:hover {
+  background: rgba(220, 38, 38, 0.35);
+  color: #ffffff;
+  border-color: rgba(239, 68, 68, 0.6);
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
 }

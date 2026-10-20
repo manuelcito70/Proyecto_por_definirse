@@ -248,6 +248,16 @@ export const downloadFile = async (pathWithId, fallbackName = 'documento.pdf') =
   }
 };
 
+// Helper para obtener el Blob del archivo con autenticación
+export const getFileBlob = async (pathWithId) => {
+  const res = await fetchWithAuth(pathWithId);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.mensaje || 'Error al obtener el archivo del servidor');
+  }
+  return await res.blob();
+};
+
 // Helper para obtener URL de descarga directa con token (fallback)
 export const getDownloadUrl = (pathWithId) => {
   const token = getToken();

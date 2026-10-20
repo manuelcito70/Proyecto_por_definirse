@@ -5,7 +5,8 @@ import {
   createRecibido, 
   updateRecibido, 
   deleteRecibido, 
-  downloadFile 
+  downloadFile,
+  getFileBlob
 } from '../services/api';
 
 const Recibidos = () => {
@@ -18,8 +19,71 @@ const Recibidos = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  // Preview Modal
+  // Preview Modal State
   const [previewDoc, setPreviewDoc] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewFileType, setPreviewFileType] = useState(null); // 'image' | 'pdf' | 'other'
+  const [previewError, setPreviewError] = useState(null);
+  const [previewZoom, setPreviewZoom] = useState(1);
+  const [previewRotation, setPreviewRotation] = useState(0);
+
+  // Load preview file as blob whenever previewDoc changes
+  useEffect(() => {
+    if (!previewDoc || !previewDoc.id || !previewDoc.archivo_path) {
+      setPreviewUrl(null);
+      setPreviewFileType(null);
+      setPreviewError(null);
+      setPreviewZoom(1);
+      setPreviewRotation(0);
+      return;
+    }
+
+    let active = true;
+    let objUrl = null;
+
+    const loadPreviewFile = async () => {
+      try {
+        setPreviewLoading(true);
+        setPreviewError(null);
+        setPreviewZoom(1);
+        setPreviewRotation(0);
+
+        const blob = await getFileBlob(`/recibidos/${previewDoc.id}/download`);
+        if (!active) return;
+
+        objUrl = URL.createObjectURL(blob);
+        setPreviewUrl(objUrl);
+
+        const filename = (previewDoc.nombre_archivo || '').toLowerCase();
+        const mime = (blob.type || '').toLowerCase();
+
+        if (mime.startsWith('image/') || filename.match(/\.(jpg|jpeg|png|webp|gif|bmp|svg)$/)) {
+          setPreviewFileType('image');
+        } else if (mime.includes('pdf') || filename.endsWith('.pdf')) {
+          setPreviewFileType('pdf');
+        } else {
+          setPreviewFileType('other');
+        }
+      } catch (err) {
+        if (active) {
+          console.error('Error al cargar vista previa:', err);
+          setPreviewError(err.message || 'Error al cargar vista previa');
+        }
+      } finally {
+        if (active) setPreviewLoading(false);
+      }
+    };
+
+    loadPreviewFile();
+
+    return () => {
+      active = false;
+      if (objUrl) {
+        URL.revokeObjectURL(objUrl);
+      }
+    };
+  }, [previewDoc]);
 
   // Form State
   const [submitting, setSubmitting] = useState(false);
@@ -725,68 +789,219 @@ const Recibidos = () => {
         </form>
       </div>
 
-      {/* 4. Modal Preview de Documento */}
+      {/* 4. Modal Preview de Documento (Visor Interactivo para Imágenes y PDFs) */}
       {previewDoc && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" 
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-black/75 backdrop-blur-md animate-in fade-in duration-200" 
           onClick={() => setPreviewDoc(null)}
         >
           <div 
-            className="bg-surface-container-lowest w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-[#c5a059]/40" 
+            className="bg-white w-full max-w-4xl max-h-[92vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col border border-[#c5a059]/40" 
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="p-space-md bg-gradient-to-r from-[#07162b] via-[#0b2545] to-[#15418c] text-white flex items-center justify-between border-b border-[#c5a059]/30">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#c5a059]">description</span>
-                <div>
-                  <h4 className="font-institutional-serif text-body-lg font-bold text-white">
-                    {previewDoc.asunto}
-                  </h4>
-                  <span className="font-label-code text-caption text-[#c5a059]">
-                    #{String(previewDoc.nro_recibido).padStart(2, '0')} / {gestion} · {previewDoc.remitente}
+            {/* Modal Header */}
+            <div className="px-5 py-3.5 bg-gradient-to-r from-[#07162b] via-[#0b2545] to-[#15418c] text-white flex items-center justify-between border-b border-[#c5a059]/30 shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-xl bg-white/10 border border-white/15 flex items-center justify-center text-[#c5a059] shrink-0 shadow-inner">
+                  <span className="material-symbols-outlined text-xl">
+                    {previewFileType === 'image' ? 'image' : previewFileType === 'pdf' ? 'picture_as_pdf' : 'description'}
+                  </span>
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="font-institutional-serif text-base font-bold text-white truncate max-w-md">
+                      {previewDoc.asunto || 'Vista de Documento'}
+                    </h4>
+                    <span className="font-label-code text-[11px] text-[#c5a059] bg-white/10 px-2 py-0.5 rounded border border-white/15">
+                      #{String(previewDoc.nro_recibido).padStart(2, '0')} / {gestion}
+                    </span>
+                  </div>
+                  <span className="font-caption text-xs text-white/70 truncate">
+                    Remitente: <strong className="text-white">{previewDoc.remitente}</strong> · Archivo: {previewDoc.nombre_archivo || 'archivo'}
                   </span>
                 </div>
               </div>
-              <button 
-                className="text-white/70 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer" 
-                onClick={() => setPreviewDoc(null)} 
-                type="button"
-              >
-                <span className="material-symbols-outlined text-xl">close</span>
-              </button>
+
+              <div className="flex items-center gap-1.5 shrink-0 ml-3">
+                {previewUrl && (
+                  <button 
+                    onClick={() => window.open(previewUrl, '_blank')}
+                    className="p-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                    title="Abrir en ventana completa"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-lg">open_in_new</span>
+                  </button>
+                )}
+                <button 
+                  className="text-white/70 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-colors cursor-pointer" 
+                  onClick={() => setPreviewDoc(null)} 
+                  type="button"
+                  title="Cerrar visor"
+                >
+                  <span className="material-symbols-outlined text-xl">close</span>
+                </button>
+              </div>
             </div>
 
-            <div className="p-space-xl flex flex-col items-center justify-center min-h-[300px] bg-surface-container-low text-center gap-space-md">
-              <div className="w-16 h-16 rounded-full bg-white text-[#c1121f] flex items-center justify-center shadow-md ring-2 ring-red-100">
-                <span className="material-symbols-outlined text-3xl">picture_as_pdf</span>
-              </div>
-              <div className="max-w-md">
-                <h5 className="font-institutional-serif text-lg text-[#0b2545] font-bold">
-                  Visor de Respaldo Documental
-                </h5>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
-                  Archivo original: <strong>{previewDoc.nombre_archivo || 'documento.pdf'}</strong>
-                </p>
-                <p className="font-caption text-caption text-on-surface-variant mt-1">
-                  Este expediente digital se encuentra indexado en el servidor de archivo FINI UAGRM bajo norma de no repudio.
-                </p>
+            {/* Modal Body: Visor Interactivo */}
+            <div className="flex-1 overflow-y-auto bg-slate-100/90 p-4 flex flex-col items-center justify-center min-h-[350px]">
+              {previewLoading ? (
+                <div className="flex flex-col items-center justify-center py-16 gap-3 text-slate-500">
+                  <div className="w-10 h-10 border-4 border-[#0b2545]/20 border-t-[#0b2545] rounded-full animate-spin"></div>
+                  <span className="font-institutional-serif text-sm font-bold text-[#0b2545]">
+                    Cargando previsualización digital del archivo...
+                  </span>
+                  <span className="font-caption text-xs text-slate-400 font-mono">
+                    {previewDoc.nombre_archivo}
+                  </span>
+                </div>
+              ) : previewError ? (
+                <div className="p-8 text-center max-w-md bg-white rounded-xl border border-red-200 shadow-sm flex flex-col items-center gap-3">
+                  <div className="w-12 h-12 rounded-full bg-red-50 text-[#c1121f] flex items-center justify-center">
+                    <span className="material-symbols-outlined text-2xl">error_outline</span>
+                  </div>
+                  <div>
+                    <h5 className="font-institutional-serif text-base font-bold text-slate-800">
+                      No se pudo cargar la vista previa directa
+                    </h5>
+                    <p className="font-caption text-xs text-slate-500 mt-1">
+                      {previewError}
+                    </p>
+                  </div>
+                  <button 
+                    onClick={() => downloadFile(`/recibidos/${previewDoc.id}/download`, previewDoc.nombre_archivo || 'recibido.pdf')}
+                    className="mt-2 inline-flex items-center gap-1.5 px-4 py-2 bg-[#0b2545] text-white rounded-lg text-xs font-bold hover:bg-[#15418c] transition-colors cursor-pointer"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-base">download</span>
+                    <span>Descargar archivo directamente</span>
+                  </button>
+                </div>
+              ) : previewFileType === 'image' && previewUrl ? (
+                /* VISOR DE IMAGEN (JPEG, PNG, WEBP, ETC.) */
+                <div className="w-full flex flex-col items-center gap-3">
+                  {/* Barra de Controles de Imagen */}
+                  <div className="inline-flex items-center gap-1 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-slate-200 shadow-sm text-slate-700">
+                    <button 
+                      onClick={() => setPreviewZoom(z => Math.max(0.5, Number((z - 0.25).toFixed(2))))}
+                      className="p-1 rounded hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+                      title="Reducir zoom (-)"
+                      type="button"
+                    >
+                      <span className="material-symbols-outlined text-lg">zoom_out</span>
+                    </button>
+                    <button 
+                      onClick={() => setPreviewZoom(1)}
+                      className="px-2 py-0.5 rounded hover:bg-slate-100 font-label-code text-xs font-bold text-[#0b2545] cursor-pointer"
+                      title="Restablecer tamaño (100%)"
+                      type="button"
+                    >
+                      {Math.round(previewZoom * 100)}%
+                    </button>
+                    <button 
+                      onClick={() => setPreviewZoom(z => Math.min(3, Number((z + 0.25).toFixed(2))))}
+                      className="p-1 rounded hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+                      title="Aumentar zoom (+)"
+                      type="button"
+                    >
+                      <span className="material-symbols-outlined text-lg">zoom_in</span>
+                    </button>
+                    <div className="h-4 w-px bg-slate-300 mx-1"></div>
+                    <button 
+                      onClick={() => setPreviewRotation(r => (r + 90) % 360)}
+                      className="p-1 rounded hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+                      title="Girar 90° a la derecha"
+                      type="button"
+                    >
+                      <span className="material-symbols-outlined text-lg">rotate_right</span>
+                    </button>
+                    <button 
+                      onClick={() => { setPreviewZoom(1); setPreviewRotation(0); }}
+                      className="p-1 rounded hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition-colors cursor-pointer"
+                      title="Restablecer vista"
+                      type="button"
+                    >
+                      <span className="material-symbols-outlined text-lg">refresh</span>
+                    </button>
+                  </div>
+
+                  {/* Lienzo de la imagen */}
+                  <div className="w-full max-h-[62vh] overflow-auto rounded-xl bg-slate-900/90 p-4 flex items-center justify-center shadow-inner border border-slate-700/50">
+                    <img 
+                      src={previewUrl} 
+                      alt={previewDoc.nombre_archivo || 'Documento recibido'}
+                      style={{
+                        transform: `scale(${previewZoom}) rotate(${previewRotation}deg)`,
+                        transformOrigin: 'center center',
+                        transition: 'transform 0.2s ease-out'
+                      }}
+                      className="max-h-[56vh] max-w-full object-contain rounded-lg shadow-2xl select-none"
+                    />
+                  </div>
+                </div>
+              ) : previewFileType === 'pdf' && previewUrl ? (
+                /* VISOR DE DOCUMENTO PDF */
+                <div className="w-full h-[66vh] rounded-xl overflow-hidden shadow-sm border border-slate-300 bg-white">
+                  <iframe 
+                    src={previewUrl} 
+                    title={previewDoc.nombre_archivo || 'Documento PDF'}
+                    className="w-full h-full border-0"
+                  />
+                </div>
+              ) : (
+                /* OTROS TIPOS DE ARCHIVO */
+                <div className="p-8 text-center max-w-md bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center gap-3">
+                  <div className="w-16 h-16 rounded-2xl bg-surface-container-low text-[#0b2545] flex items-center justify-center border border-slate-200 shadow-2xs">
+                    <span className="material-symbols-outlined text-3xl">draft</span>
+                  </div>
+                  <div>
+                    <h5 className="font-institutional-serif text-lg font-bold text-[#0b2545]">
+                      Archivo Documental Adjunto
+                    </h5>
+                    <p className="font-label-code text-xs text-slate-600 mt-1 font-semibold">
+                      {previewDoc.nombre_archivo || 'documento'}
+                    </p>
+                    <p className="font-caption text-xs text-slate-500 mt-1">
+                      Este formato se descarga directamente para su visualización en tu equipo.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-5 py-3 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 shrink-0">
+              <div className="flex items-center gap-2 text-slate-500 text-xs font-caption">
+                <span className="material-symbols-outlined text-sm text-emerald-600">verified</span>
+                <span>Documento indexado con resguardo de integridad digital FINI UAGRM</span>
               </div>
 
-              <div className="flex items-center gap-space-sm mt-2">
+              <div className="flex items-center gap-2 self-end sm:self-auto">
+                {previewUrl && (
+                  <button 
+                    onClick={() => window.open(previewUrl, '_blank')}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#0b2545] font-body-sm text-xs font-bold transition-colors cursor-pointer border border-slate-200"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-base">open_in_new</span>
+                    <span>Abrir en pestaña</span>
+                  </button>
+                )}
                 <button 
-                  className="px-space-lg py-2 rounded-lg bg-gradient-to-r from-[#0b2545] to-[#15418c] text-white font-body-sm text-body-sm font-semibold hover:opacity-95 shadow-sm inline-flex items-center gap-1 cursor-pointer" 
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#0b2545] to-[#15418c] text-white font-body-sm text-xs font-bold hover:shadow-md transition-all cursor-pointer shadow-xs border border-white/20" 
                   onClick={() => downloadFile(`/recibidos/${previewDoc.id}/download`, previewDoc.nombre_archivo || 'recibido.pdf')}
                   type="button"
                 >
                   <span className="material-symbols-outlined text-base">download</span>
-                  <span>Descargar documento</span>
+                  <span>Descargar archivo</span>
                 </button>
                 <button 
-                  className="px-space-md py-2 rounded-lg bg-white text-on-surface hover:bg-surface-container border border-slate-200 font-body-sm text-body-sm font-semibold cursor-pointer"
+                  className="px-3.5 py-2 rounded-xl bg-white text-slate-700 hover:bg-slate-100 border border-slate-200 font-body-sm text-xs font-semibold transition-colors cursor-pointer"
                   onClick={() => setPreviewDoc(null)} 
                   type="button"
                 >
-                  Cerrar visor
+                  Cerrar
                 </button>
               </div>
             </div>

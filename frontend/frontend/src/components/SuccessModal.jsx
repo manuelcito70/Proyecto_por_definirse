@@ -1,8 +1,8 @@
 import React from 'react';
-import LordIcon from './LordIcon';
+import './SuccessModal.css';
 
 /**
- * SuccessModal - Modal de confirmación institucional con animación Lordicon.
+ * SuccessModal - Modal de confirmación institucional con animación interactiva Typewriter.
  * Se muestra cuando se crea, actualiza o guarda un registro exitosamente.
  */
 export default function SuccessModal({
@@ -39,17 +39,13 @@ export default function SuccessModal({
         <div className="h-1.5 w-full bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
 
         <div className="p-6 sm:p-7 flex flex-col items-center text-center">
-          {/* Animated Success Badge */}
-          <div className="relative mb-4">
-            <div className="absolute -inset-2 bg-gradient-to-br from-emerald-100 to-amber-100 rounded-full blur-md opacity-70"></div>
-            <div className="relative p-3.5 bg-gradient-to-br from-emerald-50 to-emerald-100/60 rounded-full border border-emerald-300 shadow-sm flex items-center justify-center">
-              <LordIcon
-                src="https://cdn.lordicon.com/cgzlioyf.json"
-                trigger="in"
-                colors="primary:#0b2545,secondary:#10b981"
-                size={64}
-                fallback={<span className="material-symbols-outlined text-4xl text-emerald-600">check_circle</span>}
-              />
+          {/* Animated Typewriter (Máquina de Escribir Oficial) */}
+          <div className="typewriter-wrap mb-2">
+            <div className="typewriter-glow"></div>
+            <div className="typewriter">
+              <div className="slide"><i></i></div>
+              <div className="paper"></div>
+              <div className="keyboard"></div>
             </div>
           </div>
 

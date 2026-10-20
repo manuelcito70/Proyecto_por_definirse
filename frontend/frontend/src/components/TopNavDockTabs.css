@@ -1,0 +1,205 @@
+/* ========================================================
+   TOP NAV DOCK TABS - ESTÉTICA Y FÍSICAS DE MAGNIFICACIÓN TIPO DOCK
+   ======================================================== */
+
+.top-dock-nav {
+  width: 100%;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 1px 3px rgba(11, 37, 69, 0.03);
+  position: relative;
+  z-index: 30;
+  user-select: none;
+}
+
+.top-dock-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 24px;
+  overflow-x: auto;
+  overflow-y: visible;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+}
+
+.top-dock-container::-webkit-scrollbar {
+  display: none; /* WebKit */
+}
+
+/* ========================================================
+   ELEMENTO INDIVIDUAL DE PESTAÑA (DOCK TILE)
+   ======================================================== */
+.dock-tab-item {
+  --tab-scale: 1;
+  --tab-lift: 0px;
+  --tab-factor: 0;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: #475569;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  isolation: isolate;
+
+  /* Transformaciones de zoom y elevación con aceleración por GPU */
+  transform: scale(var(--tab-scale)) translateY(calc(-1 * var(--tab-lift))) translateZ(0);
+  transform-origin: 50% 85%;
+  will-change: transform;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  backface-visibility: hidden;
+
+  /* Transición con resorte elástico cuando el mouse sale */
+  transition:
+    transform 0.38s cubic-bezier(0.2, 1.25, 0.4, 1),
+    color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+/* Cuando el mouse se está moviendo dentro del área de la barra, la respuesta es instantánea */
+.dock-tab-item.dock-tab--active-wave {
+  transition:
+    transform 0.06s cubic-bezier(0, 0, 0.2, 1),
+    color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* ========================================================
+   CÁPSULA DE FONDO TIPO CRISTAL (GLASSMORPHISM)
+   ======================================================== */
+.dock-tab-glass {
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  z-index: -1;
+  pointer-events: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Hover / Proximidad en pestaña */
+.dock-tab-item:hover,
+.dock-tab-item.dock-tab--active-wave {
+  color: #0b2545;
+}
+
+.dock-tab-item:hover .dock-tab-glass,
+.dock-tab-item.dock-tab--active-wave .dock-tab-glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(239, 246, 255, 0.9) 100%);
+  border-color: rgba(147, 197, 253, 0.7);
+  box-shadow: 
+    0 6px 16px -2px rgba(29, 78, 216, 0.12),
+    0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+/* ========================================================
+   ÍCONO Y DINÁMICA DE ZOOM
+   ======================================================== */
+.dock-tab-icon {
+  font-size: 1.15rem !important;
+  line-height: 1 !important;
+  color: #64748b;
+  transform: scale(calc(1 + (var(--tab-scale) - 1) * 1.25));
+  transform-origin: center center;
+  transition:
+    transform 0.25s cubic-bezier(0.2, 1.2, 0.4, 1),
+    color 0.18s ease;
+}
+
+.dock-tab-item:hover .dock-tab-icon,
+.dock-tab-item.dock-tab--active-wave .dock-tab-icon {
+  color: #1d4ed8;
+}
+
+/* ========================================================
+   TEXTO DE LA PESTAÑA
+   ======================================================== */
+.dock-tab-label {
+  letter-spacing: -0.01em;
+  transition: color 0.15s ease;
+}
+
+/* ========================================================
+   BADGE DE NOTIFICACIONES (CONTADOR DE DOCUMENTOS)
+   ======================================================== */
+.dock-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 2px 4px rgba(220, 38, 38, 0.35);
+  transform: scale(calc(1 + (var(--tab-scale) - 1) * 0.5));
+  transition: transform 0.2s ease;
+}
+
+/* ========================================================
+   ESTADO ACTIVO (PESTAÑA SELECCIONADA)
+   ======================================================== */
+.dock-tab-item--active {
+  color: #0b2545 !important;
+  font-weight: 700;
+}
+
+.dock-tab-item--active .dock-tab-glass {
+  background: rgba(239, 246, 255, 0.95) !important;
+  border-color: rgba(193, 18, 31, 0.25) !important;
+  box-shadow: 
+    0 4px 14px -3px rgba(11, 37, 69, 0.12),
+    0 1px 2px rgba(193, 18, 31, 0.06) !important;
+}
+
+.dock-tab-item--active .dock-tab-icon {
+  color: #c1121f !important;
+}
+
+/* ========================================================
+   INDICADOR LUMINOSO INFERIOR (APPLE STYLE PILL INDICATOR)
+   ======================================================== */
+.dock-tab-active-indicator {
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  width: 0;
+  height: 2.5px;
+  border-radius: 2px;
+  background: #c1121f;
+  transform: translateX(-50%);
+  opacity: 0;
+  box-shadow: 0 1px 6px rgba(193, 18, 31, 0.7);
+  transition:
+    width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.2s ease;
+}
+
+.dock-tab-item--active .dock-tab-active-indicator {
+  width: 28px;
+  opacity: 1;
+}
+
+/* Hover adicional sutil en indicador activo */
+.dock-tab-item--active:hover .dock-tab-active-indicator {
+  width: 36px;
+  background: #c1121f;
+  box-shadow: 0 1px 8px rgba(193, 18, 31, 0.85);
+}

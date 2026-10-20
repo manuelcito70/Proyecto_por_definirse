@@ -86,6 +86,7 @@ const Expedidos = () => {
       descripcion: doc.descripcion || '',
       fecha: doc.fecha || new Date().toISOString().split('T')[0],
       estado: doc.estado || 'completado',
+      nro_oficio: doc.nro_oficio,
       archivo: null
     });
     setIsModalOpen(true);
@@ -140,7 +141,7 @@ const Expedidos = () => {
     }
   };
 
-  // Pagination calculation with full array safety
+  // Pagination calculation
   const safeExpedidos = Array.isArray(expedidos) ? expedidos : [];
   const totalItems = safeExpedidos.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
@@ -151,14 +152,14 @@ const Expedidos = () => {
     switch (estado) {
       case 'completado':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
             Completado
           </span>
         );
       case 'en_curso':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-900 border border-amber-200">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
             En curso
           </span>
@@ -166,8 +167,8 @@ const Expedidos = () => {
       case 'pendiente':
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-800">
-            <span className="w-1.5 h-1.5 rounded-full bg-error"></span>
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-red-50 text-[#c1121f] border border-red-200">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#c1121f] animate-pulse"></span>
             Pendiente
           </span>
         );
@@ -181,69 +182,94 @@ const Expedidos = () => {
         <nav className="flex items-center gap-space-xs text-on-surface-variant font-caption text-caption">
           <span className="hover:text-primary transition-colors cursor-pointer">Gestión documental</span>
           <span className="material-symbols-outlined text-sm">chevron_right</span>
-          <span className="font-bold text-secondary">Documentos expedidos</span>
+          <span className="font-bold text-[#c1121f]">Documentos expedidos</span>
         </nav>
-        <div className="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1 rounded-full text-on-surface-variant font-caption text-caption">
+        <div className="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1 rounded-full text-on-surface-variant font-caption text-caption border border-slate-200/60">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
           <span>Base de datos activa</span>
           <span className="text-outline-variant">•</span>
-          <span className="font-mono text-on-surface font-semibold">FINI-UAGRM</span>
+          <span className="font-label-code text-[#0b2545] font-semibold">FINI-UAGRM</span>
         </div>
       </div>
 
       {/* Page Header Title & Main Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-md">
-        <div className="flex flex-col gap-0.5">
-          <div className="flex items-center gap-space-xs">
-            <span className="font-label-badge text-label-badge tracking-wider text-secondary uppercase font-bold">
-              Dirección de Carrera / Sistemas
-            </span>
+        <div className="flex items-start gap-3">
+          <div className="w-1.5 h-12 bg-[#c1121f] rounded-full hidden sm:block mt-1 shadow-sm"></div>
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-space-xs">
+              <span className="font-label-badge text-caption tracking-widest text-[#c1121f] uppercase font-bold">
+                Dirección de Carrera · Módulo 01
+              </span>
+              <span className="text-outline-variant">•</span>
+              <span className="font-label-code text-[11px] text-[#0b2545] font-semibold uppercase">
+                Registro Legal de Oficios
+              </span>
+            </div>
+            <h1 className="font-institutional-serif text-[28px] md:text-[34px] text-[#0b2545] font-bold tracking-tight leading-tight">
+              Documentos Expedidos
+            </h1>
+            <p className="font-body-md text-body-md text-on-surface-variant">
+              Oficios elaborados en dirección y remitidos a otras dependencias bajo estricto consecutivo anual.
+            </p>
           </div>
-          <h1 className="font-display text-display text-primary tracking-tight">Documentos expedidos</h1>
-          <p className="font-body-md text-body-md text-on-surface-variant">
-            Oficios elaborados en dirección y remitidos a otras oficinas y dependencias facultativas.
-          </p>
         </div>
 
-        {/* Quick Action Modal Trigger */}
-        <div className="flex items-center gap-space-sm self-start sm:self-auto">
+        <div className="flex items-center gap-space-sm self-start sm:self-auto bg-surface-container-lowest p-1.5 rounded-xl border border-surface-container shadow-xs">
+          <div className="hidden sm:flex flex-col text-right px-2">
+            <span className="font-label-code text-[10px] text-on-surface-variant uppercase font-semibold">
+              Serie Vigente
+            </span>
+            <span className="font-label-code text-xs font-bold text-[#c1121f]">
+              OF-FINI/{gestion}
+            </span>
+          </div>
+          <div className="h-8 w-px bg-surface-container hidden sm:block"></div>
           <button 
-            className="inline-flex items-center gap-space-xs bg-secondary text-on-secondary px-space-md py-2.5 rounded-lg font-body-sm text-body-sm font-semibold shadow-md hover:bg-primary transition-all duration-200" 
+            className="inline-flex items-center gap-space-xs bg-gradient-to-r from-[#c1121f] to-[#8b0000] text-white px-space-md py-2.5 rounded-lg font-body-sm text-body-sm font-semibold shadow-md hover:shadow-lg hover:from-[#8b0000] hover:to-[#c1121f] transition-all duration-200 border border-white/20 cursor-pointer" 
             onClick={handleOpenCreateModal}
+            type="button"
           >
-            <span className="material-symbols-outlined text-base">add</span>
+            <span className="material-symbols-outlined text-base">add_circle</span>
             <span>Nuevo oficio</span>
           </button>
         </div>
       </div>
 
       {/* Correlative Running Tracker Card */}
-      <div className="relative overflow-hidden bg-surface-container-lowest rounded-xl p-space-lg shadow-sm flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg">
-        <div className="absolute -right-8 -top-12 w-48 h-48 bg-secondary/5 rounded-full blur-2xl pointer-events-none"></div>
+      <div className="relative overflow-hidden bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-surface-container flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg">
+        {/* Franjas geométricas y acento superior */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
+        <div className="absolute -right-8 -top-12 w-48 h-48 bg-[#c1121f]/5 rounded-full blur-2xl pointer-events-none"></div>
+
         <div className="flex items-center gap-space-lg min-w-0">
           {/* Big Correlative Block */}
-          <div className="flex flex-col items-center justify-center bg-surface-container-low px-space-lg py-space-sm rounded-xl min-w-[110px]">
-            <span className="font-caption text-caption uppercase tracking-wider text-on-surface-variant font-semibold">Próximo oficio</span>
-            <span className="font-correlative-counter text-correlative-counter text-secondary font-extrabold tracking-tight">
-              {String(nextNumber).padStart(2, '0')}
+          <div className="flex flex-col items-center justify-center bg-surface-container-low px-space-lg py-space-sm rounded-xl min-w-[120px] border border-slate-200/60 shadow-2xs">
+            <span className="font-caption text-caption uppercase tracking-wider text-on-surface-variant font-bold">
+              Próximo oficio
             </span>
-            <span className="font-label-code text-label-code text-on-surface-variant font-mono">FINI-SIS/{gestion}</span>
+            <span className="font-correlative-counter text-correlative-counter text-[#c1121f] font-bold tracking-tight">
+              #{String(nextNumber).padStart(2, '0')}
+            </span>
+            <span className="font-label-code text-[11px] text-[#0b2545] font-bold font-mono">
+              FINI-SIS/{gestion}
+            </span>
           </div>
 
           {/* Descriptive Information */}
           <div className="flex flex-col gap-1 min-w-0">
             <div className="flex items-center gap-space-xs flex-wrap">
-              <span className="font-headline-md text-headline-md text-on-surface font-bold">
-                Gestión {gestion} · Numeración correlativa automática
+              <span className="font-institutional-serif text-lg md:text-xl text-[#0b2545] font-bold">
+                Gestión {gestion} · Numeración correlativa oficial
               </span>
-              <span className="inline-flex items-center gap-1 bg-surface-container px-2 py-0.5 rounded text-xs font-semibold text-secondary">
-                <span className="material-symbols-outlined text-xs">lock</span>
+              <span className="inline-flex items-center gap-1 bg-[#0b2545]/10 px-2.5 py-0.5 rounded-full text-xs font-bold text-[#0b2545] border border-[#0b2545]/20">
+                <span className="material-symbols-outlined text-xs text-[#c1121f]">lock</span>
                 Consecutivo estricto
               </span>
             </div>
             <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed max-w-xl">
-              Correlativo único, ordenado de uno en uno y sin repeticiones ni duplicidad. Último oficio expedido registrado legalmente: {' '}
-              <span className="font-mono font-bold text-on-surface">
+              Correlativo legal único, ordenado de uno en uno y sin repeticiones. Último oficio expedido registrado: {' '}
+              <span className="font-label-code font-bold text-[#c1121f] bg-red-50 border border-red-200 px-1.5 py-0.2 rounded">
                 #{nextNumber > 1 ? String(nextNumber - 1).padStart(2, '0') : '00'}
               </span>.
             </p>
@@ -251,28 +277,34 @@ const Expedidos = () => {
         </div>
 
         {/* Historical Reference Box */}
-        <div className="w-full lg:w-auto flex flex-col justify-between bg-surface-container-low/70 p-space-md rounded-xl max-w-xs">
-          <div className="flex items-center justify-between gap-space-xs text-on-surface-variant mb-1">
-            <span className="font-caption text-caption uppercase tracking-wider font-bold">Cierre de gestión {gestion - 1}</span>
-            <span className="material-symbols-outlined text-sm text-secondary">inventory_2</span>
+        <div className="w-full lg:w-auto flex flex-col justify-between bg-surface-container-low p-space-md rounded-xl max-w-xs border border-slate-200/70">
+          <div className="flex items-center justify-between gap-space-xs text-[#0b2545] mb-1">
+            <span className="font-institutional-serif text-xs uppercase tracking-wider font-bold">
+              Cierre anual inmutable
+            </span>
+            <span className="material-symbols-outlined text-sm text-[#c5a059]">inventory_2</span>
           </div>
           <p className="font-caption text-caption text-on-surface-variant leading-snug">
-            El histórico documental se preserva cerrado e inmutable. Cada ciclo anual restablece la serie numérica correlativa en <span className="font-mono font-bold text-on-surface">001</span>.
+            El archivo de correspondencia de cada año se preserva bajo norma de no repudio. Cada ciclo restablece la serie numérica en <strong className="text-[#0b2545]">#01</strong>.
           </p>
         </div>
       </div>
 
       {/* Main Document Table Container */}
-      <div className="flex flex-col bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
+      <div className="flex flex-col bg-surface-container-lowest rounded-2xl shadow-sm border border-surface-container overflow-hidden">
+        <div className="h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
+
         {/* Card Head: Title, Search & Filters */}
-        <div className="p-space-lg flex flex-col gap-space-md border-b border-outline-variant/20">
+        <div className="p-space-lg flex flex-col gap-space-md border-b border-surface-container">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
-            <div className="flex items-center gap-space-xs">
-              <span className="material-symbols-outlined text-secondary text-xl">folder_shared</span>
-              <h2 className="font-headline-md text-headline-md font-bold text-on-surface">Archivo oficial de correspondencia</h2>
+            <div className="flex items-center gap-2">
+              <div className="h-5 w-1 bg-[#c1121f] rounded-full"></div>
+              <h2 className="font-institutional-serif text-lg md:text-xl font-bold text-[#0b2545]">
+                Archivo Oficial de Correspondencia
+              </h2>
             </div>
-            <div className="flex items-center gap-space-xs text-on-surface-variant font-caption text-caption">
-              <span className="material-symbols-outlined text-sm">schedule</span>
+            <div className="flex items-center gap-space-xs text-on-surface-variant font-label-code text-[11px] bg-surface-container-low px-2.5 py-1 rounded border border-surface-container">
+              <span className="material-symbols-outlined text-sm text-[#0b2545]">schedule</span>
               <span>{expedidos.length} oficios registrados en Gestión {gestion}</span>
             </div>
           </div>
@@ -285,7 +317,7 @@ const Expedidos = () => {
                 <span className="material-symbols-outlined text-lg">search</span>
               </span>
               <input 
-                className="w-full pl-10 pr-12 py-2.5 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary/20 focus:outline-none transition-all" 
+                className="w-full pl-10 pr-12 py-2.5 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:bg-surface-container-lowest focus:ring-2 focus:ring-[#0b2545]/20 focus:outline-none transition-all border border-slate-200/80" 
                 placeholder="Buscar por asunto, destinatario o descripción..." 
                 type="text"
                 value={busqueda}
@@ -300,7 +332,7 @@ const Expedidos = () => {
             <div className="flex items-center gap-space-xs">
               <div className="relative">
                 <select 
-                  className="appearance-none bg-surface-container-low pl-3 pr-8 py-2.5 rounded-lg font-body-sm text-body-sm font-medium text-on-surface hover:bg-surface-container focus:outline-none focus:ring-2 focus:ring-secondary/20 cursor-pointer"
+                  className="appearance-none bg-surface-container-low pl-3 pr-8 py-2.5 rounded-lg font-body-sm text-body-sm font-medium text-on-surface hover:bg-surface-container focus:outline-none focus:ring-2 focus:ring-[#0b2545]/20 cursor-pointer border border-slate-200/80"
                   value={filterEstado}
                   onChange={(e) => setFilterEstado(e.target.value)}
                 >
@@ -315,8 +347,9 @@ const Expedidos = () => {
               </div>
               <button 
                 onClick={fetchData}
-                className="p-2.5 bg-surface-container-low hover:bg-surface-container text-on-surface-variant rounded-lg transition-colors flex items-center justify-center" 
+                className="p-2.5 bg-surface-container-low hover:bg-surface-container text-on-surface-variant rounded-lg transition-colors flex items-center justify-center border border-slate-200/80 cursor-pointer" 
                 title="Refrescar lista"
+                type="button"
               >
                 <span className="material-symbols-outlined text-lg leading-none">refresh</span>
               </button>
@@ -324,12 +357,12 @@ const Expedidos = () => {
           </div>
         </div>
 
-        {/* Responsive Table Wrapper */}
+        {/* Responsive Table Wrapper with Institutional Theme */}
         <div className="overflow-x-auto w-full">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-surface-container-low text-on-surface-variant font-caption text-caption uppercase tracking-wider">
-                <th className="py-3 px-space-md font-bold">N.° de oficio</th>
+              <tr className="bg-[#0b2545] text-white font-caption text-[11px] uppercase tracking-wider">
+                <th className="py-3 px-space-md font-bold">N.° de Oficio</th>
                 <th className="py-3 px-space-sm font-bold">Gestión</th>
                 <th className="py-3 px-space-sm font-bold">Fecha</th>
                 <th className="py-3 px-space-md font-bold min-w-[280px]">Asunto</th>
@@ -339,7 +372,7 @@ const Expedidos = () => {
                 <th className="py-3 px-space-md font-bold text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-container-low text-on-surface font-body-sm text-body-sm">
+            <tbody className="divide-y divide-slate-100 text-on-surface font-body-sm text-body-sm">
               {loading ? (
                 <tr>
                   <td colSpan="8" className="py-8 text-center text-on-surface-variant">
@@ -352,19 +385,31 @@ const Expedidos = () => {
                     <p className="mb-2">No se encontraron oficios expedidos en la gestión {gestion}.</p>
                     <button 
                       onClick={handleOpenCreateModal}
-                      className="px-3 py-1.5 bg-secondary text-white rounded-lg text-xs font-semibold"
+                      className="px-4 py-2 bg-gradient-to-r from-[#c1121f] to-[#9e0c18] text-white rounded-lg text-xs font-bold shadow-sm cursor-pointer"
+                      type="button"
                     >
                       Registrar el primero
                     </button>
                   </td>
                 </tr>
               ) : (
-                currentExpedidos.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-surface-container-low/60 transition-colors group">
-                    <td className="py-3.5 px-space-md font-label-code text-label-code font-bold text-secondary">
-                      #{String(doc.nro_oficio).padStart(2, '0')}
+                currentExpedidos.map((doc, idx) => (
+                  <tr 
+                    key={doc.id} 
+                    className={`hover:bg-surface-container-low/60 transition-colors group ${
+                      idx % 2 === 0 ? 'bg-white' : 'bg-surface-container-lowest'
+                    }`}
+                  >
+                    <td className="py-3.5 px-space-md font-label-code text-label-code font-bold">
+                      <span className={`px-2 py-0.5 rounded border ${
+                        doc.estado === 'pendiente'
+                          ? 'bg-red-50 text-[#c1121f] border-red-200'
+                          : 'bg-slate-100 text-[#0b2545] border-slate-200'
+                      }`}>
+                        #{String(doc.nro_oficio).padStart(2, '0')}
+                      </span>
                     </td>
-                    <td className="py-3.5 px-space-sm font-label-code text-label-code text-on-surface-variant">
+                    <td className="py-3.5 px-space-sm font-label-code text-label-code text-on-surface-variant font-semibold">
                       {doc.gestion}
                     </td>
                     <td className="py-3.5 px-space-sm font-mono text-xs text-on-surface-variant">
@@ -372,7 +417,7 @@ const Expedidos = () => {
                     </td>
                     <td className="py-3.5 px-space-md">
                       <div className="flex flex-col">
-                        <span className="font-semibold text-on-surface group-hover:text-secondary transition-colors">
+                        <span className="font-semibold text-on-surface group-hover:text-[#0b2545] transition-colors">
                           {doc.asunto}
                         </span>
                         {doc.descripcion && (
@@ -382,7 +427,7 @@ const Expedidos = () => {
                         )}
                       </div>
                     </td>
-                    <td className="py-3.5 px-space-md font-medium text-on-surface">
+                    <td className="py-3.5 px-space-md font-semibold text-[#0b2545]">
                       {doc.destinatario}
                     </td>
                     <td className="py-3.5 px-space-sm">
@@ -392,8 +437,9 @@ const Expedidos = () => {
                       {doc.archivo_path ? (
                         <button 
                           onClick={() => downloadFile(`/expedidos/${doc.id}/download`, doc.nombre_archivo || 'oficio.pdf')}
-                          className="inline-flex items-center gap-1.5 text-secondary hover:text-primary font-body-sm text-body-sm font-semibold transition-colors"
+                          className="inline-flex items-center gap-1.5 text-[#0b2545] hover:text-[#c1121f] font-body-sm text-body-sm font-bold transition-colors cursor-pointer"
                           title="Descargar o abrir escaneo digital"
+                          type="button"
                         >
                           <span className="material-symbols-outlined text-base">download</span>
                           <span>Descargar PDF</span>
@@ -406,15 +452,17 @@ const Expedidos = () => {
                       <div className="inline-flex items-center justify-center gap-1">
                         <button 
                           onClick={() => handleOpenEditModal(doc)}
-                          className="p-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-secondary transition-colors" 
+                          className="p-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-[#c1121f] transition-colors cursor-pointer" 
                           title="Editar oficio"
+                          type="button"
                         >
                           <span className="material-symbols-outlined text-base">edit</span>
                         </button>
                         <button 
                           onClick={() => handleDelete(doc.id, doc.nro_oficio)}
-                          className="p-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-error transition-colors" 
+                          className="p-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-[#c1121f] transition-colors cursor-pointer" 
                           title="Eliminar oficio"
+                          type="button"
                         >
                           <span className="material-symbols-outlined text-base">delete</span>
                         </button>
@@ -428,9 +476,9 @@ const Expedidos = () => {
         </div>
 
         {/* Table Footer: Pagination & Records Tracker */}
-        <div className="p-space-md bg-surface-container-low/40 flex flex-col sm:flex-row items-center justify-between gap-space-sm border-t border-outline-variant/20">
+        <div className="p-space-md bg-surface-container-low/40 flex flex-col sm:flex-row items-center justify-between gap-space-sm border-t border-slate-200/60">
           <span className="font-body-sm text-body-sm text-on-surface-variant">
-            Mostrando <span className="font-semibold text-on-surface">{totalItems > 0 ? startIndex + 1 : 0}–{Math.min(startIndex + itemsPerPage, totalItems)}</span> de <span className="font-semibold text-on-surface">{totalItems}</span> oficios registrados
+            Mostrando <span className="font-bold text-[#0b2545]">{totalItems > 0 ? startIndex + 1 : 0}–{Math.min(startIndex + itemsPerPage, totalItems)}</span> de <span className="font-bold text-[#0b2545]">{totalItems}</span> oficios registrados
           </span>
           
           {/* Pagination Buttons */}
@@ -438,7 +486,8 @@ const Expedidos = () => {
             <button 
               disabled={currentPage <= 1}
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-40"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-40 cursor-pointer"
+              type="button"
             >
               <span className="material-symbols-outlined text-base">chevron_left</span>
             </button>
@@ -447,11 +496,12 @@ const Expedidos = () => {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`w-8 h-8 flex items-center justify-center rounded-lg font-body-sm text-body-sm font-bold transition-colors ${
+                className={`w-8 h-8 flex items-center justify-center rounded-lg font-body-sm text-body-sm font-bold transition-colors cursor-pointer ${
                   currentPage === page 
-                    ? 'bg-secondary text-on-secondary shadow-sm' 
+                    ? 'bg-[#0b2545] text-white shadow-xs' 
                     : 'text-on-surface hover:bg-surface-container-high'
                 }`}
+                type="button"
               >
                 {page}
               </button>
@@ -460,7 +510,8 @@ const Expedidos = () => {
             <button 
               disabled={currentPage >= totalPages}
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              className="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-40"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors disabled:opacity-40 cursor-pointer"
+              type="button"
             >
               <span className="material-symbols-outlined text-base">chevron_right</span>
             </button>
@@ -469,14 +520,14 @@ const Expedidos = () => {
       </div>
 
       {/* Status Legend Bar */}
-      <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-space-md">
-        <div className="flex items-center gap-space-xs text-on-surface-variant font-caption text-caption uppercase tracking-wider font-bold">
-          <span className="material-symbols-outlined text-base text-secondary">info</span>
-          <span>Seguimiento de estados:</span>
+      <div className="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-wrap items-center justify-between gap-space-md border border-surface-container">
+        <div className="flex items-center gap-space-xs text-[#0b2545] font-caption text-caption uppercase tracking-wider font-bold">
+          <span className="material-symbols-outlined text-base text-[#c1121f]">policy</span>
+          <span>Normativa y Estados Oficiales:</span>
         </div>
         <div className="flex flex-wrap items-center gap-space-lg font-body-sm text-body-sm">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
               <span className="material-symbols-outlined text-xs">check_circle</span>
               Completado
             </span>
@@ -484,7 +535,7 @@ const Expedidos = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-900 border border-amber-200">
               <span className="material-symbols-outlined text-xs">sync</span>
               En curso
             </span>
@@ -492,7 +543,7 @@ const Expedidos = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-50 text-rose-800">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-50 text-[#c1121f] border border-red-200">
               <span className="material-symbols-outlined text-xs">error</span>
               Pendiente
             </span>
@@ -504,41 +555,39 @@ const Expedidos = () => {
       {/* MODAL: REGISTRO DE NUEVO OFICIO (HIGH-FIDELITY UAGRM FINI) */}
       {isModalOpen && (
         <div 
-          className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-3 sm:p-5 bg-[#07162c]/75 backdrop-blur-md transition-all duration-300" 
+          className="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center p-3 sm:p-5 bg-black/60 backdrop-blur-md transition-all duration-300" 
           onClick={() => !submitting && setIsModalOpen(false)}
         >
           <div 
             aria-labelledby="modal-title" 
             aria-modal="true" 
-            className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-white/20 overflow-hidden transform transition-all flex flex-col my-auto animate-in fade-in zoom-in-95 duration-200" 
+            className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#c5a059]/40 overflow-hidden transform transition-all flex flex-col my-auto animate-in fade-in zoom-in-95 duration-200" 
             onClick={(e) => e.stopPropagation()} 
             role="dialog"
           >
             {/* Modal Top Branding Bar (Navy Blue Gradient) */}
-            <div className="bg-gradient-to-r from-[#07162c] via-[#0b2545] to-[#134074] px-6 py-4 border-b border-white/10 flex items-center justify-between text-white relative">
-              {/* Visual Glow Effect */}
-              <div className="absolute -top-12 -left-12 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl pointer-events-none"></div>
+            <div className="bg-gradient-to-r from-[#07162b] via-[#0b2545] to-[#134074] px-6 py-4 border-b border-[#c5a059]/30 flex items-center justify-between text-white relative">
               <div className="flex items-center space-x-3 z-10">
-                <div className="w-9 h-9 rounded-xl bg-blue-600/30 border border-blue-400/30 flex items-center justify-center text-blue-300 shadow-inner">
+                <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-[#c5a059] shadow-inner">
                   <span className="material-symbols-outlined text-xl">description</span>
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="font-bold text-base tracking-wide text-white" id="modal-title">
+                    <h2 className="font-institutional-serif text-base font-bold tracking-wide text-white" id="modal-title">
                       {editingId ? 'Modificar Oficio Expedido' : 'Registro de Nuevo Oficio'}
                     </h2>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/30 tracking-wider">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#c1121f] text-white border border-white/20 tracking-wider">
                       GESTIÓN {gestion}
                     </span>
                   </div>
-                  <p className="text-[11px] text-blue-200/80">Dirección de Ingeniería de Sistemas — Sede Ichilo</p>
+                  <p className="text-[11px] text-white/70">Dirección de Ingeniería de Sistemas — FINI UAGRM</p>
                 </div>
               </div>
 
               {/* Close Button */}
               <button 
                 aria-label="Cerrar modal" 
-                className="text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-xl border border-white/10 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer" 
+                className="text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-xl border border-white/10 transition-all duration-150 cursor-pointer" 
                 onClick={() => !submitting && setIsModalOpen(false)}
                 type="button"
               >
@@ -547,30 +596,29 @@ const Expedidos = () => {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5 bg-gradient-to-b from-slate-50/50 to-white">
-              {/* Correlative Assigned Banner (Official Folio Ticket) */}
-              <div className="relative overflow-hidden bg-gradient-to-r from-blue-50/90 via-indigo-50/50 to-slate-50 border border-blue-200/80 rounded-2xl p-4 shadow-sm">
+            <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)] space-y-5 bg-white">
+              {/* Correlative Assigned Banner */}
+              <div className="relative overflow-hidden bg-gradient-to-r from-slate-50 via-blue-50/40 to-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center space-x-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-md shrink-0 font-bold font-mono">
+                    <div className="w-10 h-10 rounded-xl bg-[#0b2545] text-[#c5a059] flex items-center justify-center text-lg shadow-md shrink-0 font-bold font-mono">
                       #
                     </div>
                     <div>
                       <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
-                        {editingId ? 'Oficio Registrado' : 'Correlativo Oficial Reservado'}
+                        {editingId ? 'Oficio Registrado' : 'Correlativo Asignado'}
                       </span>
-                      <span className="text-xl font-mono font-extrabold text-blue-900 tracking-tight">
+                      <span className="text-xl font-label-code font-bold text-[#0b2545] tracking-tight">
                         Oficio N.° {editingId ? String(formData.nro_oficio || editingId).padStart(2, '0') : String(nextNumber).padStart(2, '0')}{' '}
-                        <span className="text-blue-500 font-light">/</span> {gestion}
+                        <span className="text-[#c1121f]">/</span> {gestion}
                       </span>
                     </div>
                   </div>
 
-                  {/* Auto-Assignment Status Pill */}
-                  <div className="inline-flex items-center self-start sm:self-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-xs">
+                  <div className="inline-flex items-center self-start sm:self-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-2xs">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span className="material-symbols-outlined text-xs text-emerald-600">lock</span>
-                    <span>Asignación Automática e Inmutable</span>
+                    <span>Consecutivo Legal</span>
                   </div>
                 </div>
               </div>
@@ -581,7 +629,7 @@ const Expedidos = () => {
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1" htmlFor="destinatario-input">
-                      Destinatario <span className="text-rose-500">*</span>
+                      Destinatario <span className="text-[#c1121f]">*</span>
                     </label>
                     <span className="text-[11px] text-slate-400 font-medium">Autoridad o Unidad</span>
                   </div>
@@ -590,7 +638,7 @@ const Expedidos = () => {
                       <span className="material-symbols-outlined text-lg">corporate_fare</span>
                     </div>
                     <input 
-                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs" 
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none" 
                       id="destinatario-input" 
                       placeholder="Ej: DADSA, Decanato FINI, Consejo Facultativo..." 
                       required 
@@ -608,10 +656,10 @@ const Expedidos = () => {
                         key={item}
                         type="button"
                         onClick={() => setFormData({ ...formData, destinatario: item })}
-                        className={`text-[11px] px-2.5 py-1 rounded-md border transition-colors font-medium cursor-pointer ${
+                        className={`text-[11px] px-2.5 py-1 rounded-md border transition-colors font-semibold cursor-pointer ${
                           formData.destinatario === item
-                            ? 'bg-blue-600 text-white border-blue-600'
-                            : 'bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border-slate-200'
+                            ? 'bg-[#0b2545] text-white border-[#0b2545]'
+                            : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-200'
                         }`}
                       >
                         {item}
@@ -623,14 +671,14 @@ const Expedidos = () => {
                 {/* Field: Asunto Principal */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="asunto-input">
-                    Asunto Principal <span className="text-rose-500">*</span>
+                    Asunto Principal <span className="text-[#c1121f]">*</span>
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                       <span className="material-symbols-outlined text-lg">description</span>
                     </div>
                     <input 
-                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 placeholder-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs" 
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 placeholder-slate-400 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none" 
                       id="asunto-input" 
                       placeholder="Título descriptivo o referencia resumida del trámite..." 
                       required 
@@ -646,14 +694,14 @@ const Expedidos = () => {
                   {/* Date Picker Element */}
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="fecha-input">
-                      Fecha de Emisión <span className="text-rose-500">*</span>
+                      Fecha de Emisión <span className="text-[#c1121f]">*</span>
                     </label>
                     <div className="relative">
-                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-blue-600">
+                      <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#0b2545]">
                         <span className="material-symbols-outlined text-lg">calendar_today</span>
                       </div>
                       <input 
-                        className="w-full pl-10 pr-3 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs" 
+                        className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none" 
                         id="fecha-input" 
                         type="date"
                         value={formData.fecha}
@@ -666,14 +714,14 @@ const Expedidos = () => {
                   {/* Status Selector */}
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="estado-select">
-                      Estado del Trámite <span className="text-rose-500">*</span>
+                      Estado del Trámite <span className="text-[#c1121f]">*</span>
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-emerald-600">
                         <span className="material-symbols-outlined text-lg">check_circle</span>
                       </div>
                       <select 
-                        className="w-full pl-10 pr-8 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs appearance-none cursor-pointer" 
+                        className="w-full pl-10 pr-8 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none appearance-none cursor-pointer" 
                         id="estado-select"
                         value={formData.estado}
                         onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
@@ -700,7 +748,7 @@ const Expedidos = () => {
                     </span>
                   </div>
                   <textarea 
-                    className="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-100 transition-all duration-150 outline-none shadow-xs resize-none" 
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none resize-none" 
                     id="resumen-textarea" 
                     placeholder="Descripción adicional del documento remitido, antecedentes, códigos de seguimiento o referencias anexas..." 
                     rows="3"
@@ -714,8 +762,8 @@ const Expedidos = () => {
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
-                      <span className="material-symbols-outlined text-base text-blue-600">cloud_upload</span>
-                      <span>Digitalización (PDF Respaldo)</span>
+                      <span className="material-symbols-outlined text-base text-[#c1121f]">cloud_upload</span>
+                      <span>Digitalización (PDF Opcional)</span>
                     </label>
                     <span className="text-[11px] text-slate-500 font-medium bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
                       PDF/A hasta 20 MB
@@ -723,10 +771,9 @@ const Expedidos = () => {
                   </div>
 
                   {formData.archivo ? (
-                    /* File Info Card State */
-                    <div className="border border-blue-200/90 bg-gradient-to-b from-blue-50/40 via-white to-slate-50/30 rounded-2xl p-3 shadow-xs flex items-center justify-between">
+                    <div className="border border-slate-200 bg-slate-50 rounded-xl p-3 shadow-2xs flex items-center justify-between">
                       <div className="flex items-center space-x-3 truncate">
-                        <div className="w-10 h-10 rounded-lg bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-red-100 border border-red-200 text-[#c1121f] flex items-center justify-center shrink-0">
                           <span className="material-symbols-outlined text-xl">picture_as_pdf</span>
                         </div>
                         <div className="truncate text-left">
@@ -744,19 +791,8 @@ const Expedidos = () => {
                       </div>
 
                       <div className="flex items-center space-x-1.5 shrink-0 pl-2">
-                        <button 
-                          className="p-2 rounded-lg text-slate-500 hover:text-blue-600 hover:bg-blue-50 border border-transparent hover:border-blue-100 transition cursor-pointer" 
-                          onClick={() => {
-                            const blobUrl = URL.createObjectURL(formData.archivo);
-                            window.open(blobUrl, '_blank');
-                          }}
-                          title="Vista previa del documento" 
-                          type="button"
-                        >
-                          <span className="material-symbols-outlined text-base">visibility</span>
-                        </button>
                         <label 
-                          className="p-2 rounded-lg text-slate-500 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-100 transition cursor-pointer" 
+                          className="p-2 rounded-lg text-slate-500 hover:text-[#c1121f] hover:bg-slate-200 border border-transparent transition cursor-pointer" 
                           title="Reemplazar archivo"
                         >
                           <span className="material-symbols-outlined text-base">sync</span>
@@ -770,15 +806,14 @@ const Expedidos = () => {
                       </div>
                     </div>
                   ) : (
-                    /* Drag and drop prompt dropzone */
-                    <label className="group relative border-2 border-dashed border-blue-300 hover:border-blue-500 bg-gradient-to-b from-blue-50/40 via-white to-slate-50/30 rounded-2xl p-5 transition-all duration-200 flex flex-col items-center justify-center gap-1.5 cursor-pointer">
-                      <div className="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                    <label className="group relative border-2 border-dashed border-slate-300 hover:border-[#0b2545] bg-slate-50/60 hover:bg-slate-50 rounded-xl p-5 transition-all flex flex-col items-center justify-center gap-1.5 cursor-pointer">
+                      <div className="w-10 h-10 rounded-full bg-blue-50 text-[#0b2545] flex items-center justify-center">
                         <span className="material-symbols-outlined text-2xl">upload_file</span>
                       </div>
                       <p className="text-xs font-semibold text-slate-700 text-center">
-                        Arrastra un archivo nuevo o <span className="text-blue-600 hover:underline">examinar desde tu equipo</span>
+                        Arrastre el PDF del oficio firmado o <span className="text-[#c1121f] hover:underline">examinar archivos</span>
                       </p>
-                      <p className="text-[11px] text-slate-400">PDF firmado, escaneado o digitalizado (máx. 20 MB)</p>
+                      <p className="text-[11px] text-slate-400">Formato permitido: PDF/A hasta 15MB</p>
                       <input 
                         accept=".pdf,.png,.jpg,.jpeg" 
                         className="hidden" 
@@ -789,18 +824,18 @@ const Expedidos = () => {
                   )}
                 </div>
 
-                {/* Institutional Trust Badge / Legal Notification */}
+                {/* Institutional Trust Badge */}
                 <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50/70 border border-amber-200/80 text-amber-900 text-xs">
                   <span className="material-symbols-outlined text-amber-600 mt-0.5 text-base">shield</span>
                   <p className="text-[11px] leading-relaxed text-amber-900/90 font-medium">
-                    Al confirmar, este oficio se registrará en el libro digital de correspondencia de la <b>UAGRM - Sede Ichilo</b> con folio legal único <b>#{editingId ? String(formData.nro_oficio || editingId).padStart(2, '0') : String(nextNumber).padStart(2, '0')}</b>. Los correlativos guardados no se pueden reiniciar.
+                    Al confirmar, este oficio se registrará en el libro digital de correspondencia de la <b>UAGRM - Sede Ichilo</b> con folio legal único <b>#{editingId ? String(formData.nro_oficio || editingId).padStart(2, '0') : String(nextNumber).padStart(2, '0')}</b>.
                   </p>
                 </div>
 
-                {/* Modal Footer inside form to trigger submit */}
+                {/* Modal Footer */}
                 <footer className="pt-4 border-t border-slate-200 flex items-center justify-between gap-space-sm">
                   <button 
-                    className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold uppercase tracking-wider transition duration-150 focus:outline-none focus:ring-2 focus:ring-slate-300 active:scale-95 cursor-pointer" 
+                    className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 text-xs font-bold uppercase tracking-wider transition cursor-pointer" 
                     disabled={submitting}
                     onClick={() => setIsModalOpen(false)}
                     type="button"
@@ -808,11 +843,11 @@ const Expedidos = () => {
                     Cancelar
                   </button>
                   <button 
-                    className="group relative inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 hover:from-blue-800 hover:to-indigo-700 shadow-md hover:shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300 active:scale-98 transition-all duration-150 cursor-pointer disabled:opacity-50" 
+                    className="group relative inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider text-white bg-gradient-to-r from-[#c1121f] to-[#9e0c18] hover:shadow-lg transition-all cursor-pointer disabled:opacity-50 border border-white/20" 
                     disabled={submitting}
                     type="submit"
                   >
-                    <span className="material-symbols-outlined text-base group-hover:scale-110 transition-transform duration-150">
+                    <span className="material-symbols-outlined text-base">
                       done_all
                     </span>
                     <span>

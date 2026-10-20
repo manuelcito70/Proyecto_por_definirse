@@ -9,8 +9,16 @@
     <!-- Google Fonts & Material Symbols Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+    <style>
+      .font-institutional-serif, .font-cinzel { font-family: 'Cinzel', Georgia, serif; }
+      .guilloche-bg {
+        background-image: radial-gradient(rgba(11, 37, 69, 0.04) 1px, transparent 0);
+        background-size: 16px 16px;
+      }
+    </style>
 
     <!-- Tailwind CSS with Institutional UAGRM / FINI Palette (Local Offline Bundle) -->
     <script src="/tailwind.js"></script>
@@ -58,10 +66,18 @@
               "tertiary-container": "#530003",
               "on-tertiary": "#ffffff",
               "on-tertiary-container": "#ff4840",
+              "institutional-red": "#C1121F",
+              "institutional-red-dark": "#93000a",
+              "institutional-navy": "#0B2545",
+              "institutional-navy-dark": "#061528",
+              "institutional-gold": "#C5A059",
+              "institutional-gold-light": "#F7E7A9",
             },
             fontFamily: {
               sans: ["Plus Jakarta Sans", "sans-serif"],
               display: ["Plus Jakarta Sans", "sans-serif"],
+              "institutional-serif": ["Cinzel", "Georgia", "serif"],
+              cinzel: ["Cinzel", "Georgia", "serif"],
               "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
               "headline-md": ["Plus Jakarta Sans", "sans-serif"],
               "body-lg": ["Plus Jakarta Sans", "sans-serif"],
@@ -95,7 +111,7 @@
       }
     </style>
   </head>
-  <body class="bg-background font-sans text-on-surface antialiased">
+  <body class="bg-background font-sans text-on-surface antialiased guilloche-bg">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

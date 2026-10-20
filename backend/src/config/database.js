@@ -17,14 +17,24 @@ if (process.env.DATABASE_URL) {
     });
 } else {
     // Configuración local con variables separadas
+    const dbName = process.env.DB_NAME || 'sistema_documentos';
+    const dbUser = process.env.DB_USER || 'postgres';
+    const dbPass = process.env.DB_PASS !== undefined ? String(process.env.DB_PASS) : '';
+    const dbHost = process.env.DB_HOST || 'localhost';
+    const dbPort = process.env.DB_PORT || 5432;
+
+    if (!process.env.DB_PASS) {
+        console.warn('⚠️  ADVERTENCIA: La variable DB_PASS no está definida en el archivo backend/.env.');
+    }
+
     sequelize = new Sequelize(
-        process.env.DB_NAME,
-        process.env.DB_USER,
-        process.env.DB_PASS,
+        dbName,
+        dbUser,
+        dbPass,
         {
-            host: process.env.DB_HOST,
+            host: dbHost,
             dialect: 'postgres',
-            port: process.env.DB_PORT,
+            port: dbPort,
             logging: false
         }
     );

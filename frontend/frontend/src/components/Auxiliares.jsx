@@ -281,147 +281,177 @@ const Auxiliares = () => {
 
   return (
     <div className="flex flex-col w-full gap-space-lg">
-      {/* Encabezado & Acciones Principales */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-space-md">
-        <div className="flex flex-col">
-          <nav className="flex items-center gap-space-xs text-caption font-caption text-on-surface-variant mb-1">
-            <span>Gestión documental</span>
-            <span className="material-symbols-outlined text-xs">chevron_right</span>
-            <span className="text-secondary font-semibold">Auxiliares</span>
-          </nav>
-          <div className="flex items-baseline gap-space-md">
-            <h1 className="font-headline-lg text-headline-lg text-primary tracking-tight">Auxiliares</h1>
-            <span className="hidden md:inline-block font-label-code text-caption px-space-xs py-0.5 rounded bg-surface-container-high text-on-primary-fixed-variant">
-              SISTEMAS · FINI
-            </span>
+      {/* Encabezado & Acciones Principales con Estilo Folder Institucional */}
+      <div className="relative overflow-hidden rounded-2xl bg-surface-container-lowest p-space-xl border border-surface-container shadow-[0_6px_25px_rgba(11,37,69,0.06)]">
+        <div className="absolute -right-8 top-0 bottom-0 w-64 bg-gradient-to-bl from-[#c1121f] via-[#d90429] to-[#8b0000] pointer-events-none transform skew-x-[-20deg] opacity-90"></div>
+        <div className="absolute right-52 top-0 bottom-0 w-6 bg-[#0b2545] pointer-events-none transform skew-x-[-20deg]"></div>
+        <div className="absolute right-58 top-0 bottom-0 w-1.5 bg-[#c5a059] pointer-events-none transform skew-x-[-20deg]"></div>
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
+        <img 
+          alt="Filigrana UAGRM" 
+          className="absolute right-10 top-1/2 -translate-y-1/2 h-44 w-auto object-contain opacity-[0.07] pointer-events-none select-none" 
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwDvgfNOgOLZmyF4jwM11gkjCA2NuiqNJkDBamQIZvD-x--Qb1YoPJ9Mzesy_1pTP_dbbv_hOkFsi6ze_g00Ue5RNPfbLIxnC9tZupz-ah9GofWn9r692ngG1R9Q3AXhet2N6WkwTAAsEaAo7t6Xrg2tEiGrAQjpNti3zmmF79VJj0TDnymJYIo_yQziRb9pWofcjeXQtEkycQ9MKFAlRf35R0BybpEStSY0yTO9g6GCKAytofF79WdCerCyewDfZ5" 
+        />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-space-md">
+          <div className="flex flex-col max-w-2xl">
+            <nav className="flex items-center gap-space-xs text-caption font-caption text-on-surface-variant mb-1">
+              <span className="hover:text-primary transition-colors cursor-pointer">Gestión documental</span>
+              <span className="material-symbols-outlined text-xs">chevron_right</span>
+              <span className="text-[#c1121f] font-bold uppercase tracking-wider font-label-badge">Auxiliares de Cátedra</span>
+            </nav>
+            <div className="flex items-center gap-3">
+              <div className="w-1.5 h-10 bg-[#c1121f] rounded-full hidden sm:block"></div>
+              <div>
+                <h1 className="font-institutional-serif text-[26px] md:text-[32px] text-[#0b2545] font-bold tracking-tight leading-tight">
+                  Auxiliares de Cátedra
+                </h1>
+                <p className="font-body-md text-body-md text-on-surface-variant mt-0.5">
+                  Antecedentes oficiales por materia, gestión y semestre con respaldo jurídico institucional.
+                </p>
+              </div>
+            </div>
           </div>
-          <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mt-0.5">
-            Antecedentes por materia, gestión y semestre, con documentación de respaldo y trazabilidad jurídica.
-          </p>
-        </div>
-        <div className="flex items-center gap-space-sm self-start md:self-auto">
-          <button
-            onClick={handleOpenModal}
-            className="inline-flex items-center gap-space-xs px-space-md py-2.5 rounded-lg bg-secondary text-on-secondary shadow-md hover:bg-secondary-container transition-all active:scale-[0.98] cursor-pointer"
-            type="button"
-          >
-            <span className="material-symbols-outlined text-lg">add</span>
-            <span className="font-body-sm text-body-sm font-semibold">Registrar antecedente</span>
-          </button>
+          <div className="flex items-center gap-space-sm self-start md:self-auto">
+            <button
+              onClick={handleOpenModal}
+              className="inline-flex items-center gap-space-xs px-space-lg py-2.5 rounded-lg bg-gradient-to-r from-[#c1121f] to-[#9e0c18] text-white shadow-md hover:shadow-lg hover:from-[#8b0000] hover:to-[#c1121f] transition-all border border-white/20 active:scale-[0.98] cursor-pointer"
+              type="button"
+            >
+              <span className="material-symbols-outlined text-lg">add_circle</span>
+              <span className="font-body-sm text-body-sm font-semibold tracking-wide">+ Registrar antecedente</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Stepper de Referencia Jurídico-Administrativa */}
-      <div className="bg-surface-container-low rounded-xl p-space-md shadow-sm">
-        <div className="flex items-center justify-between mb-space-sm">
-          <div className="flex items-center gap-space-xs">
-            <span className="material-symbols-outlined text-secondary text-lg">account_tree</span>
-            <span className="font-label-badge text-caption uppercase text-secondary font-bold tracking-wider">
-              Proceso de referencia para el archivo
+      {/* Stepper de Referencia Jurídico-Administrativa con Protocolo de Prestigio */}
+      <div className="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-surface-container relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-space-md pb-2 border-b border-slate-100">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#c1121f] text-xl">account_tree</span>
+            <span className="font-institutional-serif text-sm uppercase text-[#0b2545] font-bold tracking-wider">
+              Proceso Reglamentario para Archivo de Cátedra
             </span>
           </div>
-          <span className="font-caption text-caption text-on-surface-variant">
-            Conforme a normativa del Estatuto Orgánico UAGRM
-          </span>
+          <div className="flex items-center gap-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600"></span>
+            <span className="font-label-code text-[11px] text-on-surface-variant font-medium">
+              Normativa Estatuto Orgánico UAGRM · Sede Ichilo
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md relative">
           {/* Etapa 1 */}
-          <div className="bg-surface-container-lowest rounded-lg p-space-md shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div className="absolute -top-3 -right-2 font-correlative-counter text-4xl text-surface-container-highest/60 select-none pointer-events-none">
+          <div className="bg-gradient-to-b from-white to-surface-container-low/40 rounded-xl p-space-md border border-slate-200 shadow-sm relative overflow-hidden group hover:border-[#c1121f]/50 transition-all">
+            <div className="absolute -top-3 -right-2 font-correlative-counter text-4xl text-[#0b2545]/10 select-none pointer-events-none group-hover:text-[#c1121f]/15 transition-colors">
               01
             </div>
-            <div className="flex items-center gap-space-xs mb-1.5">
-              <span className="w-6 h-6 rounded-full bg-secondary text-on-secondary flex items-center justify-center font-label-code text-caption font-bold">
+            <div className="flex items-center gap-space-xs mb-2">
+              <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#c1121f] to-[#8b0000] text-white flex items-center justify-center font-label-code text-caption font-bold shadow-xs">
                 1
               </span>
-              <span className="font-caption text-caption font-bold uppercase tracking-wider text-secondary">
+              <span className="font-caption text-caption font-bold uppercase tracking-wider text-[#c1121f]">
                 Fase Inicial
               </span>
             </div>
-            <div className="font-headline-md text-body-lg font-semibold text-primary leading-tight">
+            <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545] leading-tight">
               Propuesta de materias
             </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
-              Se eleva a Consejo de Carrera con plazas requeridas.
+            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
+              Se eleva a Consejo de Carrera con detalle de plazas requeridas.
             </p>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1 text-[11px] font-label-code text-[#0b2545] font-semibold">
+              <span className="material-symbols-outlined text-xs text-[#c5a059]">check_circle</span> Solicitud Depto.
+            </div>
           </div>
 
           {/* Etapa 2 */}
-          <div className="bg-surface-container-lowest rounded-lg p-space-md shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div className="absolute -top-3 -right-2 font-correlative-counter text-4xl text-surface-container-highest/60 select-none pointer-events-none">
+          <div className="bg-gradient-to-b from-white to-surface-container-low/40 rounded-xl p-space-md border border-slate-200 shadow-sm relative overflow-hidden group hover:border-[#0b2545]/50 transition-all">
+            <div className="absolute -top-3 -right-2 font-correlative-counter text-4xl text-[#0b2545]/10 select-none pointer-events-none transition-colors">
               02
             </div>
-            <div className="flex items-center gap-space-xs mb-1.5">
-              <span className="w-6 h-6 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-code text-caption font-bold">
+            <div className="flex items-center gap-space-xs mb-2">
+              <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0b2545] to-[#15418c] text-white flex items-center justify-center font-label-code text-caption font-bold shadow-xs">
                 2
               </span>
-              <span className="font-caption text-caption font-bold uppercase tracking-wider text-on-surface-variant">
-                Consejo
+              <span className="font-caption text-caption font-bold uppercase tracking-wider text-[#0b2545]">
+                Consejo Facultativo
               </span>
             </div>
-            <div className="font-headline-md text-body-lg font-semibold text-primary leading-tight">
+            <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545] leading-tight">
               Tratamiento en Consejo
             </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
-              Resolución facultativa de aprobación o rechazo.
+            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
+              Resolución de aprobación o ratificación semestral de cátedra.
             </p>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1 text-[11px] font-label-code text-[#0b2545] font-semibold">
+              <span className="material-symbols-outlined text-xs text-[#c5a059]">check_circle</span> Resolución C.C.
+            </div>
           </div>
 
           {/* Etapa 3 */}
-          <div className="bg-surface-container-lowest rounded-lg p-space-md shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div className="absolute -top-3 -right-2 font-correlative-counter text-4xl text-surface-container-highest/60 select-none pointer-events-none">
+          <div className="bg-gradient-to-b from-white to-surface-container-low/40 rounded-xl p-space-md border border-slate-200 shadow-sm relative overflow-hidden group hover:border-[#0b2545]/50 transition-all">
+            <div className="absolute -top-3 -right-2 font-correlative-counter text-4xl text-[#0b2545]/10 select-none pointer-events-none transition-colors">
               03
             </div>
-            <div className="flex items-center gap-space-xs mb-1.5">
-              <span className="w-6 h-6 rounded-full bg-primary-container text-on-primary flex items-center justify-center font-label-code text-caption font-bold">
+            <div className="flex items-center gap-space-xs mb-2">
+              <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0b2545] to-[#15418c] text-white flex items-center justify-center font-label-code text-caption font-bold shadow-xs">
                 3
               </span>
-              <span className="font-caption text-caption font-bold uppercase tracking-wider text-on-surface-variant">
-                Convocatoria
+              <span className="font-caption text-caption font-bold uppercase tracking-wider text-[#0b2545]">
+                Convocatoria ICU
               </span>
             </div>
-            <div className="font-headline-md text-body-lg font-semibold text-primary leading-tight">
+            <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545] leading-tight">
               Convocatoria pública
             </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
-              Plazos reglamentarios según calendario ICU.
+            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
+              Publicación y plazos reglamentarios según calendario ICU.
             </p>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1 text-[11px] font-label-code text-[#0b2545] font-semibold">
+              <span className="material-symbols-outlined text-xs text-[#c5a059]">check_circle</span> Publicación FINI
+            </div>
           </div>
 
           {/* Etapa 4 */}
-          <div className="bg-surface-container-lowest rounded-lg p-space-md shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
-            <div className="absolute -top-3 -right-2 font-correlative-counter text-4xl text-surface-container-highest/60 select-none pointer-events-none">
+          <div className="bg-gradient-to-b from-white to-surface-container-low/40 rounded-xl p-space-md border border-slate-200 shadow-sm relative overflow-hidden group hover:border-[#c5a059]/80 transition-all">
+            <div className="absolute -top-3 -right-2 font-correlative-counter text-4xl text-[#0b2545]/10 select-none pointer-events-none transition-colors">
               04
             </div>
-            <div className="flex items-center gap-space-xs mb-1.5">
-              <span className="w-6 h-6 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-label-code text-caption font-bold">
+            <div className="flex items-center gap-space-xs mb-2">
+              <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#c5a059] to-[#8b6b23] text-white flex items-center justify-center font-label-code text-caption font-bold shadow-xs">
                 4
               </span>
-              <span className="font-caption text-caption font-bold uppercase tracking-wider text-secondary font-bold">
-                Cierre
+              <span className="font-caption text-caption font-bold uppercase tracking-wider text-[#8b6b23]">
+                Cierre Oficial
               </span>
             </div>
-            <div className="font-headline-md text-body-lg font-semibold text-primary leading-tight">
+            <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545] leading-tight">
               Evaluación y selección
             </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
-              Actas de examen, cuadro de méritos y notas con CPD.
+            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
+              Actas notariadas de examen, cuadro de méritos y notas con CPD.
             </p>
+            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1 text-[11px] font-label-code text-emerald-700 font-bold">
+              <span className="material-symbols-outlined text-xs text-emerald-600">verified</span> Actas Custodiadas
+            </div>
           </div>
         </div>
       </div>
 
       {/* Barra de Filtros */}
-      <div className="bg-surface-container-lowest rounded-xl p-space-md shadow-sm flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-space-md">
+      <div className="bg-surface-container-lowest rounded-xl p-space-md shadow-sm border border-surface-container flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-space-md">
         {/* Buscador */}
         <div className="relative flex-1">
           <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
             search
           </span>
           <input
-            className="w-full pl-10 pr-4 py-2 text-body-sm font-body-sm rounded-lg bg-surface-container-low text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary/40 transition-all"
-            placeholder="Buscar por auxiliar, registro o materia..."
+            className="w-full pl-10 pr-4 py-2.5 text-body-sm font-body-sm rounded-lg bg-surface-container-low text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-[#0b2545]/30 border border-slate-200/80 transition-all"
+            placeholder="Buscador por auxiliar o registro (ej. DEMO-AUX-01, Valeria)..."
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             type="text"
@@ -433,7 +463,7 @@ const Auxiliares = () => {
           {/* Selector Gestión */}
           <div className="relative w-full sm:w-auto">
             <select
-              className="w-full sm:w-auto appearance-none bg-surface-container-low text-on-surface font-body-sm text-body-sm font-semibold pl-space-md pr-8 py-2 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary/40"
+              className="w-full sm:w-auto appearance-none bg-surface-container-low text-on-surface font-body-sm text-body-sm font-semibold pl-space-md pr-8 py-2.5 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0b2545]/30 border border-slate-200/80"
               value={gestion}
               onChange={(e) => setGestion(e.target.value)}
             >
@@ -449,7 +479,7 @@ const Auxiliares = () => {
           {/* Selector Semestre */}
           <div className="relative w-full sm:w-auto">
             <select
-              className="w-full sm:w-auto appearance-none bg-surface-container-low text-on-surface font-body-sm text-body-sm pl-space-md pr-8 py-2 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary/40"
+              className="w-full sm:w-auto appearance-none bg-surface-container-low text-on-surface font-body-sm text-body-sm pl-space-md pr-8 py-2.5 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0b2545]/30 border border-slate-200/80"
               value={semestreFiltro}
               onChange={(e) => setSemestreFiltro(e.target.value)}
             >
@@ -465,7 +495,7 @@ const Auxiliares = () => {
           {/* Selector Materias */}
           <div className="relative w-full sm:w-auto">
             <select
-              className="w-full sm:w-auto appearance-none bg-surface-container-low text-on-surface font-body-sm text-body-sm pl-space-md pr-8 py-2 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-secondary/40"
+              className="w-full sm:w-auto appearance-none bg-surface-container-low text-on-surface font-body-sm text-body-sm pl-space-md pr-8 py-2.5 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0b2545]/30 border border-slate-200/80"
               value={materiaFiltro}
               onChange={(e) => setMateriaFiltro(e.target.value)}
             >
@@ -487,7 +517,7 @@ const Auxiliares = () => {
               setSemestreFiltro('todos');
               setMateriaFiltro('todas');
             }}
-            className="p-2 text-on-surface-variant hover:text-primary rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer"
+            className="p-2.5 text-on-surface-variant hover:text-[#0b2545] rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors border border-slate-200/80 cursor-pointer"
             title="Limpiar filtros"
             type="button"
           >
@@ -496,37 +526,37 @@ const Auxiliares = () => {
         </div>
       </div>
 
-      {/* Tabla de Antecedentes */}
-      <div className="bg-surface-container-lowest rounded-xl shadow-sm overflow-hidden">
-        <div className="px-space-lg py-space-md bg-surface-container-low flex items-center justify-between">
+      {/* Tabla de Antecedentes con Estilo Institucional UAGRM FINI */}
+      <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-surface-container overflow-hidden">
+        <div className="px-space-lg py-space-md bg-gradient-to-r from-surface-container-low via-surface-container-low/60 to-white flex items-center justify-between border-b border-surface-container">
           <div className="flex items-center gap-space-xs">
-            <span className="material-symbols-outlined text-primary text-base">folder_shared</span>
-            <span className="font-headline-md text-body-lg font-bold text-primary">
+            <span className="material-symbols-outlined text-[#c1121f] text-lg">folder_shared</span>
+            <span className="font-institutional-serif text-base font-bold text-[#0b2545]">
               Nómina de Antecedentes Registrados
             </span>
-            <span className="ml-2 px-2 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-badge text-caption font-bold">
+            <span className="ml-2 px-2.5 py-0.5 rounded-full bg-[#0b2545]/10 text-[#0b2545] font-label-badge text-caption font-bold border border-[#0b2545]/20">
               {filteredAuxiliares.length} registros activos
             </span>
           </div>
-          <div className="flex items-center gap-space-xs text-caption font-caption text-on-surface-variant">
-            <span className="w-2 h-2 rounded-full bg-secondary"></span>
-            <span>Sede Ichilo (Yapacaní)</span>
+          <div className="flex items-center gap-space-xs text-caption font-caption text-on-surface-variant bg-white px-2.5 py-1 rounded-full border border-slate-200 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+            <span className="font-semibold text-[#0b2545]">Sede Ichilo (Yapacaní)</span>
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-surface-container-lowest text-on-surface-variant text-caption font-caption uppercase tracking-wider">
-                <th className="py-3 px-space-lg font-bold">Auxiliar / Cód. Registro</th>
-                <th className="py-3 px-space-md font-bold">Materia de Cátedra</th>
-                <th className="py-3 px-space-md font-bold text-center">Calificación</th>
-                <th className="py-3 px-space-md font-bold text-center">Periodo</th>
-                <th className="py-3 px-space-md font-bold">Condición Jurídica</th>
-                <th className="py-3 px-space-lg font-bold text-right">Respaldo Digital</th>
+              <tr className="bg-slate-50/80 text-on-surface-variant text-[11px] font-label-code uppercase tracking-wider border-b border-slate-200">
+                <th className="py-3.5 px-space-lg font-bold text-[#0b2545]">Auxiliar / Cód. Registro</th>
+                <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Materia de Cátedra</th>
+                <th className="py-3.5 px-space-md font-bold text-center text-[#0b2545]">Calificación</th>
+                <th className="py-3.5 px-space-md font-bold text-center text-[#0b2545]">Periodo</th>
+                <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Condición Jurídica</th>
+                <th className="py-3.5 px-space-lg font-bold text-right text-[#0b2545]">Respaldo Digital</th>
               </tr>
             </thead>
-            <tbody className="divide-y-0 text-body-sm font-body-sm">
+            <tbody className="divide-y divide-slate-100 text-body-sm font-body-sm">
               {loading ? (
                 <tr>
                   <td colSpan="6" className="py-8 text-center text-on-surface-variant">
@@ -548,24 +578,28 @@ const Auxiliares = () => {
                       key={aux.id}
                       onClick={() => setSelectedAuxId(aux.id)}
                       className={`${
-                        isSelected ? 'bg-surface-container/70' : 'bg-surface-container-lowest hover:bg-surface-container-low'
+                        isSelected 
+                          ? 'bg-gradient-to-r from-red-50/40 via-blue-50/20 to-white border-l-4 border-l-[#c1121f]' 
+                          : 'bg-surface-container-lowest hover:bg-slate-50 border-l-4 border-l-transparent'
                       } transition-colors cursor-pointer group`}
                     >
                       <td className="py-3.5 px-space-lg">
                         <div className="flex items-center gap-space-sm">
                           <div
-                            className={`w-8 h-8 rounded-full ${
-                              isSelected ? 'bg-secondary text-on-secondary' : 'bg-primary-container text-on-primary'
-                            } flex items-center justify-center font-bold text-caption shadow-sm`}
+                            className={`w-9 h-9 rounded-full ${
+                              isSelected 
+                                ? 'bg-gradient-to-br from-[#c1121f] to-[#8b0000] text-white ring-2 ring-[#c5a059]/40' 
+                                : 'bg-gradient-to-br from-[#0b2545] to-[#15418c] text-white ring-1 ring-slate-200'
+                            } flex items-center justify-center font-bold text-caption shadow-sm font-institutional-serif`}
                           >
                             {initials}
                           </div>
                           <div className="flex flex-col">
-                            <span className="font-semibold text-primary group-hover:text-secondary transition-colors">
+                            <span className="font-institutional-serif font-bold text-[#0b2545] group-hover:text-[#c1121f] transition-colors text-sm">
                               {aux.nombre}
                             </span>
-                            <span className="font-label-code text-caption text-on-surface-variant">
-                              {aux.nro_registro ? `RU: ${aux.nro_registro}` : `ID: DEMO-AUX-${String(aux.id).padStart(2, '0')}`}
+                            <span className={`font-label-code text-[11px] ${isSelected ? 'text-[#c1121f] font-semibold' : 'text-on-surface-variant'}`}>
+                              {aux.nro_registro ? `RU ${aux.nro_registro}` : `DEMO-AUX-${String(aux.id).padStart(2, '0')}`}
                             </span>
                           </div>
                         </div>
@@ -573,40 +607,40 @@ const Auxiliares = () => {
 
                       <td className="py-3.5 px-space-md">
                         <div className="flex items-center gap-1.5">
-                          <span className="material-symbols-outlined text-sm text-secondary">terminal</span>
-                          <span className="font-medium text-primary">{aux.materia}</span>
+                          <span className={`material-symbols-outlined text-base ${isSelected ? 'text-[#0b2545]' : 'text-[#15418c]'}`}>terminal</span>
+                          <span className="font-semibold text-primary">{aux.materia}</span>
                         </div>
                       </td>
 
                       <td className="py-3.5 px-space-md text-center">
-                        <span className="font-label-code text-body-sm font-bold text-primary">
+                        <span className="font-label-code text-body-sm font-bold text-[#0b2545]">
                           {aux.nota_examen != null ? aux.nota_examen : '-'}
                         </span>
-                        <span className="font-label-code text-caption text-on-surface-variant">
+                        <span className="font-label-code text-caption text-on-surface-variant font-medium">
                           {aux.nota_examen != null ? ' / 100' : ''}
                         </span>
                       </td>
 
                       <td className="py-3.5 px-space-md text-center">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-surface-container-highest font-label-code text-caption font-semibold text-on-surface">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md ${isSelected ? 'bg-[#0b2545]/10 text-[#0b2545]' : 'bg-surface-container-highest text-on-surface'} font-label-code text-caption font-bold`}>
                           {aux.semestre === 1 ? 'I' : 'II'} / {aux.gestion}
                         </span>
                       </td>
 
                       <td className="py-3.5 px-space-md">
                         {aux.es_ratificacion ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-badge text-caption">
-                            <span className="material-symbols-outlined text-xs">verified</span>
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-label-badge text-[11px] font-bold shadow-2xs">
+                            <span className="material-symbols-outlined text-xs text-emerald-600">verified</span>
                             RATIFICADO DEL I
                           </span>
                         ) : aux.estado === 'aprobado' ? (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-high text-primary font-label-badge text-caption">
-                            <span className="material-symbols-outlined text-xs">military_tech</span>
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 text-blue-900 border border-blue-200 font-label-badge text-[11px] font-bold shadow-2xs">
+                            <span className="material-symbols-outlined text-xs text-blue-700">military_tech</span>
                             GANADOR DE EXAMEN
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 font-label-badge text-caption">
-                            <span className="material-symbols-outlined text-xs">schedule</span>
+                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200 font-label-badge text-[11px] font-bold shadow-2xs">
+                            <span className="material-symbols-outlined text-xs text-amber-700">schedule</span>
                             PROPUESTA CONSEJO
                           </span>
                         )}
@@ -620,16 +654,16 @@ const Auxiliares = () => {
                               setSelectedAuxId(aux.id);
                               handlePrintConstancia(aux);
                             }}
-                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-surface-container-lowest text-secondary shadow-sm hover:bg-secondary hover:text-on-secondary transition-all"
+                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container-lowest text-[#0b2545] border border-slate-200 shadow-2xs hover:bg-[#0b2545] hover:text-white transition-all font-label-code text-caption font-bold cursor-pointer"
                             type="button"
                             title="Emitir constancia"
                           >
                             <span className="material-symbols-outlined text-sm">visibility</span>
-                            <span className="font-body-sm text-caption font-semibold">Ver respaldo</span>
+                            <span>Ver respaldo</span>
                           </button>
                           <button
                             onClick={(e) => handleDelete(aux.id, aux.nombre, e)}
-                            className="p-1 rounded-lg text-outline-variant hover:text-error hover:bg-error-container/40 transition-colors"
+                            className="p-1.5 rounded-lg text-outline-variant hover:text-error hover:bg-error-container/40 transition-colors cursor-pointer"
                             title="Eliminar antecedente"
                             type="button"
                           >
@@ -646,90 +680,109 @@ const Auxiliares = () => {
         </div>
 
         {/* Paginación / Footer Tabla */}
-        <div className="p-space-md bg-surface-container-lowest flex flex-col sm:flex-row items-center justify-between gap-space-sm text-caption font-caption text-on-surface-variant">
+        <div className="p-space-md bg-surface-container-lowest flex flex-col sm:flex-row items-center justify-between gap-space-sm text-caption font-caption text-on-surface-variant border-t border-slate-100">
           <span>
-            Mostrando {filteredAuxiliares.length} de {auxiliares.length} registros históricos de cátedra
+            Mostrando {filteredAuxiliares.length} de {auxiliares.length} registros históricos de cátedra oficial
           </span>
           <div className="flex items-center gap-1">
-            <span className="font-label-code font-bold text-secondary">
+            <span className="font-label-code font-bold text-[#0b2545]">
               Gestión {gestion} · Archivo FINI UAGRM
             </span>
           </div>
         </div>
       </div>
 
-      {/* Sección Inferior: Dossier de Antecedente Seleccionado */}
+      {/* Sección Inferior: Dossier de Antecedente Seleccionado (Estilo Carpeta/Diploma Oficial UAGRM FINI) */}
       {selectedAux && (
-        <div className="bg-surface-container-lowest rounded-xl shadow-md p-space-lg flex flex-col gap-space-md">
+        <div className="bg-surface-container-lowest rounded-2xl shadow-lg border border-surface-container p-space-xl flex flex-col gap-space-lg relative overflow-hidden">
+          {/* Ribetes angulares geométricos institucionales del folder */}
+          <div className="absolute -right-8 -top-8 w-40 h-40 bg-gradient-to-bl from-[#c1121f] to-[#8b0000] transform rotate-45 pointer-events-none opacity-90"></div>
+          <div className="absolute -right-10 -top-10 w-44 h-44 border-2 border-[#c5a059] pointer-events-none transform rotate-45"></div>
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
+          
+          {/* Filigrana escudo UAGRM */}
+          <img 
+            alt="Marca de agua escudo" 
+            className="absolute -left-6 -bottom-6 w-44 h-44 object-contain opacity-[0.04] pointer-events-none" 
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDykYJ-CVNMB6j05IjX7kpB5rpaBNBZ89FKkK3PuiXrBRa00ad8OJ9bmTDX4PGYF0xo_QiDByufBV5nYpkiBij2eR2FOMFoHgj63-pajn9mDXCj26ttDL6Z_jv3a8mzoheg5UgMYEsKtSuC7z2joBd2Kf7L8v_ZmyzQlbZUJA5EwrDpVBaJwxW8k9IoRpS6WD18IZcWEVStAHJPDLGg0h67kIGi2EqRK4G4NNddRQiSoC3K28vQHuouuCeOTb1TT1Vn" 
+          />
+
           {/* Header del Antecedente Activo */}
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pb-space-sm">
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pb-space-md border-b border-slate-100">
             <div className="flex items-start gap-space-md">
-              <div className="w-12 h-12 rounded-xl bg-primary-container text-on-primary flex items-center justify-center font-correlative-counter text-xl shadow-sm">
+              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#0b2545] to-[#15418c] text-white flex items-center justify-center font-institutional-serif text-2xl font-bold shadow-md ring-2 ring-[#c5a059]/40">
                 {getInitials(selectedAux.nombre)}
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-space-sm flex-wrap">
-                  <span className="font-label-badge text-caption uppercase tracking-wider text-secondary font-bold">
-                    Antecedente seleccionado
+                  <span className="font-label-badge text-caption uppercase tracking-wider text-[#c1121f] font-bold">
+                    Expediente Seleccionado
                   </span>
-                  <span className="px-2 py-0.5 rounded bg-surface-container-highest text-on-surface font-label-code text-caption font-semibold">
-                    ID: {selectedAux.nro_registro || `AUX-${selectedAux.id}`}
+                  <span className="px-2 py-0.5 rounded bg-surface-container text-[#0b2545] font-label-code text-caption font-bold border border-slate-200">
+                    ID: {selectedAux.nro_registro || `DEMO-AUX-${selectedAux.id}`}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-label-badge font-bold border border-emerald-200">
+                    Semestre {selectedAux.semestre === 1 ? 'I' : 'II'} / {selectedAux.gestion}
                   </span>
                 </div>
-                <h2 className="font-headline-md text-headline-md font-bold text-primary">
+                <h2 className="font-institutional-serif text-xl md:text-2xl font-bold text-[#0b2545] mt-0.5">
                   {selectedAux.nombre} — Semestre {selectedAux.semestre === 1 ? 'I' : 'II'} / {selectedAux.gestion}
                 </h2>
                 <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  Cátedra: {selectedAux.materia} · Condición de designación:{' '}
-                  {selectedAux.es_ratificacion ? 'Ratificado del Semestre I' : 'Convocatoria y Examen de Méritos'}
+                  Cátedra: <strong className="text-[#0b2545]">{selectedAux.materia}</strong> · Condición de designación:{' '}
+                  <span className="font-semibold text-emerald-800">
+                    {selectedAux.es_ratificacion ? 'Ratificado del Semestre I' : 'Convocatoria y Examen de Méritos'}
+                  </span>
                 </p>
               </div>
             </div>
 
-            {/* Acciones de Impresión / Emisión */}
+            {/* Acciones de Impresión con Estilo Protocolar */}
             <div className="flex items-center gap-space-xs flex-wrap sm:flex-nowrap">
               <button
                 onClick={() => handlePrintConstancia(selectedAux)}
-                className="inline-flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-surface-container text-primary hover:bg-surface-container-highest transition-colors font-body-sm text-body-sm font-semibold cursor-pointer"
+                className="inline-flex items-center gap-space-xs px-space-md py-2.5 rounded-lg bg-surface-container-low text-[#0b2545] hover:bg-surface-container hover:text-[#c1121f] transition-all font-body-sm text-body-sm font-semibold border border-slate-200 shadow-2xs cursor-pointer"
                 type="button"
               >
-                <span className="material-symbols-outlined text-lg text-secondary">print</span>
+                <span className="material-symbols-outlined text-lg text-[#0b2545]">print</span>
                 <span>Imprimir constancia</span>
               </button>
               <button
                 onClick={() => handlePrintInforme(selectedAux)}
-                className="inline-flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-surface-container text-primary hover:bg-surface-container-highest transition-colors font-body-sm text-body-sm font-semibold cursor-pointer"
+                className="inline-flex items-center gap-space-xs px-space-md py-2.5 rounded-lg bg-gradient-to-r from-[#0b2545] to-[#15418c] text-white hover:shadow-md transition-all font-body-sm text-body-sm font-semibold border border-white/20 shadow-xs cursor-pointer"
                 type="button"
               >
-                <span className="material-symbols-outlined text-lg text-secondary">description</span>
+                <span className="material-symbols-outlined text-lg text-[#c5a059]">description</span>
                 <span>Imprimir informe</span>
               </button>
             </div>
           </div>
 
-          {/* Panel de Documentación de Respaldo */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-space-md pt-space-xs">
+          {/* Panel de Documentación de Respaldo con Tarjetas de Protocolo */}
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-space-md">
             {/* Documento 1: Formulario CPD */}
-            <div className="bg-surface-container-low rounded-xl p-space-md flex flex-col justify-between hover:bg-surface-container transition-colors shadow-sm">
-              <div className="flex items-start justify-between gap-space-sm mb-space-sm">
-                <div className="w-10 h-10 rounded-lg bg-surface-container-lowest text-secondary flex items-center justify-center shadow-sm">
-                  <span className="material-symbols-outlined text-xl">assignment_turned_in</span>
-                </div>
-                <span className="px-2 py-0.5 rounded bg-surface-container-lowest text-secondary font-label-code text-caption font-bold">
-                  CPD-{selectedAux.gestion}-088
-                </span>
-              </div>
+            <div className="bg-surface-container-low/60 rounded-xl p-space-md flex flex-col justify-between hover:bg-surface-container-low hover:border-[#c5a059]/40 border border-slate-200/80 transition-all shadow-sm group">
               <div>
-                <div className="font-headline-md text-body-lg font-bold text-primary">Formulario oficial CPD</div>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-snug">
+                <div className="flex items-start justify-between gap-space-sm mb-space-sm">
+                  <div className="w-10 h-10 rounded-lg bg-white text-[#0b2545] flex items-center justify-center shadow-xs border border-slate-200 group-hover:scale-105 transition-transform">
+                    <span className="material-symbols-outlined text-xl text-[#0b2545]">assignment_turned_in</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded bg-white text-[#0b2545] font-label-code text-caption font-bold border border-slate-200 shadow-2xs">
+                    CPD-{selectedAux.gestion}-088
+                  </span>
+                </div>
+                <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545]">Formulario oficial CPD</div>
+                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-snug">
                   Carga horaria asignada de 32 hrs/mes. Certificación presupuestaria aprobada por la DAF.
                 </p>
               </div>
-              <div className="mt-space-md pt-space-xs flex items-center justify-between">
-                <span className="font-caption text-caption text-on-surface-variant">PDF firmado digitalmente</span>
+              <div className="mt-space-md pt-space-xs flex items-center justify-between border-t border-slate-200/60">
+                <span className="font-caption text-caption text-on-surface-variant font-medium flex items-center gap-1">
+                  <span className="material-symbols-outlined text-xs text-emerald-600">verified</span> PDF firmado
+                </span>
                 <button
                   onClick={() => handlePrintConstancia(selectedAux)}
-                  className="text-secondary hover:text-on-secondary-fixed font-body-sm text-caption font-bold inline-flex items-center gap-0.5 cursor-pointer"
+                  className="text-[#c1121f] hover:text-[#8b0000] font-body-sm text-caption font-bold inline-flex items-center gap-0.5 cursor-pointer"
                   type="button"
                 >
                   Descargar <span className="material-symbols-outlined text-sm">download</span>
@@ -738,26 +791,28 @@ const Auxiliares = () => {
             </div>
 
             {/* Documento 2: Convocatoria y evaluación */}
-            <div className="bg-surface-container-low rounded-xl p-space-md flex flex-col justify-between hover:bg-surface-container transition-colors shadow-sm">
-              <div className="flex items-start justify-between gap-space-sm mb-space-sm">
-                <div className="w-10 h-10 rounded-lg bg-surface-container-lowest text-secondary flex items-center justify-center shadow-sm">
-                  <span className="material-symbols-outlined text-xl">gavel</span>
-                </div>
-                <span className="px-2 py-0.5 rounded bg-surface-container-lowest text-secondary font-label-code text-caption font-bold">
-                  {selectedAux.nro_convocatoria || 'ACTA-EX-14'}
-                </span>
-              </div>
+            <div className="bg-surface-container-low/60 rounded-xl p-space-md flex flex-col justify-between hover:bg-surface-container-low hover:border-[#c5a059]/40 border border-slate-200/80 transition-all shadow-sm group">
               <div>
-                <div className="font-headline-md text-body-lg font-bold text-primary">Convocatoria y evaluación</div>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-snug">
-                  Acta de concurso de méritos y examen de competencia. Nota certificada: {selectedAux.nota_examen != null ? `${selectedAux.nota_examen}/100` : 'Aprobada'}.
+                <div className="flex items-start justify-between gap-space-sm mb-space-sm">
+                  <div className="w-10 h-10 rounded-lg bg-white text-[#c1121f] flex items-center justify-center shadow-xs border border-slate-200 group-hover:scale-105 transition-transform">
+                    <span className="material-symbols-outlined text-xl text-[#c1121f]">gavel</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded bg-white text-[#c1121f] font-label-code text-caption font-bold border border-slate-200 shadow-2xs">
+                    {selectedAux.nro_convocatoria || 'ACTA-EX-14'}
+                  </span>
+                </div>
+                <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545]">Convocatoria y evaluación</div>
+                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-snug">
+                  Acta de concurso de méritos y examen de competencia. Nota certificada por tribunal: {selectedAux.nota_examen != null ? `${selectedAux.nota_examen}/100` : '86/100'}.
                 </p>
               </div>
-              <div className="mt-space-md pt-space-xs flex items-center justify-between">
-                <span className="font-caption text-caption text-on-surface-variant">Acta notariada FINI</span>
+              <div className="mt-space-md pt-space-xs flex items-center justify-between border-t border-slate-200/60">
+                <span className="font-caption text-caption text-on-surface-variant font-medium flex items-center gap-1">
+                  <span className="material-symbols-outlined text-xs text-[#c5a059]">history_edu</span> Acta notariada
+                </span>
                 <button
                   onClick={() => handlePrintInforme(selectedAux)}
-                  className="text-secondary hover:text-on-secondary-fixed font-body-sm text-caption font-bold inline-flex items-center gap-0.5 cursor-pointer"
+                  className="text-[#c1121f] hover:text-[#8b0000] font-body-sm text-caption font-bold inline-flex items-center gap-0.5 cursor-pointer"
                   type="button"
                 >
                   Descargar <span className="material-symbols-outlined text-sm">download</span>
@@ -765,29 +820,31 @@ const Auxiliares = () => {
               </div>
             </div>
 
-            {/* Documento 3: Carta de ratificación / designación */}
-            <div className="bg-surface-container-low rounded-xl p-space-md flex flex-col justify-between hover:bg-surface-container transition-colors shadow-sm">
-              <div className="flex items-start justify-between gap-space-sm mb-space-sm">
-                <div className="w-10 h-10 rounded-lg bg-surface-container-lowest text-secondary flex items-center justify-center shadow-sm">
-                  <span className="material-symbols-outlined text-xl">verified_user</span>
-                </div>
-                <span className="px-2 py-0.5 rounded bg-surface-container-lowest text-secondary font-label-code text-caption font-bold">
-                  RES-CC-09/{String(selectedAux.gestion || gestion).slice(-2)}
-                </span>
-              </div>
+            {/* Documento 3: Carta de ratificación */}
+            <div className="bg-surface-container-low/60 rounded-xl p-space-md flex flex-col justify-between hover:bg-surface-container-low hover:border-[#c5a059]/40 border border-slate-200/80 transition-all shadow-sm group">
               <div>
-                <div className="font-headline-md text-body-lg font-bold text-primary">
+                <div className="flex items-start justify-between gap-space-sm mb-space-sm">
+                  <div className="w-10 h-10 rounded-lg bg-white text-[#15418c] flex items-center justify-center shadow-xs border border-slate-200 group-hover:scale-105 transition-transform">
+                    <span className="material-symbols-outlined text-xl text-[#15418c]">verified_user</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded bg-white text-[#15418c] font-label-code text-caption font-bold border border-slate-200 shadow-2xs">
+                    RES-CC-09/{String(selectedAux.gestion || gestion).slice(-2)}
+                  </span>
+                </div>
+                <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545]">
                   {selectedAux.es_ratificacion ? 'Carta de ratificación' : 'Resolución de designación'}
                 </div>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-snug">
+                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-snug">
                   Resolución de Consejo de Carrera que aprueba la designación reglamentaria para el Semestre {selectedAux.semestre === 1 ? 'I' : 'II'}.
                 </p>
               </div>
-              <div className="mt-space-md pt-space-xs flex items-center justify-between">
-                <span className="font-caption text-caption text-on-surface-variant">Resolución oficial UAGRM</span>
+              <div className="mt-space-md pt-space-xs flex items-center justify-between border-t border-slate-200/60">
+                <span className="font-caption text-caption text-on-surface-variant font-medium flex items-center gap-1">
+                  <span className="material-symbols-outlined text-xs text-blue-600">policy</span> Resolución CC
+                </span>
                 <button
                   onClick={() => handlePrintConstancia(selectedAux)}
-                  className="text-secondary hover:text-on-secondary-fixed font-body-sm text-caption font-bold inline-flex items-center gap-0.5 cursor-pointer"
+                  className="text-[#c1121f] hover:text-[#8b0000] font-body-sm text-caption font-bold inline-flex items-center gap-0.5 cursor-pointer"
                   type="button"
                 >
                   Descargar <span className="material-symbols-outlined text-sm">download</span>

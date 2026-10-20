@@ -95,7 +95,7 @@ const Docentes = () => {
   // General documents (CV, programa analitico, anexos)
   const generalDocs = useMemo(() => {
     const list = Array.isArray(archivos) ? archivos : [];
-    return list.filter(a => a && (a.tipo === 'curriculum' || a.tipo === 'programa_analitico'));
+    return list.filter(a => a && (a.tipo === 'curriculum' || a.tipo === 'programa_analitico' || a.tipo === 'anexos_cv'));
   }, [archivos]);
 
   // Semestral documents (informes, listas de asistencia)
@@ -184,110 +184,153 @@ const Docentes = () => {
 
   return (
     <div className="flex flex-col w-full">
-      {/* Sub-header / Breadcrumbs & Page Action Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-space-md mb-space-lg">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-space-xs text-on-surface-variant font-caption text-caption">
-            <span>Gestión documental</span>
-            <span className="material-symbols-outlined text-xs">chevron_right</span>
-            <span className="text-secondary font-semibold">Docentes</span>
-          </div>
-          <div className="flex items-baseline gap-space-sm mt-0.5">
-            <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">Docentes</h1>
-            <span className="hidden sm:inline-block w-1.5 h-1.5 rounded-full bg-secondary"></span>
-            <p className="font-body-sm text-body-sm text-on-surface-variant">
-              Archivo por docente: datos oficiales y documentos aportados para su conservación institucional.
-            </p>
-          </div>
-        </div>
+      {/* 2. Banner de Cabecera Solemne con Cortes Institucionales Diagonal */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[#0B2545] via-[#0D2E56] to-[#081B33] text-white shadow-xl mb-space-lg border border-[#c5a059]/30">
+        {/* Cortes Geométricos Diagonales inspirados en los Folders/Diplomas Institucionales */}
+        <div className="absolute -right-16 -top-24 w-80 h-80 bg-[#C1121F] rotate-45 transform origin-bottom-left shadow-2xl opacity-90 pointer-events-none"></div>
+        <div className="absolute -right-10 -top-24 w-80 h-80 border-4 border-[#c5a059]/40 rotate-45 transform origin-bottom-left pointer-events-none"></div>
+        <div className="absolute right-36 -bottom-24 w-40 h-40 bg-[#0B2545]/80 rotate-12 pointer-events-none"></div>
+        
+        {/* Filigrana tenue del Escudo UAGRM */}
+        <img 
+          alt="Filigrana Escudo UAGRM" 
+          className="absolute right-12 top-1/2 -translate-y-1/2 w-44 h-52 object-contain opacity-10 pointer-events-none filter brightness-200" 
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQiMcjjl81LiDusLYwNzVCfvGUsQDoVqxd3cQizcnsxOLE2cNcLwZlo_sxrNeia2SKc7wB36KrWMwQFrViefGkYZ5-ElVlfe7tcybBODmWl3_0arfnQlUCPNaoNAl10CQABBGjadxs1kSCDJlmh8V4SvcRAvFXxC-P3C5BfG8GaZKT_UI53F6XmGGd1Arat8sB8EdSoh6T5SORw5csO55Rbmxk4OWByKhmIAkiT332pcGZAZzlHPEKDx3o-xjqhmfA"
+        />
 
-        <div className="flex items-center gap-space-sm self-start md:self-auto">
-          <button
-            onClick={() => {
-              setDocenteForm({
-                nombre: '',
-                ci: '',
-                materia_principal: '',
-                gestion_ingreso: gestion
-              });
-              setIsDocenteModalOpen(true);
-            }}
-            className="inline-flex items-center gap-space-xs px-space-md py-2.5 rounded-lg bg-secondary text-on-secondary font-body-sm text-body-sm font-semibold hover:bg-on-secondary-fixed-variant shadow-md shadow-secondary/20 transition-all cursor-pointer"
-            type="button"
-          >
-            <span className="material-symbols-outlined text-lg leading-none">person_add</span>
-            <span>Registrar docente</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Banner Informativo Superior & CV Metric Box */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-md mb-space-lg">
-        <div className="lg:col-span-8 bg-surface-container-low rounded-xl p-space-md shadow-sm flex items-start gap-space-md relative overflow-hidden">
-          <div className="w-10 h-10 rounded-lg bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed shrink-0 mt-0.5">
-            <span className="material-symbols-outlined text-xl">verified_user</span>
-          </div>
-          <div className="flex flex-col gap-1 pr-space-md">
-            <span className="font-body-sm text-body-sm font-bold text-on-surface">Conservación Documental Auditada</span>
-            <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-              Documentos del docente, conservados sin modificar su contenido. Dirección escanea o carga archivos en formato{' '}
-              <strong className="font-semibold text-on-surface font-label-code text-caption">PDF/A</strong> homologado para consultar el historial de carrera y descargar respaldos auditables.
-            </p>
-          </div>
-          <div className="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-surface-container-highest/40 pointer-events-none"></div>
-        </div>
-
-        <div className="lg:col-span-4 bg-primary-container text-on-primary rounded-xl p-space-md shadow-sm flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <span className="font-label-badge text-caption tracking-wider uppercase px-2 py-0.5 rounded-full bg-secondary text-on-secondary">
-              Regla Institucional
-            </span>
-            <span className="font-label-code text-caption text-primary-fixed">RES-DIR-04/26</span>
-          </div>
-          <div className="my-space-xs">
-            <div className="font-headline-md text-headline-md font-bold tracking-tight text-surface-container-lowest">
-              CV ACTUALIZABLE
+        <div className="relative z-10 px-space-xl py-space-lg flex flex-col md:flex-row md:items-center justify-between gap-space-md">
+          <div className="flex flex-col gap-1 max-w-3xl">
+            <div className="flex items-center gap-space-xs text-[#f7e7a9] font-caption text-xs uppercase tracking-widest font-semibold">
+              <span className="hover:underline cursor-pointer">Gestión documental</span>
+              <span className="material-symbols-outlined text-xs text-[#c5a059]">chevron_right</span>
+              <span className="text-white">Expedientes Académicos</span>
             </div>
-            <p className="font-caption text-caption text-on-primary-container mt-1">
-              No se exige una entrega nueva cada semestre lectivo ({gestion}). Se mantiene en resguardo permanente hasta actualización expresa.
+            <div className="flex items-center gap-3 mt-1">
+              <div className="w-2.5 h-9 bg-[#C1121F] rounded-sm shadow"></div>
+              <h1 className="font-institutional-serif text-2xl md:text-3xl font-extrabold tracking-wider text-white uppercase drop-shadow-sm">
+                DOCENTES
+              </h1>
+              <span className="px-2.5 py-0.5 rounded-full bg-white/10 border border-[#c5a059]/40 text-[#f7e7a9] font-label-code text-xs font-semibold">
+                PLANTEL OFICIAL FINI
+              </span>
+            </div>
+            <p className="font-body-sm text-sm text-slate-200 mt-1 pl-5 border-l border-[#c5a059]/30 max-w-2xl">
+              Archivo por docente: custodia de datos oficiales, legajos curriculares y documentos aportados para su conservación institucional permanente.
             </p>
           </div>
-          <div className="w-full bg-surface-container-lowest/10 h-1 rounded-full overflow-hidden mt-1">
-            <div className="bg-secondary h-full rounded-full w-full"></div>
+
+          <div className="flex items-center gap-space-sm self-start md:self-auto z-10">
+            <button 
+              onClick={() => {
+                setDocenteForm({
+                  nombre: '',
+                  ci: '',
+                  materia_principal: '',
+                  gestion_ingreso: gestion
+                });
+                setIsDocenteModalOpen(true);
+              }}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#C1121F] to-[#A50E1A] text-white font-body-sm text-sm font-bold hover:shadow-lg hover:shadow-[#c1121f]/40 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer border border-white/20" 
+              type="button"
+            >
+              <span className="material-symbols-outlined text-xl">person_add</span>
+              <span>+ Registrar docente</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Cenefa de acento dorado institucional al pie del banner */}
+        <div className="h-1.5 w-full bg-gradient-to-r from-[#C1121F] via-[#c5a059] to-[#0B2545]"></div>
+      </div>
+
+      {/* 3. Bloques de Normativa Superior con Filigrana y Cortes Bicolor */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-md mb-space-lg">
+        {/* Tarjeta 1: Conservación Documental Auditada */}
+        <div className="lg:col-span-8 bg-white rounded-2xl p-6 shadow-sm border border-slate-200/90 relative overflow-hidden flex flex-col sm:flex-row items-start gap-space-md group">
+          {/* Esquina angular bicolor institucional */}
+          <div className="absolute top-0 left-0 w-2.5 h-full bg-gradient-to-b from-[#0B2545] via-[#1d4ed8] to-[#C1121F]"></div>
+          
+          {/* Filigrana UAGRM tenue en fondo */}
+          <img 
+            alt="Filigrana de fondo" 
+            className="absolute -right-6 -bottom-10 w-36 h-44 object-contain opacity-[0.06] pointer-events-none group-hover:scale-105 transition-transform" 
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQiMcjjl81LiDusLYwNzVCfvGUsQDoVqxd3cQizcnsxOLE2cNcLwZlo_sxrNeia2SKc7wB36KrWMwQFrViefGkYZ5-ElVlfe7tcybBODmWl3_0arfnQlUCPNaoNAl10CQABBGjadxs1kSCDJlmh8V4SvcRAvFXxC-P3C5BfG8GaZKT_UI53F6XmGGd1Arat8sB8EdSoh6T5SORw5csO55Rbmxk4OWByKhmIAkiT332pcGZAZzlHPEKDx3o-xjqhmfA"
+          />
+
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#0B2545] to-[#1E3A8A] text-white flex items-center justify-center shrink-0 shadow-md ring-2 ring-[#c5a059]/40">
+            <span className="material-symbols-outlined text-2xl text-[#c5a059]">verified_user</span>
+          </div>
+
+          <div className="flex flex-col gap-1.5 pr-space-md">
+            <div className="flex items-center gap-2">
+              <span className="font-institutional-serif text-sm font-bold tracking-wider text-[#0B2545]">
+                CONSERVACIÓN DOCUMENTAL AUDITADA
+              </span>
+              <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 font-label-code text-[11px] font-bold">
+                NORMA ISO/FINI
+              </span>
+            </div>
+            <p className="font-body-sm text-sm text-slate-600 leading-relaxed">
+              Documentos del docente, conservados sin modificar su contenido original. La Dirección escanea o procesa archivos en formato <strong className="font-semibold text-[#0B2545] font-label-code bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">PDF/A</strong> homologado para consultar el historial de carrera y descargar respaldos íntegros de auditoría institucional.
+            </p>
+          </div>
+        </div>
+
+        {/* Tarjeta 2: Regla Institucional CV Actualizable */}
+        <div className="lg:col-span-4 bg-gradient-to-br from-[#0B2545] to-[#07172B] text-white rounded-2xl p-6 shadow-md border border-[#c5a059]/30 flex flex-col justify-between relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-24 h-24 bg-[#c1121f]/20 rounded-full blur-xl pointer-events-none"></div>
+          
+          <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-[#c5a059]"></span>
+              <span className="font-label-badge text-[11px] tracking-widest uppercase font-bold text-[#f7e7a9]">
+                REGLA INSTITUCIONAL
+              </span>
+            </div>
+            <span className="font-label-code text-xs px-2 py-0.5 rounded bg-white/10 text-white font-semibold border border-white/15">
+              RES-DIR-04/26
+            </span>
+          </div>
+
+          <div className="my-space-sm relative z-10">
+            <div className="font-institutional-serif text-lg font-bold tracking-wider text-white flex items-center gap-2">
+              <span>CV ACTUALIZABLE</span>
+              <span className="material-symbols-outlined text-[#c5a059] text-lg">auto_mode</span>
+            </div>
+            <p className="font-body-sm text-xs text-slate-300 mt-1.5 leading-relaxed">
+              No se exige una entrega nueva cada semestre lectivo ({gestion}). Se mantiene en resguardo permanente hasta actualización expresa informada a Dirección.
+            </p>
+          </div>
+
+          <div className="w-full bg-white/10 h-1.5 rounded-full overflow-hidden mt-1 relative z-10">
+            <div className="bg-gradient-to-r from-[#c5a059] to-[#C1121F] h-full rounded-full w-full"></div>
           </div>
         </div>
       </div>
 
-      {/* Layout Principal a Dos Columnas */}
+      {/* 4. Layout Principal a Dos Columnas */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
-        {/* COLUMNA IZQUIERDA: Directorio y Archivo por Docente (4 cols en escritorio) */}
+        {/* COLUMNA IZQUIERDA: Directorio y Archivo por Docente (4 columnas) */}
         <div className="lg:col-span-4 flex flex-col gap-space-md">
-          <div className="bg-surface-container-lowest rounded-xl shadow-sm p-space-md">
-            <div className="flex items-center justify-between mb-space-sm">
-              <div className="flex items-center gap-space-xs">
-                <span className="font-headline-md text-headline-md text-on-surface">Archivo por docente</span>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container font-label-code text-caption text-secondary font-bold">
-                  {docentes.length} Activos
-                </span>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-space-md">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 mb-space-sm">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#0B2545] text-xl">folder_shared</span>
+                <h2 className="font-institutional-serif text-base font-bold text-[#0B2545]">Archivo por docente</h2>
               </div>
-              <button
-                onClick={() => setBusqueda('')}
-                className="p-1 rounded-lg text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors cursor-pointer"
-                title="Limpiar búsqueda"
-                type="button"
-              >
-                <span className="material-symbols-outlined text-lg">filter_list</span>
-              </button>
+              <span className="px-2.5 py-0.5 rounded-full bg-[#0B2545]/10 font-label-code text-xs text-[#0B2545] font-bold">
+                {docentes.length} Activos
+              </span>
             </div>
 
             {/* Buscador */}
             <div className="relative mb-space-md">
-              <span className="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-lg">
+              <span className="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-lg">
                 search
               </span>
-              <input
-                className="w-full pl-9 pr-space-md py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-secondary/40 transition-all"
-                placeholder="Buscar docente o materia..."
+              <input 
+                className="w-full pl-9 pr-space-md py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/30 focus:border-[#0B2545] transition-all" 
+                placeholder="Buscar docente o código institucional..." 
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
                 type="text"
@@ -295,13 +338,13 @@ const Docentes = () => {
             </div>
 
             {/* Lista Selectora de Docentes */}
-            <div className="flex flex-col gap-space-xs" id="docentes-list">
+            <div className="flex flex-col gap-2" id="docentes-list">
               {loading ? (
-                <div className="p-4 text-center text-on-surface-variant text-sm">
+                <div className="p-4 text-center text-slate-500 text-sm">
                   Cargando nómina docente...
                 </div>
               ) : docentes.length === 0 ? (
-                <div className="p-4 text-center text-on-surface-variant text-sm">
+                <div className="p-4 text-center text-slate-500 text-sm">
                   No se encontraron docentes registrados.
                 </div>
               ) : (
@@ -309,129 +352,140 @@ const Docentes = () => {
                   const isSelected = selectedDocente && String(selectedDocente.id) === String(doc.id);
                   const initials = getInitials(doc.nombre);
 
+                  if (isSelected) {
+                    return (
+                      <div 
+                        key={doc.id}
+                        onClick={() => setSelectedDocenteId(doc.id)}
+                        className="group relative flex items-center justify-between p-3.5 rounded-xl bg-gradient-to-r from-[#0B2545] to-[#123661] text-white shadow-md cursor-pointer transition-all border-l-4 border-[#C1121F]"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-11 h-11 rounded-xl bg-white/10 ring-1 ring-[#c5a059]/40 flex items-center justify-center text-[#f7e7a9] font-institutional-serif text-base font-bold shrink-0 shadow-inner">
+                            {initials}
+                          </div>
+                          <div className="flex flex-col min-w-0">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-body-md text-sm font-bold text-white truncate">
+                                {doc.nombre}
+                              </span>
+                              <span className="material-symbols-outlined text-[#c5a059] text-base shrink-0" title="Validado en nómina">
+                                verified
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="font-label-code text-[11px] text-[#c5a059] font-semibold">
+                                DOC-{String(doc.id).padStart(3, '0')}
+                              </span>
+                              <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                              <span className="font-caption text-[11px] text-slate-300 truncate">
+                                {doc.materia_principal || 'Titular · Ordinario'}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                        <span className="material-symbols-outlined text-[#c5a059] text-xl shrink-0">
+                          check_circle
+                        </span>
+                      </div>
+                    );
+                  }
+
                   return (
-                    <div
+                    <div 
                       key={doc.id}
                       onClick={() => setSelectedDocenteId(doc.id)}
-                      className={`group ${
-                        isSelected
-                          ? 'relative bg-primary-container text-on-primary shadow-md'
-                          : 'bg-surface-container-lowest hover:bg-surface-container-low text-on-surface'
-                      } flex items-center justify-between p-space-md rounded-xl cursor-pointer transition-all`}
+                      className="group flex items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100 transition-all cursor-pointer border border-transparent hover:border-slate-200"
                     >
-                      <div className="flex items-center gap-space-sm min-w-0">
-                        <div
-                          className={`w-10 h-10 rounded-lg ${
-                            isSelected
-                              ? 'bg-secondary text-on-secondary shadow-inner'
-                              : 'bg-surface-container text-on-surface'
-                          } flex items-center justify-center font-headline-md text-headline-md shrink-0`}
-                        >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-11 h-11 rounded-xl bg-white border border-slate-200 flex items-center justify-center text-[#0B2545] font-institutional-serif text-sm font-bold shrink-0 group-hover:border-[#0B2545]/30 group-hover:bg-slate-50">
                           {initials}
                         </div>
                         <div className="flex flex-col min-w-0">
-                          <span
-                            className={`font-body-md text-body-md ${
-                              isSelected
-                                ? 'font-bold text-surface-container-lowest'
-                                : 'font-medium text-on-surface group-hover:text-secondary'
-                            } truncate transition-colors`}
-                          >
+                          <span className="font-body-md text-sm font-semibold text-slate-800 group-hover:text-[#0B2545] truncate transition-colors">
                             {doc.nombre}
                           </span>
                           <div className="flex items-center gap-2 mt-0.5">
-                            <span
-                              className={`font-label-code text-caption ${
-                                isSelected ? 'text-secondary-fixed' : 'text-on-surface-variant'
-                              }`}
-                            >
-                              {doc.ci ? `CI: ${doc.ci}` : `ID: DOC-${doc.id}`}
+                            <span className="font-label-code text-[11px] text-slate-500 font-medium">
+                              {doc.ci ? `CI: ${doc.ci}` : `DOC-${String(doc.id).padStart(3, '0')}`}
                             </span>
-                            <span
-                              className={`w-1 h-1 rounded-full ${
-                                isSelected ? 'bg-secondary-fixed/50' : 'bg-outline-variant'
-                              }`}
-                            ></span>
-                            <span
-                              className={`font-caption text-caption ${
-                                isSelected ? 'text-on-primary-container' : 'text-on-surface-variant'
-                              } truncate`}
-                            >
-                              {doc.materia_principal || 'Docente Titular'}
+                            <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                            <span className="font-caption text-[11px] text-slate-500 truncate">
+                              {doc.materia_principal || 'Docente UAGRM'}
                             </span>
                           </div>
                         </div>
                       </div>
-
-                      {isSelected ? (
-                        <span className="material-symbols-outlined text-secondary-fixed text-lg shrink-0">
-                          check_circle
-                        </span>
-                      ) : (
-                        <span className="material-symbols-outlined text-outline-variant group-hover:text-on-surface-variant text-lg shrink-0">
-                          chevron_right
-                        </span>
-                      )}
+                      <span className="material-symbols-outlined text-slate-400 group-hover:text-[#0B2545] text-lg shrink-0">
+                        chevron_right
+                      </span>
                     </div>
                   );
                 })
               )}
             </div>
 
-            <div className="mt-space-md pt-space-sm flex items-center justify-between text-on-surface-variant font-caption text-caption border-t border-outline-variant/20">
-              <span>
-                Total registrados: <strong>{docentes.length} docentes</strong>
-              </span>
-              <button
+            <div className="mt-space-md pt-3 border-t border-slate-100 flex items-center justify-between text-slate-500 font-caption text-xs">
+              <span>Total en carrera: <strong className="text-[#0B2545] font-bold">{docentes.length} docentes</strong></span>
+              <button 
                 onClick={() => setBusqueda('')}
-                className="text-secondary hover:underline font-semibold cursor-pointer"
+                className="text-[#C1121F] hover:text-[#93000a] hover:underline font-bold inline-flex items-center gap-0.5 cursor-pointer"
                 type="button"
               >
-                Ver todos
+                <span>Ver catálogo completo</span>
+                <span className="material-symbols-outlined text-xs">arrow_forward</span>
               </button>
             </div>
           </div>
 
-          {/* Card auxiliar de auditoría rápida */}
-          <div className="bg-surface-container-high rounded-xl p-space-md shadow-sm">
-            <div className="flex items-center gap-space-xs text-on-surface font-headline-md text-headline-md mb-1">
-              <span className="material-symbols-outlined text-secondary">history_edu</span>
-              <span>Depósito Central FINI</span>
+          {/* Recuadro institucional: Depósito Central FINI al pie */}
+          <div className="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-5 shadow-sm border-l-4 border-[#c5a059] border-r border-t border-b border-slate-200/80 relative overflow-hidden">
+            <div className="flex items-center gap-2 text-[#0B2545] font-institutional-serif text-sm font-bold mb-1.5">
+              <span className="material-symbols-outlined text-[#C1121F] text-xl">account_balance</span>
+              <span>DEPÓSITO CENTRAL FINI</span>
             </div>
-            <p className="font-caption text-caption text-on-surface-variant leading-relaxed">
-              Los legajos digitales cuentan con respaldo criptográfico en el servidor local de Yapacaní. La integridad documental se verifica semestralmente ante el Honorable Consejo Facultativo.
+            <p className="font-body-sm text-xs text-slate-600 leading-relaxed">
+              Los legajos digitales cuentan con respaldo criptográfico en el servidor local de Yapacaní. La integridad documental se verifica semestralmente ante el Honorable Consejo Facultativo de la FINI.
             </p>
+            <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[11px] text-slate-500 font-label-code">
+              <span className="flex items-center gap-1 text-emerald-700 font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>
+                Servidor Local OK
+              </span>
+              <span>Yapacaní - Santa Cruz</span>
+            </div>
           </div>
         </div>
 
-        {/* COLUMNA DERECHA: Expediente Oficial Seleccionado (8 cols en escritorio) */}
+        {/* COLUMNA DERECHA: Expediente Oficial Seleccionado (8 columnas) */}
         <div className="lg:col-span-8 flex flex-col gap-space-lg">
           {selectedDocente ? (
             <>
               {/* Ficha de Encabezado Oficial */}
-              <div className="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md relative overflow-hidden">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-sm">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-space-lg flex flex-col gap-space-md relative overflow-hidden">
+                <div className="absolute -right-8 -top-8 w-36 h-36 border-4 border-slate-100 rounded-full pointer-events-none"></div>
+
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-space-sm border-b border-slate-100">
                   <div className="flex items-center gap-space-md">
-                    <div className="w-14 h-14 rounded-xl bg-surface-container-high flex items-center justify-center text-secondary font-headline-lg text-headline-lg font-bold shadow-inner">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#0B2545] to-[#123661] text-[#c5a059] flex items-center justify-center font-institutional-serif text-2xl font-bold shadow-md ring-2 ring-[#c5a059]/40">
                       {getInitials(selectedDocente.nombre)}
                     </div>
                     <div className="flex flex-col">
-                      <div className="flex items-center gap-space-xs">
-                        <h2 className="font-headline-lg text-headline-lg text-on-surface font-extrabold tracking-tight">
+                      <div className="flex items-center gap-2">
+                        <h2 className="font-institutional-serif text-xl md:text-2xl text-[#0B2545] font-extrabold tracking-tight">
                           {selectedDocente.nombre}
                         </h2>
-                        <span className="material-symbols-outlined text-secondary text-xl" title="Docente validado en nómina">
+                        <span className="material-symbols-outlined text-[#C1121F] text-xl" title="Docente validado en nómina universitaria">
                           verified
                         </span>
                       </div>
-                      <span className="font-body-sm text-body-sm text-on-surface-variant">
-                        Cátedras: {selectedDocente.materia_principal || 'Asignaturas de Sistemas'}
+                      <span className="font-body-sm text-xs md:text-sm text-slate-600 font-medium mt-0.5">
+                        Cátedras: {selectedDocente.materia_principal || 'Cátedras Oficiales de Sistemas'}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-space-xs self-start sm:self-auto">
-                    <button
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <button 
                       onClick={() => {
                         setArchivoForm({
                           tipo: 'informe_final',
@@ -441,16 +495,16 @@ const Docentes = () => {
                         });
                         setIsArchivoModalOpen(true);
                       }}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container font-body-sm text-body-sm font-semibold text-on-surface hover:bg-surface-container-high transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#0B2545] font-body-sm text-xs font-bold transition-all border border-slate-200 shadow-sm cursor-pointer" 
                       type="button"
                     >
-                      <span className="material-symbols-outlined text-base">upload_file</span>
+                      <span className="material-symbols-outlined text-base text-[#0B2545]">upload_file</span>
                       <span>Anexar archivo</span>
                     </button>
-                    <button
-                      onClick={() => alert(`Expediente de ${selectedDocente.nombre} con ${archivos.length} archivos indexados en servidor FINI.`)}
-                      className="p-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors cursor-pointer"
-                      title="Detalle del legajo"
+                    <button 
+                      onClick={() => alert(`Expediente oficial de ${selectedDocente.nombre} con ${archivos.length} documentos indexados.`)}
+                      className="p-2 rounded-xl bg-slate-100 hover:bg-[#0B2545] hover:text-white text-slate-700 transition-all border border-slate-200 shadow-sm cursor-pointer" 
+                      title="Descargar expediente comprimido .ZIP" 
                       type="button"
                     >
                       <span className="material-symbols-outlined text-lg">folder_zip</span>
@@ -458,30 +512,30 @@ const Docentes = () => {
                   </div>
                 </div>
 
-                {/* Metadatos de Legajo Oficial */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-space-sm pt-space-xs">
-                  <div className="bg-surface-container-low p-space-sm rounded-lg flex flex-col">
-                    <span className="font-caption text-caption uppercase tracking-wider text-on-surface-variant font-bold">
+                {/* Metadatos de Legajo Oficial con acento institucional */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                  <div className="bg-slate-50 border border-slate-200/80 p-3 rounded-xl flex flex-col">
+                    <span className="font-caption text-[11px] uppercase tracking-wider text-slate-500 font-bold">
                       Registro de Archivo
                     </span>
-                    <span className="font-label-code text-body-md font-bold text-secondary mt-0.5">
+                    <span className="font-label-code text-sm font-bold text-[#0B2545] mt-1">
                       DOC-{String(selectedDocente.id).padStart(3, '0')}
                     </span>
                   </div>
-                  <div className="bg-surface-container-low p-space-sm rounded-lg flex flex-col">
-                    <span className="font-caption text-caption uppercase tracking-wider text-on-surface-variant font-bold">
+                  <div className="bg-slate-50 border border-slate-200/80 p-3 rounded-xl flex flex-col">
+                    <span className="font-caption text-[11px] uppercase tracking-wider text-slate-500 font-bold">
                       Cédula de Identidad
                     </span>
-                    <span className="font-label-code text-body-md font-semibold text-on-surface mt-0.5">
+                    <span className="font-label-code text-sm font-bold text-slate-700 mt-1">
                       {selectedDocente.ci || 'No registrada'}
                     </span>
                   </div>
-                  <div className="bg-surface-container-low p-space-sm rounded-lg flex flex-col">
-                    <span className="font-caption text-caption uppercase tracking-wider text-on-surface-variant font-bold">
+                  <div className="bg-slate-50 border border-slate-200/80 p-3 rounded-xl flex flex-col">
+                    <span className="font-caption text-[11px] uppercase tracking-wider text-slate-500 font-bold">
                       Condición Académica
                     </span>
-                    <span className="font-body-md text-body-md font-semibold text-on-surface mt-0.5 flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-secondary"></span>
+                    <span className="font-body-md text-xs font-bold text-[#0B2545] mt-1 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#C1121F]"></span>
                       Ordinario / Titular
                     </span>
                   </div>
@@ -489,18 +543,21 @@ const Docentes = () => {
               </div>
 
               {/* SECCIÓN 1: Documentación General (Conservación continua) */}
-              <div className="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-space-lg flex flex-col gap-space-md relative overflow-hidden">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm pb-2 border-b border-slate-100">
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-space-xs">
-                      <span className="material-symbols-outlined text-secondary text-xl">folder_shared</span>
-                      <h3 className="font-headline-md text-headline-md text-on-surface font-bold">Documentación general</h3>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-5 bg-[#0B2545] rounded-sm"></div>
+                      <h3 className="font-institutional-serif text-base md:text-lg text-[#0B2545] font-bold">
+                        DOCUMENTACIÓN GENERAL
+                      </h3>
                     </div>
-                    <span className="font-caption text-caption text-on-surface-variant">
+                    <span className="font-caption text-xs text-slate-500 pl-3">
                       Conservación continua · Sin obligación de renovación semestral
                     </span>
                   </div>
-                  <button
+
+                  <button 
                     onClick={() => {
                       setArchivoForm({
                         tipo: 'curriculum',
@@ -510,40 +567,40 @@ const Docentes = () => {
                       });
                       setIsArchivoModalOpen(true);
                     }}
-                    className="inline-flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container font-body-sm text-body-sm font-semibold text-secondary hover:bg-secondary-fixed transition-colors cursor-pointer self-start sm:self-auto"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0B2545]/5 text-[#0B2545] hover:bg-[#0B2545] hover:text-white border border-[#0B2545]/20 font-body-sm text-xs font-bold transition-all cursor-pointer self-start sm:self-auto" 
                     type="button"
                   >
-                    <span className="material-symbols-outlined text-lg leading-none">upload_file</span>
+                    <span className="material-symbols-outlined text-lg leading-none text-[#C1121F]">upload_file</span>
                     <span>Cargar PDF</span>
                   </button>
                 </div>
 
                 {/* Lista de Documentos Generales */}
-                <div className="flex flex-col gap-space-xs mt-1">
-                  {/* DOC ITEM 1: CV */}
+                <div className="flex flex-col gap-2.5 mt-1">
+                  {/* DOC ITEM 1: CV (Vigente) */}
                   {(() => {
                     const cv = generalDocs.find(a => a.tipo === 'curriculum');
                     return (
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors gap-space-sm">
-                        <div className="flex items-start gap-space-sm">
-                          <div className="w-10 h-10 rounded-lg bg-error-container text-on-error-container flex items-center justify-center shrink-0 mt-0.5">
-                            <span className="material-symbols-outlined text-xl">picture_as_pdf</span>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100/90 border border-slate-200/80 transition-colors gap-space-sm">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-red-100 text-[#C1121F] flex items-center justify-center shrink-0 mt-0.5 border border-red-200">
+                            <span className="material-symbols-outlined text-2xl">picture_as_pdf</span>
                           </div>
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2">
-                              <span className="font-body-md text-body-md font-semibold text-on-surface">Curriculum vitae</span>
-                              <span className="font-label-badge text-caption px-1.5 py-0.5 rounded bg-surface-container-highest text-on-secondary-fixed font-bold">
+                              <span className="font-body-md text-sm font-bold text-slate-800">Curriculum vitae</span>
+                              <span className="font-label-badge text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold">
                                 {cv ? 'VIGENTE' : 'PENDIENTE'}
                               </span>
                             </div>
-                            <div className="flex items-center gap-2 mt-0.5 font-label-code text-caption text-on-surface-variant">
-                              <span className="text-secondary font-medium">
-                                {cv ? cv.nombre_original : `cv_${selectedDocente.nombre.toLowerCase().replace(/\s+/g, '_')}.pdf`}
+                            <div className="flex flex-wrap items-center gap-2 mt-0.5 font-label-code text-[11px] text-slate-500">
+                              <span className="text-[#0B2545] font-semibold">
+                                {cv ? cv.nombre_original : `cv_${selectedDocente.nombre.toLowerCase().replace(/\s+/g, '_')}_demo.pdf`}
                               </span>
                               <span>·</span>
                               <span>PDF/A-1b</span>
                               <span>·</span>
-                              <span>{cv ? 'En resguardo' : 'No adjunto aún'}</span>
+                              <span>{cv ? 'En resguardo oficial' : 'No adjunto aún'}</span>
                             </div>
                           </div>
                         </div>
@@ -551,26 +608,26 @@ const Docentes = () => {
                         <div className="flex items-center gap-1 self-end sm:self-auto">
                           {cv ? (
                             <>
-                              <button
+                              <button 
                                 onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${cv.id}/download`, cv.nombre_original)}
-                                className="p-2 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-lowest transition-colors cursor-pointer"
-                                title="Ver escaneo oficial"
+                                className="p-2 rounded-lg text-slate-600 hover:text-[#0B2545] hover:bg-white border border-transparent hover:border-slate-200 transition-colors cursor-pointer" 
+                                title="Ver escaneo oficial" 
                                 type="button"
                               >
                                 <span className="material-symbols-outlined text-lg">visibility</span>
                               </button>
-                              <button
+                              <button 
                                 onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${cv.id}/download`, cv.nombre_original)}
-                                className="p-2 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-lowest transition-colors cursor-pointer"
-                                title="Descargar archivo"
+                                className="p-2 rounded-lg text-slate-600 hover:text-[#C1121F] hover:bg-white border border-transparent hover:border-slate-200 transition-colors cursor-pointer" 
+                                title="Descargar archivo" 
                                 type="button"
                               >
                                 <span className="material-symbols-outlined text-lg">download</span>
                               </button>
-                              <button
+                              <button 
                                 onClick={() => handleDeleteArchivo(cv.id, cv.nombre_original)}
-                                className="p-2 rounded-lg text-outline-variant hover:text-error hover:bg-surface-container-lowest transition-colors cursor-pointer"
-                                title="Eliminar archivo"
+                                className="p-2 rounded-lg text-slate-400 hover:text-[#C1121F] hover:bg-white border border-transparent hover:border-slate-200 transition-colors cursor-pointer" 
+                                title="Eliminar archivo" 
                                 type="button"
                               >
                                 <span className="material-symbols-outlined text-lg">delete</span>
@@ -587,7 +644,7 @@ const Docentes = () => {
                                 });
                                 setIsArchivoModalOpen(true);
                               }}
-                              className="px-3 py-1 bg-secondary text-on-secondary text-caption font-semibold rounded-lg hover:bg-secondary-container transition-colors cursor-pointer"
+                              className="px-3 py-1.5 bg-[#C1121F] text-white text-xs font-bold rounded-lg hover:bg-[#93000a] transition-colors cursor-pointer shadow-sm"
                               type="button"
                             >
                               + Cargar CV
@@ -602,26 +659,28 @@ const Docentes = () => {
                   {(() => {
                     const prog = generalDocs.find(a => a.tipo === 'programa_analitico');
                     return (
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors gap-space-sm">
-                        <div className="flex items-start gap-space-sm">
-                          <div className="w-10 h-10 rounded-lg bg-error-container text-on-error-container flex items-center justify-center shrink-0 mt-0.5">
-                            <span className="material-symbols-outlined text-xl">picture_as_pdf</span>
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100/90 border border-slate-200/80 transition-colors gap-space-sm">
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-red-100 text-[#C1121F] flex items-center justify-center shrink-0 mt-0.5 border border-red-200">
+                            <span className="material-symbols-outlined text-2xl">picture_as_pdf</span>
                           </div>
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2">
-                              <span className="font-body-md text-body-md font-semibold text-on-surface">
+                              <span className="font-body-md text-sm font-bold text-slate-800">
                                 Programa analítico - {selectedDocente.materia_principal || 'Cátedra Oficial'}
                               </span>
-                              <span className="font-label-badge text-caption px-1.5 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed font-bold">
-                                {prog ? 'HOMOLOGADO' : 'PENDIENTE'}
+                              <span className="font-label-badge text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-[#0B2545] font-bold border border-blue-200">
+                                {prog ? 'HOMOLOGADO' : 'NUEVA MALLA'}
                               </span>
                             </div>
-                            <div className="flex items-center gap-2 mt-0.5 font-label-code text-caption text-on-surface-variant">
-                              <span className="text-secondary font-medium">
-                                {prog ? prog.nombre_original : 'programa_analitico_sistemas.pdf'}
+                            <div className="flex flex-wrap items-center gap-2 mt-0.5 font-label-code text-[11px] text-slate-500">
+                              <span className="text-[#0B2545] font-semibold">
+                                {prog ? prog.nombre_original : 'programa_analitico_demo.pdf'}
                               </span>
                               <span>·</span>
-                              <span>Plan UAGRM</span>
+                              <span>Plan 2024</span>
+                              <span>·</span>
+                              <span>{prog ? 'Cotejado con original' : 'Pendiente'}</span>
                             </div>
                           </div>
                         </div>
@@ -629,26 +688,26 @@ const Docentes = () => {
                         <div className="flex items-center gap-1 self-end sm:self-auto">
                           {prog ? (
                             <>
-                              <button
+                              <button 
                                 onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${prog.id}/download`, prog.nombre_original)}
-                                className="p-2 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-lowest transition-colors cursor-pointer"
-                                title="Ver escaneo oficial"
+                                className="p-2 rounded-lg text-slate-600 hover:text-[#0B2545] hover:bg-white border border-transparent hover:border-slate-200 transition-colors cursor-pointer" 
+                                title="Ver escaneo oficial" 
                                 type="button"
                               >
                                 <span className="material-symbols-outlined text-lg">visibility</span>
                               </button>
-                              <button
+                              <button 
                                 onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${prog.id}/download`, prog.nombre_original)}
-                                className="p-2 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-lowest transition-colors cursor-pointer"
-                                title="Descargar archivo"
+                                className="p-2 rounded-lg text-slate-600 hover:text-[#C1121F] hover:bg-white border border-transparent hover:border-slate-200 transition-colors cursor-pointer" 
+                                title="Descargar archivo" 
                                 type="button"
                               >
                                 <span className="material-symbols-outlined text-lg">download</span>
                               </button>
-                              <button
+                              <button 
                                 onClick={() => handleDeleteArchivo(prog.id, prog.nombre_original)}
-                                className="p-2 rounded-lg text-outline-variant hover:text-error hover:bg-surface-container-lowest transition-colors cursor-pointer"
-                                title="Eliminar archivo"
+                                className="p-2 rounded-lg text-slate-400 hover:text-[#C1121F] hover:bg-white border border-transparent hover:border-slate-200 transition-colors cursor-pointer" 
+                                title="Eliminar archivo" 
                                 type="button"
                               >
                                 <span className="material-symbols-outlined text-lg">delete</span>
@@ -665,7 +724,7 @@ const Docentes = () => {
                                 });
                                 setIsArchivoModalOpen(true);
                               }}
-                              className="px-3 py-1 bg-surface-container-highest text-secondary text-caption font-semibold rounded-lg hover:bg-secondary-fixed transition-colors cursor-pointer"
+                              className="px-3 py-1.5 bg-[#0B2545] text-white text-xs font-bold rounded-lg hover:bg-[#153e70] transition-colors cursor-pointer shadow-sm"
                               type="button"
                             >
                               + Cargar Programa
@@ -679,23 +738,25 @@ const Docentes = () => {
               </div>
 
               {/* SECCIÓN 2: Documentación por Semestre */}
-              <div className="bg-surface-container-lowest rounded-xl shadow-sm p-space-lg flex flex-col gap-space-md">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pb-space-xs">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-space-lg flex flex-col gap-space-md">
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pb-2 border-b border-slate-100">
                   <div className="flex flex-col">
-                    <div className="flex items-center gap-space-xs">
-                      <span className="material-symbols-outlined text-secondary text-xl">date_range</span>
-                      <h3 className="font-headline-md text-headline-md text-on-surface font-bold">Documentación por semestre</h3>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-5 bg-[#C1121F] rounded-sm"></div>
+                      <h3 className="font-institutional-serif text-base md:text-lg text-[#0B2545] font-bold">
+                        DOCUMENTACIÓN POR SEMESTRE
+                      </h3>
                     </div>
-                    <span className="font-caption text-caption text-on-surface-variant">
+                    <span className="font-caption text-xs text-slate-500 pl-3">
                       Depósitos periódicos requeridos por cada ciclo académico regular
                     </span>
                   </div>
 
                   {/* Selectores de Ciclo & Botón Cargar */}
-                  <div className="flex flex-wrap items-center gap-space-xs">
-                    <div className="flex items-center bg-surface-container-low rounded-lg p-1">
-                      <select
-                        className="bg-transparent font-label-code text-body-sm font-semibold text-on-surface px-2 py-1 outline-none cursor-pointer"
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl p-1 shadow-inner">
+                      <select 
+                        className="bg-transparent font-label-code text-xs font-bold text-slate-800 px-2.5 py-1.5 outline-none cursor-pointer"
                         value={filtroGestionSemestre}
                         onChange={(e) => setFiltroGestionSemestre(e.target.value)}
                       >
@@ -703,9 +764,9 @@ const Docentes = () => {
                         <option value="2025">Gestión: 2025</option>
                         <option value="2024">Gestión: 2024</option>
                       </select>
-                      <div className="h-4 w-px bg-outline-variant mx-1"></div>
-                      <select
-                        className="bg-transparent font-label-code text-body-sm font-semibold text-on-surface px-2 py-1 outline-none cursor-pointer"
+                      <div className="h-4 w-px bg-slate-300 mx-1"></div>
+                      <select 
+                        className="bg-transparent font-label-code text-xs font-bold text-slate-800 px-2.5 py-1.5 outline-none cursor-pointer"
                         value={filtroSemestre}
                         onChange={(e) => setFiltroSemestre(e.target.value)}
                       >
@@ -714,7 +775,7 @@ const Docentes = () => {
                       </select>
                     </div>
 
-                    <button
+                    <button 
                       onClick={() => {
                         setArchivoForm({
                           tipo: 'informe_final',
@@ -724,25 +785,25 @@ const Docentes = () => {
                         });
                         setIsArchivoModalOpen(true);
                       }}
-                      className="inline-flex items-center gap-space-xs px-space-md py-2 rounded-lg bg-secondary text-on-secondary font-body-sm text-body-sm font-semibold hover:bg-on-secondary-fixed-variant transition-colors cursor-pointer shadow-sm"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-[#0B2545] to-[#153e70] text-white font-body-sm text-xs font-bold hover:shadow-md transition-all cursor-pointer border border-[#c5a059]/30" 
                       type="button"
                     >
-                      <span className="material-symbols-outlined text-lg leading-none">add_circle</span>
+                      <span className="material-symbols-outlined text-base leading-none text-[#c5a059]">add_circle</span>
                       <span>Cargar documentación</span>
                     </button>
                   </div>
                 </div>
 
                 {/* Archivos Semestrales Registrados */}
-                <div className="flex flex-col gap-space-xs">
+                <div className="flex flex-col gap-2.5">
                   {loadingArchivos ? (
-                    <div className="p-4 text-center text-on-surface-variant text-sm">
+                    <div className="p-4 text-center text-slate-500 text-sm">
                       Consultando archivos semestrales...
                     </div>
                   ) : semestralDocs.length === 0 ? (
-                    <div className="p-6 text-center bg-surface-container-low/50 rounded-xl text-on-surface-variant flex flex-col items-center gap-2">
-                      <span className="material-symbols-outlined text-3xl text-outline-variant">folder_off</span>
-                      <p className="font-body-sm text-body-sm">
+                    <div className="p-8 text-center bg-slate-50/70 border border-slate-200/60 rounded-xl text-slate-500 flex flex-col items-center gap-2">
+                      <span className="material-symbols-outlined text-3xl text-slate-400">folder_off</span>
+                      <p className="font-body-sm text-sm">
                         No hay archivos registrados para el <strong>Semestre {filtroSemestre === '1' ? 'I' : 'II'} / {filtroGestionSemestre}</strong>.
                       </p>
                       <button
@@ -755,7 +816,7 @@ const Docentes = () => {
                           });
                           setIsArchivoModalOpen(true);
                         }}
-                        className="px-3 py-1.5 rounded-lg bg-surface-container text-secondary text-body-sm font-semibold hover:bg-surface-container-high transition-colors cursor-pointer mt-1"
+                        className="px-4 py-2 rounded-xl bg-[#0B2545] text-white text-xs font-bold hover:bg-[#153e70] transition-colors cursor-pointer mt-1 shadow-sm"
                         type="button"
                       >
                         + Anexar informe o lista de asistencia
@@ -763,27 +824,35 @@ const Docentes = () => {
                     </div>
                   ) : (
                     semestralDocs.map((arc) => (
-                      <div
+                      <div 
                         key={arc.id}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between p-space-md rounded-xl bg-surface-container-low hover:bg-surface-container transition-colors gap-space-sm"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-xl bg-slate-50 hover:bg-slate-100/90 border border-slate-200/80 transition-colors gap-space-sm"
                       >
-                        <div className="flex items-start gap-space-sm">
-                          <div className="w-10 h-10 rounded-lg bg-surface-container-highest text-secondary flex items-center justify-center shrink-0 mt-0.5">
+                        <div className="flex items-start gap-3">
+                          <div className={`w-10 h-10 rounded-xl ${
+                            arc.tipo === 'lista_asistencia' 
+                              ? 'bg-amber-50 text-amber-800 border border-amber-200' 
+                              : 'bg-blue-100 text-[#0B2545] border border-blue-200'
+                          } flex items-center justify-center shrink-0 mt-0.5`}>
                             <span className="material-symbols-outlined text-xl">
                               {arc.tipo === 'lista_asistencia' ? 'fact_check' : 'description'}
                             </span>
                           </div>
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2">
-                              <span className="font-body-md text-body-md font-semibold text-on-surface">
+                              <span className="font-body-md text-sm font-bold text-slate-800">
                                 {arc.tipo === 'lista_asistencia' ? 'Lista de asistencia' : 'Informe final / de cátedra'}
                               </span>
-                              <span className="font-label-badge text-caption px-1.5 py-0.5 rounded bg-surface-container-highest text-secondary font-bold">
+                              <span className={`font-label-badge text-[10px] px-2 py-0.5 rounded-full ${
+                                arc.tipo === 'lista_asistencia'
+                                  ? 'bg-amber-100 text-amber-900 border border-amber-200 font-bold'
+                                  : 'bg-blue-100 text-[#0B2545] font-bold border border-blue-200'
+                              }`}>
                                 {arc.tipo === 'lista_asistencia' ? 'CUSTODIA' : 'ARCHIVADO'}
                               </span>
                             </div>
-                            <div className="flex items-center gap-2 mt-0.5 font-label-code text-caption text-on-surface-variant">
-                              <span className="text-secondary font-medium">{arc.nombre_original}</span>
+                            <div className="flex flex-wrap items-center gap-2 mt-0.5 font-label-code text-[11px] text-slate-500">
+                              <span className="text-[#0B2545] font-semibold">{arc.nombre_original}</span>
                               <span>·</span>
                               <span>Semestre {arc.semestre === 1 ? 'I' : 'II'} / {arc.gestion}</span>
                               <span>·</span>
@@ -793,26 +862,26 @@ const Docentes = () => {
                         </div>
 
                         <div className="flex items-center gap-1 self-end sm:self-auto">
-                          <button
+                          <button 
                             onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${arc.id}/download`, arc.nombre_original)}
-                            className="p-2 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-lowest transition-colors cursor-pointer"
-                            title="Ver informe oficial"
+                            className="p-2 rounded-lg text-slate-600 hover:text-[#0B2545] hover:bg-white border border-transparent hover:border-slate-200 transition-colors cursor-pointer" 
+                            title="Ver informe oficial" 
                             type="button"
                           >
                             <span className="material-symbols-outlined text-lg">visibility</span>
                           </button>
-                          <button
+                          <button 
                             onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${arc.id}/download`, arc.nombre_original)}
-                            className="p-2 rounded-lg text-on-surface-variant hover:text-secondary hover:bg-surface-container-lowest transition-colors cursor-pointer"
-                            title="Descargar archivo"
+                            className="p-2 rounded-lg text-slate-600 hover:text-[#C1121F] hover:bg-white border border-transparent hover:border-slate-200 transition-colors cursor-pointer" 
+                            title="Descargar archivo" 
                             type="button"
                           >
                             <span className="material-symbols-outlined text-lg">download</span>
                           </button>
-                          <button
+                          <button 
                             onClick={() => handleDeleteArchivo(arc.id, arc.nombre_original)}
-                            className="p-2 rounded-lg text-outline-variant hover:text-error hover:bg-surface-container-lowest transition-colors cursor-pointer"
-                            title="Eliminar archivo"
+                            className="p-2 rounded-lg text-slate-400 hover:text-[#C1121F] hover:bg-white border border-transparent hover:border-slate-200 transition-colors cursor-pointer" 
+                            title="Eliminar archivo" 
                             type="button"
                           >
                             <span className="material-symbols-outlined text-lg">delete</span>
@@ -824,16 +893,16 @@ const Docentes = () => {
                 </div>
 
                 {/* Nota aclaratoria reglamentaria al pie del expediente */}
-                <div className="mt-space-sm p-space-md rounded-lg bg-surface-container-low flex items-start gap-space-sm text-on-surface-variant">
-                  <span className="material-symbols-outlined text-secondary text-lg shrink-0 mt-0.5">info</span>
-                  <p className="font-caption text-caption leading-relaxed">
-                    <strong className="font-semibold text-on-surface">Nota aclaratoria:</strong> La lista de asistencia se conserva únicamente como documento de custodia. No incluye control de asistencia ni actas de notas registradas en CPD. Para calificaciones oficiales remitirse al Sistema de Procesamiento de Datos central UAGRM.
+                <div className="mt-space-sm p-4 rounded-xl bg-amber-50/70 border border-amber-200/80 flex items-start gap-3 text-slate-700">
+                  <span className="material-symbols-outlined text-amber-700 text-xl shrink-0 mt-0.5">info</span>
+                  <p className="font-caption text-xs leading-relaxed">
+                    <strong className="font-bold text-slate-900">Nota aclaratoria:</strong> La lista de asistencia se conserva únicamente como documento de custodia institucional. No incluye control de asistencia de personal ni actas de notas registradas en CPD. Para calificaciones oficiales remitirse al Sistema de Procesamiento de Datos central UAGRM.
                   </p>
                 </div>
               </div>
             </>
           ) : (
-            <div className="bg-surface-container-lowest rounded-xl p-space-lg text-center text-on-surface-variant">
+            <div className="bg-white rounded-2xl p-space-lg text-center text-slate-500 border border-slate-200">
               Seleccione un docente del directorio para consultar su expediente.
             </div>
           )}
@@ -842,15 +911,15 @@ const Docentes = () => {
 
       {/* MODAL REGISTRAR NUEVO DOCENTE */}
       {isDocenteModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-primary-container/60 backdrop-blur-sm">
-          <div className="bg-surface-container-lowest rounded-xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
-            <div className="bg-primary text-on-primary px-space-lg py-space-md flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col border border-[#c5a059]/40 animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-gradient-to-r from-[#07162b] via-[#0B2545] to-[#15418c] text-white px-space-lg py-4 flex items-center justify-between border-b border-[#c5a059]/30">
               <div className="flex items-center gap-space-xs">
-                <span className="material-symbols-outlined text-secondary-fixed">person_add</span>
-                <span className="font-headline-md text-headline-md font-bold">Registrar Nuevo Docente</span>
+                <span className="material-symbols-outlined text-[#c5a059]">person_add</span>
+                <span className="font-institutional-serif text-base font-bold">Registrar Nuevo Docente</span>
               </div>
               <button
-                className="text-on-primary/70 hover:text-on-primary cursor-pointer"
+                className="text-white/70 hover:text-white cursor-pointer"
                 onClick={() => !submitting && setIsDocenteModalOpen(false)}
                 type="button"
               >
@@ -861,11 +930,11 @@ const Docentes = () => {
             <form onSubmit={handleCreateDocente}>
               <div className="p-space-lg flex flex-col gap-space-md">
                 <div className="flex flex-col gap-1">
-                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-slate-600">
                     Nombre Completo del Docente *
                   </label>
                   <input
-                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                    className="w-full px-space-sm py-2 bg-slate-50 border border-slate-200 rounded-lg font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/30"
                     placeholder="Ej. Ing. Mario Renato Chocala"
                     value={docenteForm.nombre}
                     onChange={(e) => setDocenteForm({ ...docenteForm, nombre: e.target.value })}
@@ -876,11 +945,11 @@ const Docentes = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
                   <div className="flex flex-col gap-1">
-                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-slate-600">
                       Cédula de Identidad (CI)
                     </label>
                     <input
-                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                      className="w-full px-space-sm py-2 bg-slate-50 border border-slate-200 rounded-lg font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/30"
                       placeholder="Ej. 4829102 SC"
                       value={docenteForm.ci}
                       onChange={(e) => setDocenteForm({ ...docenteForm, ci: e.target.value })}
@@ -889,11 +958,11 @@ const Docentes = () => {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-slate-600">
                       Gestión de Ingreso
                     </label>
                     <input
-                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                      className="w-full px-space-sm py-2 bg-slate-50 border border-slate-200 rounded-lg font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/30"
                       value={docenteForm.gestion_ingreso}
                       onChange={(e) => setDocenteForm({ ...docenteForm, gestion_ingreso: e.target.value })}
                       type="number"
@@ -902,11 +971,11 @@ const Docentes = () => {
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-slate-600">
                     Materia Principal / Cátedra Asignada
                   </label>
                   <input
-                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                    className="w-full px-space-sm py-2 bg-slate-50 border border-slate-200 rounded-lg font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/30"
                     placeholder="Ej. Programación I · Algoritmos y Estructuras"
                     value={docenteForm.materia_principal}
                     onChange={(e) => setDocenteForm({ ...docenteForm, materia_principal: e.target.value })}
@@ -915,9 +984,9 @@ const Docentes = () => {
                 </div>
               </div>
 
-              <div className="px-space-lg py-space-md bg-surface-container-low flex items-center justify-end gap-space-sm">
+              <div className="px-space-lg py-space-md bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-space-sm">
                 <button
-                  className="px-space-md py-2 rounded-lg font-body-sm text-body-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer"
+                  className="px-space-md py-2 rounded-lg font-body-sm text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
                   disabled={submitting}
                   onClick={() => setIsDocenteModalOpen(false)}
                   type="button"
@@ -925,7 +994,7 @@ const Docentes = () => {
                   Cancelar
                 </button>
                 <button
-                  className="px-space-md py-2 bg-secondary text-on-secondary rounded-lg font-body-sm text-body-sm font-semibold shadow-sm hover:bg-primary transition-colors disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2.5 bg-gradient-to-r from-[#C1121F] to-[#93000a] text-white rounded-xl font-body-sm text-sm font-bold shadow-md hover:shadow-lg transition-all disabled:opacity-50 cursor-pointer border border-white/20"
                   disabled={submitting}
                   type="submit"
                 >
@@ -939,15 +1008,15 @@ const Docentes = () => {
 
       {/* MODAL CARGAR ARCHIVO AL EXPEDIENTE */}
       {isArchivoModalOpen && selectedDocente && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-primary-container/60 backdrop-blur-sm">
-          <div className="bg-surface-container-lowest rounded-xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-200">
-            <div className="bg-primary text-on-primary px-space-lg py-space-md flex items-center justify-between">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-space-md bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col border border-[#c5a059]/40 animate-in fade-in zoom-in-95 duration-200">
+            <div className="bg-gradient-to-r from-[#07162b] via-[#0B2545] to-[#15418c] text-white px-space-lg py-4 flex items-center justify-between border-b border-[#c5a059]/30">
               <div className="flex items-center gap-space-xs">
-                <span className="material-symbols-outlined text-secondary-fixed">upload_file</span>
-                <span className="font-headline-md text-headline-md font-bold">Cargar Documento al Expediente</span>
+                <span className="material-symbols-outlined text-[#c5a059]">upload_file</span>
+                <span className="font-institutional-serif text-base font-bold">Cargar Documento al Expediente</span>
               </div>
               <button
-                className="text-on-primary/70 hover:text-on-primary cursor-pointer"
+                className="text-white/70 hover:text-white cursor-pointer"
                 onClick={() => !submitting && setIsArchivoModalOpen(false)}
                 type="button"
               >
@@ -957,21 +1026,21 @@ const Docentes = () => {
 
             <form onSubmit={handleUploadArchivo}>
               <div className="p-space-lg flex flex-col gap-space-md">
-                <div className="bg-surface-container-low p-space-sm rounded-lg flex items-center justify-between">
-                  <span className="font-caption text-caption text-on-surface-variant font-semibold">
+                <div className="bg-slate-50 p-space-sm rounded-xl border border-slate-200 flex items-center justify-between">
+                  <span className="font-caption text-caption text-slate-500 font-semibold">
                     Docente Destino:
                   </span>
-                  <span className="font-label-code text-label-code font-bold text-secondary bg-surface-container px-2 py-0.5 rounded">
+                  <span className="font-label-code text-xs font-bold text-[#0B2545] bg-white px-2 py-0.5 rounded border border-slate-200">
                     {selectedDocente.nombre}
                   </span>
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-slate-600">
                     Tipo de Documento *
                   </label>
                   <select
-                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                    className="w-full px-space-sm py-2 bg-slate-50 border border-slate-200 rounded-lg font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/30 cursor-pointer"
                     value={archivoForm.tipo}
                     onChange={(e) => setArchivoForm({ ...archivoForm, tipo: e.target.value })}
                   >
@@ -986,11 +1055,11 @@ const Docentes = () => {
                 {archivoForm.tipo !== 'curriculum' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
                     <div className="flex flex-col gap-1">
-                      <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                      <label className="font-caption text-caption uppercase tracking-wider font-bold text-slate-600">
                         Gestión Académica
                       </label>
                       <input
-                        className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                        className="w-full px-space-sm py-2 bg-slate-50 border border-slate-200 rounded-lg font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/30"
                         value={archivoForm.gestion}
                         onChange={(e) => setArchivoForm({ ...archivoForm, gestion: e.target.value })}
                         required
@@ -999,11 +1068,11 @@ const Docentes = () => {
                     </div>
 
                     <div className="flex flex-col gap-1">
-                      <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                      <label className="font-caption text-caption uppercase tracking-wider font-bold text-slate-600">
                         Semestre
                       </label>
                       <select
-                        className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                        className="w-full px-space-sm py-2 bg-slate-50 border border-slate-200 rounded-lg font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/30 cursor-pointer"
                         value={archivoForm.semestre}
                         onChange={(e) => setArchivoForm({ ...archivoForm, semestre: e.target.value })}
                       >
@@ -1015,15 +1084,15 @@ const Docentes = () => {
                 )}
 
                 <div className="flex flex-col gap-1">
-                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-slate-600">
                     Archivo Digital (PDF o Escaneo) *
                   </label>
-                  <label className="border-2 border-dashed border-outline-variant hover:border-secondary rounded-lg p-space-md flex flex-col items-center justify-center gap-1 cursor-pointer bg-surface-container-low/40 transition-colors">
-                    <span className="material-symbols-outlined text-2xl text-secondary">upload_file</span>
-                    <span className="font-body-sm text-body-sm font-medium text-on-surface">
+                  <label className="border-2 border-dashed border-slate-300 hover:border-[#0B2545] rounded-xl p-space-md flex flex-col items-center justify-center gap-1 cursor-pointer bg-slate-50/70 hover:bg-slate-50 transition-colors">
+                    <span className="material-symbols-outlined text-2xl text-[#C1121F]">upload_file</span>
+                    <span className="font-body-sm text-sm font-medium text-slate-800">
                       {archivoForm.archivo ? archivoForm.archivo.name : 'Haga clic para seleccionar archivo PDF'}
                     </span>
-                    <span className="font-caption text-caption text-outline">
+                    <span className="font-caption text-xs text-slate-400">
                       Formatos homologados: PDF/A hasta 25MB
                     </span>
                     <input
@@ -1037,9 +1106,9 @@ const Docentes = () => {
                 </div>
               </div>
 
-              <div className="px-space-lg py-space-md bg-surface-container-low flex items-center justify-end gap-space-sm">
+              <div className="px-space-lg py-space-md bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-space-sm">
                 <button
-                  className="px-space-md py-2 rounded-lg font-body-sm text-body-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer"
+                  className="px-space-md py-2 rounded-lg font-body-sm text-sm font-semibold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
                   disabled={submitting}
                   onClick={() => setIsArchivoModalOpen(false)}
                   type="button"
@@ -1047,7 +1116,7 @@ const Docentes = () => {
                   Cancelar
                 </button>
                 <button
-                  className="px-space-md py-2 bg-secondary text-on-secondary rounded-lg font-body-sm text-body-sm font-semibold shadow-sm hover:bg-primary transition-colors disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2.5 bg-gradient-to-r from-[#0B2545] to-[#15418c] text-white rounded-xl font-body-sm text-sm font-bold shadow-md hover:shadow-lg transition-all disabled:opacity-50 cursor-pointer border border-[#c5a059]/30"
                   disabled={submitting}
                   type="submit"
                 >

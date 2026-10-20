@@ -1,0 +1,164 @@
+/* Animación 3D Flip Card y Borde Giratorio Institucional (UAGRM FINI) 
+   Adaptado del diseño interactivo de Uiverse.io para FileDropzone */
+
+.dropzone-card {
+  perspective: 1200px;
+  width: 100%;
+  max-width: 460px;
+  height: 230px;
+  margin: 0 auto;
+}
+
+.dropzone-content {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 600ms cubic-bezier(0.34, 1.4, 0.64, 1);
+  box-shadow: 0px 10px 25px -5px rgba(7, 22, 43, 0.35);
+  border-radius: 16px;
+}
+
+.dropzone-card:hover .dropzone-content,
+.dropzone-card.flipped .dropzone-content {
+  transform: rotateY(180deg);
+}
+
+.dropzone-front,
+.dropzone-back {
+  background-color: #07162b;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* CARA FRONTAL (Confirmación de subido con borde giratorio tricolor UAGRM FINI) */
+.dropzone-front {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid rgba(197, 160, 89, 0.3);
+}
+
+.dropzone-front::before {
+  position: absolute;
+  content: ' ';
+  display: block;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(90deg, transparent, #c5a059, #10b981, #0b2545, #c1121f, #c5a059, transparent);
+  animation: dropzone_rotation_border 5000ms infinite linear;
+}
+
+@keyframes dropzone_rotation_border {
+  0% {
+    transform: rotateZ(0deg);
+  }
+  100% {
+    transform: rotateZ(360deg);
+  }
+}
+
+.dropzone-front-content {
+  position: absolute;
+  inset: 2.5px;
+  background: radial-gradient(ellipse at 50% 10%, #0d2e56 0%, #07162b 70%, #040c17 100%);
+  border-radius: 14px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  z-index: 2;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.4);
+}
+
+/* CARA TRASERA (Previsualización al rotar en hover) */
+.dropzone-back {
+  transform: rotateY(180deg);
+  background: #091a32;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid rgba(197, 160, 89, 0.4);
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+}
+
+.dropzone-back .preview-bg-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(0.65) contrast(1.05);
+  z-index: 0;
+}
+
+.dropzone-back .preview-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 22, 43, 0.8) 0%, rgba(7, 22, 43, 0.5) 50%, rgba(7, 22, 43, 0.95) 100%);
+  z-index: 1;
+}
+
+/* Círculos flotantes luminosos inspirados en el diseño de Uiverse */
+.dropzone-circle {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background-color: rgba(197, 160, 89, 0.2);
+  position: absolute;
+  filter: blur(25px);
+  animation: dropzone_floating 3500ms infinite ease-in-out;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dropzone-circle-bottom {
+  background-color: rgba(193, 18, 31, 0.25);
+  left: 60%;
+  bottom: -20px;
+  width: 140px;
+  height: 140px;
+  animation-delay: -1000ms;
+}
+
+.dropzone-circle-right {
+  background-color: rgba(16, 185, 129, 0.25);
+  right: -20px;
+  top: -20px;
+  width: 90px;
+  height: 90px;
+  animation-delay: -2000ms;
+}
+
+@keyframes dropzone_floating {
+  0% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(12px) scale(1.06);
+  }
+  100% {
+    transform: translateY(0px) scale(1);
+  }
+}
+
+.dropzone-back-content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}

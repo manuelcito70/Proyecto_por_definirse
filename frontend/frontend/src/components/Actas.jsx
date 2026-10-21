@@ -326,10 +326,10 @@ const Actas = () => {
             onClick={() => { setModalidadSeleccionada(''); setBusqueda(''); }}
             className="inline-flex items-center gap-space-xs px-space-md py-2.5 rounded-lg bg-surface-container-low text-[#0b2545] font-body-sm font-semibold hover:bg-surface-container border border-surface-container transition-all shadow-2xs cursor-pointer"
             type="button"
-            title="Restablecer filtros"
+            title="Restablecer búsqueda y filtros"
           >
-            <span className="material-symbols-outlined text-sm text-[#0b2545]">tune</span>
-            <span>Avanzado</span>
+            <span className="material-symbols-outlined text-sm text-[#0b2545]">restart_alt</span>
+            <span>Limpiar filtros</span>
           </button>
           <button
             onClick={handleOpenModal}
@@ -575,7 +575,7 @@ const Actas = () => {
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      downloadFile(`/actas/${acta.id}/download`, acta.nombre_archivo || 'acta.pdf');
+                                      downloadFile(`/actas/${acta.id}/download`, acta.nombre_archivo || 'acta.pdf', true);
                                     }}
                                     className="p-1.5 rounded-lg text-[#c1121f] hover:text-[#8b0000] hover:bg-surface-container-highest transition-colors cursor-pointer"
                                     title="Descargar PDF"
@@ -790,7 +790,7 @@ const Actas = () => {
                     <button
                       onClick={() => {
                         if (selectedActa.archivo_path) {
-                          downloadFile(`/actas/${selectedActa.id}/download`, selectedActa.nombre_archivo || 'acta.pdf');
+                          downloadFile(`/actas/${selectedActa.id}/download`, selectedActa.nombre_archivo || 'acta.pdf', true);
                         } else {
                           alert('Esta acta no cuenta con archivo digital adjunto.');
                         }

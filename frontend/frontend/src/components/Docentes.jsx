@@ -638,7 +638,7 @@ const Docentes = () => {
                                 <span className="material-symbols-outlined text-lg">visibility</span>
                               </button>
                               <button 
-                                onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${cv.id}/download`, cv.nombre_original)}
+                                onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${cv.id}/download`, cv.nombre_original, true)}
                                 className="p-2 rounded-lg text-slate-600 hover:text-[#C1121F] hover:bg-white border border-transparent hover:border-slate-200 transition-colors cursor-pointer" 
                                 title="Descargar archivo" 
                                 type="button"
@@ -718,7 +718,7 @@ const Docentes = () => {
                                 <span className="material-symbols-outlined text-lg">visibility</span>
                               </button>
                               <button 
-                                onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${prog.id}/download`, prog.nombre_original)}
+                                onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${prog.id}/download`, prog.nombre_original, true)}
                                 className="p-2 rounded-lg text-slate-600 hover:text-[#C1121F] hover:bg-white border border-transparent hover:border-slate-200 transition-colors cursor-pointer" 
                                 title="Descargar archivo" 
                                 type="button"
@@ -892,7 +892,7 @@ const Docentes = () => {
                             <span className="material-symbols-outlined text-lg">visibility</span>
                           </button>
                           <button 
-                            onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${arc.id}/download`, arc.nombre_original)}
+                            onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${arc.id}/download`, arc.nombre_original, true)}
                             className="p-2 rounded-lg text-slate-600 hover:text-[#C1121F] hover:bg-white border border-transparent hover:border-slate-200 transition-colors cursor-pointer" 
                             title="Descargar archivo" 
                             type="button"

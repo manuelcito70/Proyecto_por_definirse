@@ -220,7 +220,7 @@ export const deleteDocenteArchivo = async (docenteId, archivoId) => {
 };
 
 // Helper para descargar o abrir archivos de forma segura con Authorization Header
-export const downloadFile = async (pathWithId, fallbackName = 'documento.pdf') => {
+export const downloadFile = async (pathWithId, fallbackName = 'documento.pdf', forceDownload = false) => {
   try {
     const res = await fetchWithAuth(pathWithId);
     if (!res.ok) {
@@ -230,21 +230,31 @@ export const downloadFile = async (pathWithId, fallbackName = 'documento.pdf') =
     const blob = await res.blob();
     const blobUrl = window.URL.createObjectURL(blob);
     
-    // Si es imagen o PDF, abrir en nueva pestaña para visualizar
-    const mime = blob.type || '';
-    if (mime.includes('pdf') || mime.includes('image') || mime.includes('jpeg') || mime.includes('png')) {
-      window.open(blobUrl, '_blank');
-    } else {
+    // Si se especifica descargar explícitamente, forzar descarga al disco local
+    if (forceDownload) {
       const a = document.createElement('a');
       a.href = blobUrl;
       a.download = fallbackName;
       document.body.appendChild(a);
       a.click();
       a.remove();
+    } else {
+      // Si es visualización y es documento o imagen, abrir en pestaña nueva
+      const mime = blob.type || '';
+      if (mime.includes('pdf') || mime.includes('image') || mime.includes('jpeg') || mime.includes('png')) {
+        window.open(blobUrl, '_blank');
+      } else {
+        const a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = fallbackName;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
     }
     setTimeout(() => window.URL.revokeObjectURL(blobUrl), 60000);
   } catch (err) {
-    alert('No se pudo abrir el archivo: ' + err.message);
+    alert('No se pudo procesar el archivo: ' + err.message);
   }
 };
 

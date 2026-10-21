@@ -244,8 +244,8 @@ const Expedidos = () => {
             onClick={handleOpenCreateModal}
             type="button"
           >
-            <span className="material-symbols-outlined text-base text-[#c5a059]">add_circle</span>
-            <span>+ Nuevo oficio</span>
+            <span className="material-symbols-outlined text-base">add_circle</span>
+            <span>Nuevo oficio</span>
           </button>
         </div>
       </div>

@@ -205,8 +205,8 @@ const PanelControl = () => {
               onClick={() => setIsQuickEmitOpen(true)} 
               type="button"
             >
-              <span className="material-symbols-outlined text-base text-[#c5a059]">add_circle</span>
-              <span>+ Nuevo Registro</span>
+              <span className="material-symbols-outlined text-base">add_circle</span>
+              <span>Nuevo Registro</span>
             </button>
           </div>
         </div>

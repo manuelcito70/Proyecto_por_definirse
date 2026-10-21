@@ -336,8 +336,8 @@ const Actas = () => {
             className="btn-doc-fold"
             type="button"
           >
-            <span className="material-symbols-outlined text-base text-[#c5a059]">add_circle</span>
-            <span>+ Registrar acta</span>
+            <span className="material-symbols-outlined text-base">add_circle</span>
+            <span>Registrar acta</span>
           </button>
         </div>
       </div>

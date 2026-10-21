@@ -37,7 +37,7 @@ code {
    Adaptado del diseño interactivo de Uiverse.io by ferlagher para FINI UAGRM
    ========================================================================== */
 
-/* Variante 1: Primaria Institucional (Azul FINI con Pliegue Dorado) */
+/* Variante 1: Primaria Institucional (Rojo UAGRM con Pliegue Dorado) */
 .btn-doc-fold {
   position: relative;
   display: inline-flex;
@@ -48,12 +48,12 @@ code {
   font-size: 0.875rem;
   font-weight: 600;
   padding: 0.625rem 1.25rem;
-  background: linear-gradient(135deg, #0b2545 0%, #15418c 100%);
+  background: linear-gradient(135deg, #c1121f 0%, #8b0000 100%);
   color: #ffffff !important;
   text-decoration: none;
-  border: 1px solid rgba(197, 160, 89, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 0.625rem;
-  box-shadow: 0 4px 14px rgba(7, 22, 43, 0.3);
+  box-shadow: 0 4px 14px rgba(193, 18, 31, 0.35);
   cursor: pointer;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -80,9 +80,9 @@ code {
 }
 
 .btn-doc-fold:hover {
-  box-shadow: 0 6px 20px rgba(197, 160, 89, 0.35);
+  box-shadow: 0 6px 20px rgba(193, 18, 31, 0.5);
   transform: translateY(-1.5px);
-  border-color: rgba(197, 160, 89, 0.8);
+  border-color: rgba(197, 160, 89, 0.6);
 }
 
 .btn-doc-fold:active {

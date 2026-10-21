@@ -248,8 +248,8 @@ const Docentes = () => {
               className="btn-doc-fold" 
               type="button"
             >
-              <span className="material-symbols-outlined text-lg text-[#c5a059]">person_add</span>
-              <span>+ Registrar docente</span>
+              <span className="material-symbols-outlined text-lg">person_add</span>
+              <span>Registrar docente</span>
             </button>
           </div>
         </div>

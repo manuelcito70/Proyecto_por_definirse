@@ -322,17 +322,49 @@
   border-color: rgba(255, 255, 255, 0.35);
 }
 
-/* Botón "Eliminar" */
+/* Botón "Eliminar" con animación de pliegue de esquina institucional */
 .file-btn-danger {
-  background: rgba(220, 38, 38, 0.18);
+  position: relative;
+  background: rgba(220, 38, 38, 0.2);
   color: #fca5a5;
   border-color: rgba(239, 68, 68, 0.35);
   padding: 6px 10px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.file-btn-danger::before {
+  position: absolute;
+  content: '';
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  background: linear-gradient(135deg, #1e0307 0%, #1e0307 50%, #c1121f 50%, #e63946 65%);
+  border-radius: 0 0 6px 0;
+  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.45);
+  transition: width 0.25s ease, height 0.25s ease;
+  z-index: 1;
+}
+
+.file-btn-danger:hover::before {
+  width: 14px;
+  height: 14px;
 }
 
 .file-btn-danger:hover {
-  background: rgba(220, 38, 38, 0.35);
+  background: rgba(220, 38, 38, 0.4);
   color: #ffffff;
-  border-color: rgba(239, 68, 68, 0.6);
-  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+  border-color: rgba(239, 68, 68, 0.7);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+  transform: translateY(-1px);
+}
+
+.file-btn-danger:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+.file-btn-danger > * {
+  position: relative;
+  z-index: 2;
 }

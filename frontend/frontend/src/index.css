@@ -31,3 +31,175 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* ==========================================================================
+   BOTÓN PLIEGUE DE ESQUINA INSTITUCIONAL ("DOG-EAR" FOLD BUTTON)
+   Adaptado del diseño interactivo de Uiverse.io by ferlagher para FINI UAGRM
+   ========================================================================== */
+
+/* Variante 1: Primaria Institucional (Azul FINI con Pliegue Dorado) */
+.btn-doc-fold {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #0b2545 0%, #15418c 100%);
+  color: #ffffff !important;
+  text-decoration: none;
+  border: 1px solid rgba(197, 160, 89, 0.45);
+  border-radius: 0.625rem;
+  box-shadow: 0 4px 14px rgba(7, 22, 43, 0.3);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+}
+
+.btn-doc-fold::before {
+  position: absolute;
+  content: '';
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  background: linear-gradient(135deg, #07162b 0%, #07162b 50%, #c5a059 50%, #e0bd70 65%);
+  border-radius: 0 0 0.5rem 0;
+  box-shadow: 0.15rem 0.15rem 0.3rem rgba(0, 0, 0, 0.4);
+  transition: width 0.3s cubic-bezier(0.34, 1.2, 0.64, 1), height 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+  z-index: 1;
+}
+
+.btn-doc-fold:hover::before {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.btn-doc-fold:hover {
+  box-shadow: 0 6px 20px rgba(197, 160, 89, 0.35);
+  transform: translateY(-1.5px);
+  border-color: rgba(197, 160, 89, 0.8);
+}
+
+.btn-doc-fold:active {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Variante 1-Crimson: Primaria Carmesí UAGRM con Pliegue Dorado */
+.btn-doc-fold-primary-crimson {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.625rem 1.25rem;
+  background: linear-gradient(135deg, #c1121f 0%, #8b0000 100%);
+  color: #ffffff !important;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 0.625rem;
+  box-shadow: 0 4px 14px rgba(193, 18, 31, 0.35);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+}
+
+.btn-doc-fold-primary-crimson::before {
+  position: absolute;
+  content: '';
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  background: linear-gradient(135deg, #07162b 0%, #07162b 50%, #c5a059 50%, #e0bd70 65%);
+  border-radius: 0 0 0.5rem 0;
+  box-shadow: 0.15rem 0.15rem 0.3rem rgba(0, 0, 0, 0.4);
+  transition: width 0.3s cubic-bezier(0.34, 1.2, 0.64, 1), height 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+  z-index: 1;
+}
+
+.btn-doc-fold-primary-crimson:hover::before {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.btn-doc-fold-primary-crimson:hover {
+  box-shadow: 0 6px 20px rgba(193, 18, 31, 0.5);
+  transform: translateY(-1.5px);
+  border-color: rgba(197, 160, 89, 0.6);
+}
+
+.btn-doc-fold-primary-crimson:active {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Variante 3: Peligro / Acción Crítica (Rojo UAGRM + Pliegue Oscuro) */
+.btn-doc-fold-danger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #78091c 0%, #c1121f 100%);
+  color: #ffffff !important;
+  text-decoration: none;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 10px rgba(120, 9, 28, 0.3);
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  user-select: none;
+}
+
+.btn-doc-fold-danger::before {
+  position: absolute;
+  content: '';
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  background: linear-gradient(135deg, #1e0307 0%, #1e0307 50%, #c1121f 50%, #e63946 65%);
+  border-radius: 0 0 0.45rem 0;
+  box-shadow: 0.15rem 0.15rem 0.25rem rgba(0, 0, 0, 0.45);
+  transition: width 0.3s cubic-bezier(0.34, 1.2, 0.64, 1), height 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+  z-index: 1;
+}
+
+.btn-doc-fold-danger:hover::before {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.btn-doc-fold-danger:hover {
+  box-shadow: 0 6px 16px rgba(193, 18, 31, 0.45);
+  transform: translateY(-1.5px);
+  border-color: rgba(239, 68, 68, 0.75);
+}
+
+.btn-doc-fold-danger:active {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transform: translateY(1px) scale(0.98);
+}
+
+/* Asegurar que los hijos (iconos y texto) estén por encima del pliegue */
+.btn-doc-fold > *,
+.btn-doc-fold-primary-crimson > *,
+.btn-doc-fold-danger > * {
+  position: relative;
+  z-index: 2;
+}

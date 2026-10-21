@@ -324,11 +324,11 @@ const Auxiliares = () => {
           <div className="flex items-center gap-space-sm self-start md:self-auto">
             <button
               onClick={handleOpenModal}
-              className="inline-flex items-center gap-space-xs px-space-lg py-2.5 rounded-lg bg-gradient-to-r from-[#c1121f] to-[#9e0c18] text-white shadow-md hover:shadow-lg hover:from-[#8b0000] hover:to-[#c1121f] transition-all border border-white/20 active:scale-[0.98] cursor-pointer"
+              className="btn-doc-fold"
               type="button"
             >
-              <span className="material-symbols-outlined text-lg">add_circle</span>
-              <span className="font-body-sm text-body-sm font-semibold tracking-wide">+ Registrar antecedente</span>
+              <span className="material-symbols-outlined text-base text-[#c5a059]">add_circle</span>
+              <span>+ Registrar antecedente</span>
             </button>
           </div>
         </div>

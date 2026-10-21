@@ -245,10 +245,10 @@ const Docentes = () => {
                 });
                 setIsDocenteModalOpen(true);
               }}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-[#C1121F] to-[#A50E1A] text-white font-body-sm text-sm font-bold hover:shadow-lg hover:shadow-[#c1121f]/40 hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer border border-white/20" 
+              className="btn-doc-fold" 
               type="button"
             >
-              <span className="material-symbols-outlined text-xl">person_add</span>
+              <span className="material-symbols-outlined text-lg text-[#c5a059]">person_add</span>
               <span>+ Registrar docente</span>
             </button>
           </div>

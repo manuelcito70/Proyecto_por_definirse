@@ -239,14 +239,13 @@ const Expedidos = () => {
               OF-FINI/{gestion}
             </span>
           </div>
-          <div className="h-8 w-px bg-surface-container hidden sm:block"></div>
           <button 
-            className="inline-flex items-center gap-space-xs bg-gradient-to-r from-[#c1121f] to-[#8b0000] text-white px-space-md py-2.5 rounded-lg font-body-sm text-body-sm font-semibold shadow-md hover:shadow-lg hover:from-[#8b0000] hover:to-[#c1121f] transition-all duration-200 border border-white/20 cursor-pointer" 
+            className="btn-doc-fold" 
             onClick={handleOpenCreateModal}
             type="button"
           >
-            <span className="material-symbols-outlined text-base">add_circle</span>
-            <span>Nuevo oficio</span>
+            <span className="material-symbols-outlined text-base text-[#c5a059]">add_circle</span>
+            <span>+ Nuevo oficio</span>
           </button>
         </div>
       </div>

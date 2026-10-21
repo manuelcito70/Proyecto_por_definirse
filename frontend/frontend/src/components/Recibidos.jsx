@@ -282,15 +282,15 @@ const Recibidos = () => {
             </div>
             <div className="h-10 w-px bg-surface-container hidden sm:block"></div>
             <button 
-              className="inline-flex items-center gap-space-xs rounded-lg bg-gradient-to-r from-[#c1121f] to-[#9e0c18] px-space-lg py-2.5 font-body-sm font-semibold text-white shadow-md hover:shadow-lg hover:from-[#8b0000] hover:to-[#c1121f] transition-all duration-200 border border-white/20 cursor-pointer" 
+              className="btn-doc-fold" 
               onClick={() => {
                 const el = document.getElementById('form-registro-section');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }} 
               type="button"
             >
-              <span className="material-symbols-outlined text-lg">add_circle</span>
-              <span className="tracking-wide">+ Registrar recibido</span>
+              <span className="material-symbols-outlined text-base text-[#c5a059]">add_circle</span>
+              <span>+ Registrar recibido</span>
             </button>
           </div>
         </div>

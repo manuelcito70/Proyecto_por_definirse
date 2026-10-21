@@ -333,11 +333,11 @@ const Actas = () => {
           </button>
           <button
             onClick={handleOpenModal}
-            className="inline-flex items-center gap-space-xs px-space-lg py-2.5 rounded-lg bg-gradient-to-r from-[#c1121f] to-[#9e0c18] text-white font-body-sm font-semibold hover:shadow-lg transition-all shadow-md border border-white/20 cursor-pointer"
+            className="btn-doc-fold"
             type="button"
           >
-            <span className="material-symbols-outlined text-base">add_circle</span>
-            <span>Registrar acta</span>
+            <span className="material-symbols-outlined text-base text-[#c5a059]">add_circle</span>
+            <span>+ Registrar acta</span>
           </button>
         </div>
       </div>

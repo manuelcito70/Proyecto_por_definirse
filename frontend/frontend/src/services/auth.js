@@ -56,13 +56,6 @@ export const register = async (userData) => {
     }
 };
 
-export const getAllUsers = async () => {
-    const response = await fetchWithAuth(`/users`);
-    if (!response.ok) {
-        throw new Error('Error al obtener usuarios');
-    }
-    return await response.json();
-};
 
 export const logout = () => {
     localStorage.removeItem('token');

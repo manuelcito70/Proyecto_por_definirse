@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useGestion } from '../context/GestionContext';
-import { getAuxiliares, createAuxiliar, deleteAuxiliar } from '../services/api';
+import { 
+  getAuxiliares, 
+  createAuxiliar, 
+  updateAuxiliar, 
+  deleteAuxiliar, 
+  getMaterias, 
+  getConvocatorias 
+} from '../services/api';
 import EmptyState from './EmptyState';
 import LoadingState from './LoadingState';
 import SuccessModal from './SuccessModal';
@@ -8,16 +15,24 @@ import SuccessModal from './SuccessModal';
 const Auxiliares = () => {
   const { gestion, setGestion } = useGestion();
   const [auxiliares, setAuxiliares] = useState([]);
+  const [catalogoMaterias, setCatalogoMaterias] = useState([]);
+  const [catalogoConvocatorias, setCatalogoConvocatorias] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState('');
   const [semestreFiltro, setSemestreFiltro] = useState('todos');
   const [materiaFiltro, setMateriaFiltro] = useState('todas');
+  
+  // Expediente seleccionado y pestaña activa
   const [selectedAuxId, setSelectedAuxId] = useState(null);
+  const [activeTab, setActiveTab] = useState('constancia'); // 'constancia' | 'informe'
   const [successModalData, setSuccessModalData] = useState(null);
 
-  // Modal State
+  // Modales
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Formulario Crear Auxiliar
   const [formData, setFormData] = useState({
     nombre: '',
     nro_registro: '',
@@ -29,19 +44,30 @@ const Auxiliares = () => {
     es_ratificacion: false
   });
 
+  // Formulario Editar Auxiliar
+  const [editFormData, setEditFormData] = useState({
+    id: null,
+    nombre: '',
+    nro_registro: '',
+    materia: '',
+    semestre: '1',
+    nota_examen: '',
+    estado: 'aprobado',
+    nro_convocatoria: '',
+    es_ratificacion: false
+  });
+
   const fetchData = async () => {
     try {
       setLoading(true);
-      const list = await getAuxiliares({
-        gestion,
-        semestre: semestreFiltro !== 'todos' ? parseInt(semestreFiltro) : undefined,
-        busqueda: busqueda || undefined
-      });
+      const params = { gestion };
+      if (semestreFiltro !== 'todos') params.semestre = parseInt(semestreFiltro, 10);
+      if (materiaFiltro !== 'todas') params.materia = materiaFiltro;
+      if (busqueda && busqueda.trim()) params.busqueda = busqueda.trim();
+
+      const list = await getAuxiliares(params);
       const safeList = Array.isArray(list) ? list : [];
       setAuxiliares(safeList);
-      if (safeList.length > 0 && (!selectedAuxId || !safeList.find(a => a.id === selectedAuxId))) {
-        setSelectedAuxId(safeList[0].id);
-      }
     } catch (err) {
       console.error('Error cargando auxiliares:', err);
       setAuxiliares([]);
@@ -52,64 +78,87 @@ const Auxiliares = () => {
 
   useEffect(() => {
     fetchData();
-  }, [gestion, semestreFiltro]);
+  }, [gestion, semestreFiltro, materiaFiltro, busqueda]);
 
-  // Extract unique subjects for the filter dropdown
+  useEffect(() => {
+    const loadCatalogos = async () => {
+      try {
+        const [mats, convs] = await Promise.all([
+          getMaterias(),
+          getConvocatorias()
+        ]);
+        setCatalogoMaterias(Array.isArray(mats) ? mats : []);
+        setCatalogoConvocatorias(Array.isArray(convs) ? convs : []);
+      } catch (err) {
+        console.error('Error cargando catálogos de materias/convocatorias:', err);
+      }
+    };
+    loadCatalogos();
+  }, []);
+
+  // Lista unificada de materias para el dropdown de filtros
   const materiasDisponibles = useMemo(() => {
-    const set = new Set();
+    const map = new Map();
+    if (Array.isArray(catalogoMaterias)) {
+      catalogoMaterias.forEach(m => {
+        if (m && m.nombre) map.set(m.nombre, m);
+      });
+    }
     const list = Array.isArray(auxiliares) ? auxiliares : [];
     list.forEach(a => {
-      if (a && a.materia) set.add(a.materia);
+      if (a && a.materia && !map.has(a.materia)) {
+        map.set(a.materia, { nombre: a.materia, codigo: a.materia_codigo || '' });
+      }
     });
-    return Array.from(set);
-  }, [auxiliares]);
+    return Array.from(map.values());
+  }, [catalogoMaterias, auxiliares]);
 
-  // Client filtered with string safety
+  // Filtrado reactivo en cliente (instantáneo)
   const filteredAuxiliares = useMemo(() => {
     if (!Array.isArray(auxiliares)) return [];
     return auxiliares.filter((item) => {
       if (!item) return false;
       const matchMateria = materiaFiltro === 'todas' || item.materia === materiaFiltro;
+      const matchSemestre = semestreFiltro === 'todos' || String(item.semestre) === String(semestreFiltro);
       const q = (busqueda || '').toLowerCase().trim();
-      if (!q) return matchMateria;
+      if (!q) return matchMateria && matchSemestre;
       const matchSearch =
         String(item.nombre || '').toLowerCase().includes(q) ||
         String(item.materia || '').toLowerCase().includes(q) ||
         String(item.nro_registro || '').toLowerCase().includes(q) ||
         String(item.nro_convocatoria || '').toLowerCase().includes(q);
-      return matchMateria && matchSearch;
+      return matchMateria && matchSemestre && matchSearch;
     });
-  }, [auxiliares, materiaFiltro, busqueda]);
+  }, [auxiliares, materiaFiltro, semestreFiltro, busqueda]);
 
+  // Auxiliar seleccionado actualmente
   const selectedAux = useMemo(() => {
-    if (!filteredAuxiliares.length) return null;
-    return filteredAuxiliares.find(a => a && String(a.id) === String(selectedAuxId)) || filteredAuxiliares[0] || null;
-  }, [filteredAuxiliares, selectedAuxId]);
+    if (!selectedAuxId) return null;
+    return auxiliares.find(a => a && String(a.id) === String(selectedAuxId)) || null;
+  }, [auxiliares, selectedAuxId]);
 
   const getInitials = (name) => {
     if (!name) return 'AX';
-    const parts = name.trim().split(/\s+/);
+    const clean = name.replace(/^(univ\.|ing\.|lic\.)\s*/i, '').trim();
+    const parts = clean.split(/\s+/);
     if (parts.length >= 2) {
       return (parts[0][0] + parts[1][0]).toUpperCase();
     }
-    return name.slice(0, 2).toUpperCase();
+    return clean.slice(0, 2).toUpperCase();
   };
 
-  const handleOpenModal = () => {
-    setFormData({
-      nombre: '',
-      nro_registro: '',
-      materia: '',
-      semestre: '1',
-      nota_examen: '',
-      estado: 'aprobado',
-      nro_convocatoria: `CONV-01/${gestion}`,
-      es_ratificacion: false
-    });
-    setIsModalOpen(true);
+  const formatFecha = (dateStr) => {
+    if (!dateStr) return '26/Oct/2026';
+    try {
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    } catch {
+      return '26/Oct/2026';
+    }
   };
 
-  const handleSubmit = async (e) => {
+  // Crear Auxiliar
+  const handleCreateSubmit = async (e) => {
     e.preventDefault();
     if (!formData.nombre || !formData.materia) {
       alert('Por favor complete el nombre del auxiliar y la materia.');
@@ -121,7 +170,7 @@ const Auxiliares = () => {
       const nuevo = await createAuxiliar({
         ...formData,
         gestion,
-        semestre: parseInt(formData.semestre),
+        semestre: parseInt(formData.semestre, 10),
         nota_examen: formData.nota_examen ? parseFloat(formData.nota_examen) : null
       });
       setSuccessModalData({
@@ -133,6 +182,7 @@ const Auxiliares = () => {
       await fetchData();
       if (nuevo && nuevo.id) {
         setSelectedAuxId(nuevo.id);
+        setActiveTab('constancia');
       }
     } catch (err) {
       alert('Error al registrar auxiliar: ' + err.message);
@@ -141,17 +191,47 @@ const Auxiliares = () => {
     }
   };
 
+  // Editar Auxiliar
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!editFormData.id || !editFormData.nombre || !editFormData.materia) return;
+
+    try {
+      setSubmitting(true);
+      await updateAuxiliar(editFormData.id, {
+        ...editFormData,
+        gestion,
+        semestre: parseInt(editFormData.semestre, 10),
+        nota_examen: editFormData.nota_examen ? parseFloat(editFormData.nota_examen) : null
+      });
+      setSuccessModalData({
+        badge: `ANTECEDENTE ACTUALIZADO`,
+        title: '¡Expediente Actualizado!',
+        message: `Los datos del auxiliar de cátedra "${editFormData.nombre}" han sido actualizados con éxito.`
+      });
+      setIsEditModalOpen(false);
+      await fetchData();
+    } catch (err) {
+      alert('Error al actualizar auxiliar: ' + err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Eliminar Auxiliar
   const handleDelete = async (id, nombre, e) => {
-    e.stopPropagation();
-    if (!window.confirm(`¿Estás seguro de eliminar el registro de ${nombre}?`)) return;
+    if (e) e.stopPropagation();
+    if (!window.confirm(`¿Estás seguro de eliminar el antecedente oficial de ${nombre}?`)) return;
     try {
       await deleteAuxiliar(id);
+      if (selectedAuxId === id) setSelectedAuxId(null);
       fetchData();
     } catch (err) {
       alert('Error al eliminar: ' + err.message);
     }
   };
 
+  // Imprimir Constancia Oficial con membrete UAGRM
   const handlePrintConstancia = (aux) => {
     if (!aux) return;
     const vent = window.open('', '_blank');
@@ -230,6 +310,7 @@ const Auxiliares = () => {
     vent.document.close();
   };
 
+  // Imprimir Informe Técnico para Consejo Facultativo
   const handlePrintInforme = (aux) => {
     if (!aux) return;
     const vent = window.open('', '_blank');
@@ -289,598 +370,522 @@ const Auxiliares = () => {
   };
 
   return (
-    <div className="flex flex-col w-full gap-space-lg">
-      {/* Encabezado & Acciones Principales con Estilo Folder Institucional */}
-      <div className="relative overflow-hidden rounded-2xl bg-surface-container-lowest p-space-xl border border-surface-container shadow-[0_6px_25px_rgba(11,37,69,0.06)]">
-        <div className="absolute -right-8 top-0 bottom-0 w-64 bg-gradient-to-bl from-[#c1121f] via-[#d90429] to-[#8b0000] pointer-events-none transform skew-x-[-20deg] opacity-90"></div>
-        <div className="absolute right-52 top-0 bottom-0 w-6 bg-[#0b2545] pointer-events-none transform skew-x-[-20deg]"></div>
-        <div className="absolute right-58 top-0 bottom-0 w-1.5 bg-[#c5a059] pointer-events-none transform skew-x-[-20deg]"></div>
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
-        <img 
-          alt="Filigrana UAGRM" 
-          className="absolute right-10 top-1/2 -translate-y-1/2 h-44 w-auto object-contain opacity-[0.07] pointer-events-none select-none" 
-          src="https://lh3.googleusercontent.com/aida-public/AB6AXuBwDvgfNOgOLZmyF4jwM11gkjCA2NuiqNJkDBamQIZvD-x--Qb1YoPJ9Mzesy_1pTP_dbbv_hOkFsi6ze_g00Ue5RNPfbLIxnC9tZupz-ah9GofWn9r692ngG1R9Q3AXhet2N6WkwTAAsEaAo7t6Xrg2tEiGrAQjpNti3zmmF79VJj0TDnymJYIo_yQziRb9pWofcjeXQtEkycQ9MKFAlRf35R0BybpEStSY0yTO9g6GCKAytofF79WdCerCyewDfZ5" 
-        />
-
-        <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-space-md">
-          <div className="flex flex-col max-w-2xl">
-            <nav className="flex items-center gap-space-xs text-caption font-caption text-on-surface-variant mb-1">
-              <span className="hover:text-primary transition-colors cursor-pointer">Gestión documental</span>
-              <span className="material-symbols-outlined text-xs">chevron_right</span>
-              <span className="text-[#c1121f] font-bold uppercase tracking-wider font-label-badge">Auxiliares de Cátedra</span>
-            </nav>
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-10 bg-[#c1121f] rounded-full hidden sm:block"></div>
-              <div>
-                <h1 className="font-institutional-serif text-[26px] md:text-[32px] text-[#0b2545] font-bold tracking-tight leading-tight">
-                  Auxiliares de Cátedra
-                </h1>
-                <p className="font-body-md text-body-md text-on-surface-variant mt-0.5">
-                  Antecedentes oficiales por materia, gestión y semestre con respaldo jurídico institucional.
-                </p>
-              </div>
-            </div>
+    <div className="flex flex-col w-full max-w-7xl mx-auto pb-12">
+      {/* 1. BARRA SUPERIOR DE BÚSQUEDA Y FILTROS (Diseño de la Imagen 1 / Anti-fatiga visual) */}
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200/90 p-4 mb-6">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          
+          {/* Campo de búsqueda con icono */}
+          <div className="relative flex-1">
+            <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg">
+              search
+            </span>
+            <input 
+              type="text"
+              placeholder="Buscar auxiliar por nombre, RU, materia o convocatoria..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20 focus:border-[#0B2545] transition-all"
+            />
           </div>
-          <div className="flex items-center gap-space-sm self-start md:self-auto">
+
+          {/* Selector de Materias extraídas de la tabla 'materias' */}
+          <div className="relative min-w-[220px] sm:min-w-[240px]">
+            <select
+              value={materiaFiltro}
+              onChange={(e) => setMateriaFiltro(e.target.value)}
+              className="w-full appearance-none pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-700 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20 focus:border-[#0B2545] cursor-pointer transition-all"
+            >
+              <option value="todas">Materia / Cátedra: Todas</option>
+              {materiasDisponibles.map((mat) => (
+                <option key={mat.nombre} value={mat.nombre}>
+                  {mat.codigo ? `[${mat.codigo}] ` : ''}{mat.nombre}
+                </option>
+              ))}
+            </select>
+            <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xl">
+              expand_more
+            </span>
+          </div>
+
+          {/* Selector de Semestre / Ciclo */}
+          <div className="relative min-w-[140px]">
+            <select
+              value={semestreFiltro}
+              onChange={(e) => setSemestreFiltro(e.target.value)}
+              className="w-full appearance-none pl-3.5 pr-8 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium text-slate-700 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20 focus:border-[#0B2545] cursor-pointer transition-all"
+            >
+              <option value="todos">Semestre: Todos</option>
+              <option value="1">Semestre I</option>
+              <option value="2">Semestre II</option>
+            </select>
+            <span className="material-symbols-outlined absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-xl">
+              expand_more
+            </span>
+          </div>
+
+          {/* Contador en vivo & Indicador de Convocatoria ICU & Botón Registrar */}
+          <div className="flex flex-wrap items-center justify-between lg:justify-end gap-3 sm:gap-4 shrink-0 text-xs font-medium text-slate-600">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              <span>
+                Mostrando <strong className="text-slate-900 font-bold">{filteredAuxiliares.length}</strong> de <strong className="text-slate-900 font-bold">{auxiliares.length}</strong> auxiliares
+              </span>
+            </div>
+
+            <div className="hidden sm:flex items-center gap-1.5 text-slate-500 border-l border-slate-200 pl-4">
+              <span className="material-symbols-outlined text-slate-400 text-base">verified_user</span>
+              <span>Concurso ICU · Acreditación CPD</span>
+            </div>
+
             <button
-              onClick={handleOpenModal}
-              className="btn-doc-fold"
+              onClick={() => {
+                setFormData({
+                  nombre: '',
+                  nro_registro: '',
+                  materia: materiaFiltro !== 'todas' ? materiaFiltro : (catalogoMaterias[0]?.nombre || ''),
+                  semestre: semestreFiltro !== 'todos' ? semestreFiltro : '1',
+                  nota_examen: '',
+                  estado: 'aprobado',
+                  nro_convocatoria: `CONV-01/${gestion}`,
+                  es_ratificacion: false
+                });
+                setIsModalOpen(true);
+              }}
+              className="btn-doc-fold py-2 px-3.5 text-xs shadow-sm cursor-pointer ml-auto sm:ml-0"
               type="button"
             >
               <span className="material-symbols-outlined text-base">add_circle</span>
               <span>Registrar antecedente</span>
             </button>
           </div>
+
         </div>
       </div>
 
-      {/* Stepper de Referencia Jurídico-Administrativa con Protocolo de Prestigio */}
-      <div className="bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-surface-container relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-space-md pb-2 border-b border-slate-100">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#c1121f] text-xl">account_tree</span>
-            <span className="font-institutional-serif text-sm uppercase text-[#0b2545] font-bold tracking-wider">
-              Proceso Reglamentario para Archivo de Cátedra
-            </span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-600"></span>
-            <span className="font-label-code text-[11px] text-on-surface-variant font-medium">
-              Normativa Estatuto Orgánico UAGRM · Sede Ichilo
-            </span>
-          </div>
-        </div>
+      {/* 2. CONTENEDOR PRINCIPAL CON ANIMACIÓN SUAVE DE DESPLAZAMIENTO (SPLIT VIEW) */}
+      <div className="flex flex-col lg:flex-row items-start gap-6 w-full transition-all duration-300 ease-in-out">
+        
+        {/* COLUMNA DE LA LISTA DE AUXILIARES (Se adapta suavemente según si hay un expediente abierto) */}
+        <div className={`transition-all duration-300 ease-in-out flex flex-col gap-4 ${
+          selectedAux ? 'lg:w-[58%] w-full' : 'w-full'
+        }`}>
+          {loading ? (
+            <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-slate-200">
+              <LoadingState message={`Sincronizando nómina oficial de auxiliares (${gestion})...`} size={44} />
+            </div>
+          ) : filteredAuxiliares.length === 0 ? (
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-slate-200">
+              <EmptyState
+                title="No se encontraron auxiliares de cátedra"
+                message={
+                  materiaFiltro !== 'todas'
+                    ? `No hay auxiliares registrados para "${materiaFiltro}".`
+                    : busqueda
+                    ? `Sin coincidencias para "${busqueda}".`
+                    : `No existen auxiliares registrados para la gestión ${gestion}.`
+                }
+                actionText="Registrar antecedente"
+                onAction={() => {
+                  setFormData({
+                    nombre: '',
+                    nro_registro: '',
+                    materia: materiaFiltro !== 'todas' ? materiaFiltro : (catalogoMaterias[0]?.nombre || ''),
+                    semestre: semestreFiltro !== 'todos' ? semestreFiltro : '1',
+                    nota_examen: '',
+                    estado: 'aprobado',
+                    nro_convocatoria: `CONV-01/${gestion}`,
+                    es_ratificacion: false
+                  });
+                  setIsModalOpen(true);
+                }}
+                iconSize={48}
+              />
+            </div>
+          ) : (
+            filteredAuxiliares.map((aux) => {
+              const isSelected = selectedAux && String(selectedAux.id) === String(aux.id);
+              const initials = getInitials(aux.nombre);
+              const isRatificado = Boolean(aux.es_ratificacion);
+              const notaVal = aux.nota_examen ? parseFloat(aux.nota_examen) : null;
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md relative">
-          {/* Etapa 1 */}
-          <div className="bg-gradient-to-b from-white to-surface-container-low/40 rounded-xl p-space-md border border-slate-200 shadow-sm relative overflow-hidden group hover:border-[#c1121f]/50 transition-all">
-            <div className="absolute -top-3 -right-2 font-correlative-counter text-4xl text-[#0b2545]/10 select-none pointer-events-none group-hover:text-[#c1121f]/15 transition-colors">
-              01
-            </div>
-            <div className="flex items-center gap-space-xs mb-2">
-              <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#c1121f] to-[#8b0000] text-white flex items-center justify-center font-label-code text-caption font-bold shadow-xs">
-                1
-              </span>
-              <span className="font-caption text-caption font-bold uppercase tracking-wider text-[#c1121f]">
-                Fase Inicial
-              </span>
-            </div>
-            <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545] leading-tight">
-              Propuesta de materias
-            </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
-              Se eleva a Consejo de Carrera con detalle de plazas requeridas.
-            </p>
-            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1 text-[11px] font-label-code text-[#0b2545] font-semibold">
-              <span className="material-symbols-outlined text-xs text-[#c5a059]">check_circle</span> Solicitud Depto.
-            </div>
-          </div>
+              return (
+                <div
+                  key={aux.id}
+                  className={`bg-white rounded-2xl p-5 sm:p-6 transition-all duration-300 relative border ${
+                    isSelected
+                      ? 'border-l-4 border-l-[#C1121F] border-t-slate-200 border-r-slate-200 border-b-slate-200 shadow-md ring-1 ring-[#C1121F]/10'
+                      : 'border-slate-200/90 shadow-sm hover:shadow-md hover:border-slate-300'
+                  }`}
+                >
+                  {/* Fila Superior: Avatar + Nombre + RU + Insignias */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3.5 min-w-0">
+                      {/* Avatar con Iniciales */}
+                      <div className="w-12 h-12 rounded-xl bg-[#0B2545] text-[#f7e7a9] font-institutional-serif text-base font-bold flex items-center justify-center shrink-0 shadow-inner ring-1 ring-[#c5a059]/40">
+                        {initials}
+                      </div>
 
-          {/* Etapa 2 */}
-          <div className="bg-gradient-to-b from-white to-surface-container-low/40 rounded-xl p-space-md border border-slate-200 shadow-sm relative overflow-hidden group hover:border-[#0b2545]/50 transition-all">
-            <div className="absolute -top-3 -right-2 font-correlative-counter text-4xl text-[#0b2545]/10 select-none pointer-events-none transition-colors">
-              02
-            </div>
-            <div className="flex items-center gap-space-xs mb-2">
-              <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0b2545] to-[#15418c] text-white flex items-center justify-center font-label-code text-caption font-bold shadow-xs">
-                2
-              </span>
-              <span className="font-caption text-caption font-bold uppercase tracking-wider text-[#0b2545]">
-                Consejo Facultativo
-              </span>
-            </div>
-            <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545] leading-tight">
-              Tratamiento en Consejo
-            </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
-              Resolución de aprobación o ratificación semestral de cátedra.
-            </p>
-            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1 text-[11px] font-label-code text-[#0b2545] font-semibold">
-              <span className="material-symbols-outlined text-xs text-[#c5a059]">check_circle</span> Resolución C.C.
-            </div>
-          </div>
-
-          {/* Etapa 3 */}
-          <div className="bg-gradient-to-b from-white to-surface-container-low/40 rounded-xl p-space-md border border-slate-200 shadow-sm relative overflow-hidden group hover:border-[#0b2545]/50 transition-all">
-            <div className="absolute -top-3 -right-2 font-correlative-counter text-4xl text-[#0b2545]/10 select-none pointer-events-none transition-colors">
-              03
-            </div>
-            <div className="flex items-center gap-space-xs mb-2">
-              <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#0b2545] to-[#15418c] text-white flex items-center justify-center font-label-code text-caption font-bold shadow-xs">
-                3
-              </span>
-              <span className="font-caption text-caption font-bold uppercase tracking-wider text-[#0b2545]">
-                Convocatoria ICU
-              </span>
-            </div>
-            <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545] leading-tight">
-              Convocatoria pública
-            </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
-              Publicación y plazos reglamentarios según calendario ICU.
-            </p>
-            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1 text-[11px] font-label-code text-[#0b2545] font-semibold">
-              <span className="material-symbols-outlined text-xs text-[#c5a059]">check_circle</span> Publicación FINI
-            </div>
-          </div>
-
-          {/* Etapa 4 */}
-          <div className="bg-gradient-to-b from-white to-surface-container-low/40 rounded-xl p-space-md border border-slate-200 shadow-sm relative overflow-hidden group hover:border-[#c5a059]/80 transition-all">
-            <div className="absolute -top-3 -right-2 font-correlative-counter text-4xl text-[#0b2545]/10 select-none pointer-events-none transition-colors">
-              04
-            </div>
-            <div className="flex items-center gap-space-xs mb-2">
-              <span className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#c5a059] to-[#8b6b23] text-white flex items-center justify-center font-label-code text-caption font-bold shadow-xs">
-                4
-              </span>
-              <span className="font-caption text-caption font-bold uppercase tracking-wider text-[#8b6b23]">
-                Cierre Oficial
-              </span>
-            </div>
-            <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545] leading-tight">
-              Evaluación y selección
-            </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-relaxed">
-              Actas notariadas de examen, cuadro de méritos y notas con CPD.
-            </p>
-            <div className="mt-3 pt-2 border-t border-slate-100 flex items-center gap-1 text-[11px] font-label-code text-emerald-700 font-bold">
-              <span className="material-symbols-outlined text-xs text-emerald-600">verified</span> Actas Custodiadas
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Barra de Filtros */}
-      <div className="bg-surface-container-lowest rounded-xl p-space-md shadow-sm border border-surface-container flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-space-md">
-        {/* Buscador */}
-        <div className="relative flex-1">
-          <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-lg">
-            search
-          </span>
-          <input
-            className="w-full pl-10 pr-4 py-2.5 text-body-sm font-body-sm rounded-lg bg-surface-container-low text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest focus:ring-2 focus:ring-[#0b2545]/30 border border-slate-200/80 transition-all"
-            placeholder="Buscador por auxiliar o registro (ej. DEMO-AUX-01, Valeria)..."
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-            type="text"
-          />
-        </div>
-
-        {/* Selectores */}
-        <div className="flex flex-wrap sm:flex-nowrap items-center gap-space-sm">
-          {/* Selector Gestión */}
-          <div className="relative w-full sm:w-auto">
-            <select
-              className="w-full sm:w-auto appearance-none bg-surface-container-low text-on-surface font-body-sm text-body-sm font-semibold pl-space-md pr-8 py-2.5 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0b2545]/30 border border-slate-200/80"
-              value={gestion}
-              onChange={(e) => setGestion(e.target.value)}
-            >
-              <option value="2026">Gestión 2026</option>
-              <option value="2025">Gestión 2025</option>
-              <option value="2024">Gestión 2024</option>
-            </select>
-            <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-sm">
-              expand_more
-            </span>
-          </div>
-
-          {/* Selector Semestre */}
-          <div className="relative w-full sm:w-auto">
-            <select
-              className="w-full sm:w-auto appearance-none bg-surface-container-low text-on-surface font-body-sm text-body-sm pl-space-md pr-8 py-2.5 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0b2545]/30 border border-slate-200/80"
-              value={semestreFiltro}
-              onChange={(e) => setSemestreFiltro(e.target.value)}
-            >
-              <option value="todos">Ambos semestres</option>
-              <option value="1">Semestre I</option>
-              <option value="2">Semestre II</option>
-            </select>
-            <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-sm">
-              expand_more
-            </span>
-          </div>
-
-          {/* Selector Materias */}
-          <div className="relative w-full sm:w-auto">
-            <select
-              className="w-full sm:w-auto appearance-none bg-surface-container-low text-on-surface font-body-sm text-body-sm pl-space-md pr-8 py-2.5 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#0b2545]/30 border border-slate-200/80"
-              value={materiaFiltro}
-              onChange={(e) => setMateriaFiltro(e.target.value)}
-            >
-              <option value="todas">Todas las materias</option>
-              {materiasDisponibles.map((mat) => (
-                <option key={mat} value={mat}>
-                  {mat}
-                </option>
-              ))}
-            </select>
-            <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none text-sm">
-              expand_more
-            </span>
-          </div>
-
-          <button
-            onClick={() => {
-              setBusqueda('');
-              setSemestreFiltro('todos');
-              setMateriaFiltro('todas');
-            }}
-            className="p-2.5 text-on-surface-variant hover:text-[#0b2545] rounded-lg bg-surface-container-low hover:bg-surface-container transition-colors border border-slate-200/80 cursor-pointer"
-            title="Limpiar filtros"
-            type="button"
-          >
-            <span className="material-symbols-outlined text-lg">tune</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Tabla de Antecedentes con Estilo Institucional UAGRM FINI */}
-      <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-surface-container overflow-hidden">
-        <div className="px-space-lg py-space-md bg-gradient-to-r from-surface-container-low via-surface-container-low/60 to-white flex items-center justify-between border-b border-surface-container">
-          <div className="flex items-center gap-space-xs">
-            <span className="material-symbols-outlined text-[#c1121f] text-lg">folder_shared</span>
-            <span className="font-institutional-serif text-base font-bold text-[#0b2545]">
-              Nómina de Antecedentes Registrados
-            </span>
-            <span className="ml-2 px-2.5 py-0.5 rounded-full bg-[#0b2545]/10 text-[#0b2545] font-label-badge text-caption font-bold border border-[#0b2545]/20">
-              {filteredAuxiliares.length} registros activos
-            </span>
-          </div>
-          <div className="flex items-center gap-space-xs text-caption font-caption text-on-surface-variant bg-white px-2.5 py-1 rounded-full border border-slate-200 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-            <span className="font-semibold text-[#0b2545]">Sede Ichilo (Yapacaní)</span>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50/80 text-on-surface-variant text-[11px] font-label-code uppercase tracking-wider border-b border-slate-200">
-                <th className="py-3.5 px-space-lg font-bold text-[#0b2545]">Auxiliar / Cód. Registro</th>
-                <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Materia de Cátedra</th>
-                <th className="py-3.5 px-space-md font-bold text-center text-[#0b2545]">Calificación</th>
-                <th className="py-3.5 px-space-md font-bold text-center text-[#0b2545]">Periodo</th>
-                <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Condición Jurídica</th>
-                <th className="py-3.5 px-space-lg font-bold text-right text-[#0b2545]">Respaldo Digital</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-body-sm font-body-sm">
-              {loading ? (
-                <tr>
-                  <td colSpan="6" className="py-6 px-4">
-                    <LoadingState message={`Sincronizando antecedentes de cátedra (${gestion})...`} />
-                  </td>
-                </tr>
-              ) : filteredAuxiliares.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="py-6 px-4">
-                    <EmptyState
-                      title="No se encontraron auxiliares"
-                      message={busqueda ? `Sin registros para "${busqueda}".` : `No existen auxiliares registrados para la gestión ${gestion}.`}
-                      actionText="Registrar auxiliar"
-                      onAction={handleOpenModal}
-                    />
-                  </td>
-                </tr>
-              ) : (
-                filteredAuxiliares.map((aux) => {
-                  const isSelected = selectedAux && String(selectedAux.id) === String(aux.id);
-                  const initials = getInitials(aux.nombre);
-                  return (
-                    <tr
-                      key={aux.id}
-                      onClick={() => setSelectedAuxId(aux.id)}
-                      className={`${
-                        isSelected 
-                          ? 'bg-gradient-to-r from-red-50/40 via-blue-50/20 to-white border-l-4 border-l-[#c1121f]' 
-                          : 'bg-surface-container-lowest hover:bg-slate-50 border-l-4 border-l-transparent'
-                      } transition-colors cursor-pointer group`}
-                    >
-                      <td className="py-3.5 px-space-lg">
-                        <div className="flex items-center gap-space-sm">
-                          <div
-                            className={`w-9 h-9 rounded-full ${
-                              isSelected 
-                                ? 'bg-gradient-to-br from-[#c1121f] to-[#8b0000] text-white ring-2 ring-[#c5a059]/40' 
-                                : 'bg-gradient-to-br from-[#0b2545] to-[#15418c] text-white ring-1 ring-slate-200'
-                            } flex items-center justify-center font-bold text-caption shadow-sm font-institutional-serif`}
+                      {/* Nombre y Metadatos */}
+                      <div className="flex flex-col min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-institutional-serif text-base sm:text-lg font-bold text-slate-800 tracking-wide uppercase truncate">
+                            {aux.nombre}
+                          </h3>
+                          <span 
+                            className="material-symbols-outlined text-[#C1121F] text-base shrink-0" 
+                            title="Auxiliar acreditado con resolución oficial de Consejo Facultativo"
                           >
-                            {initials}
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="font-institutional-serif font-bold text-[#0b2545] group-hover:text-[#c1121f] transition-colors text-sm">
-                              {aux.nombre}
-                            </span>
-                            <span className={`font-label-code text-[11px] ${isSelected ? 'text-[#c1121f] font-semibold' : 'text-on-surface-variant'}`}>
-                              {aux.nro_registro ? `RU ${aux.nro_registro}` : `DEMO-AUX-${String(aux.id).padStart(2, '0')}`}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="py-3.5 px-space-md">
-                        <div className="flex items-center gap-1.5">
-                          <span className={`material-symbols-outlined text-base ${isSelected ? 'text-[#0b2545]' : 'text-[#15418c]'}`}>terminal</span>
-                          <span className="font-semibold text-primary">{aux.materia}</span>
-                        </div>
-                      </td>
-
-                      <td className="py-3.5 px-space-md text-center">
-                        <span className="font-label-code text-body-sm font-bold text-[#0b2545]">
-                          {aux.nota_examen != null ? aux.nota_examen : '-'}
-                        </span>
-                        <span className="font-label-code text-caption text-on-surface-variant font-medium">
-                          {aux.nota_examen != null ? ' / 100' : ''}
-                        </span>
-                      </td>
-
-                      <td className="py-3.5 px-space-md text-center">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md ${isSelected ? 'bg-[#0b2545]/10 text-[#0b2545]' : 'bg-surface-container-highest text-on-surface'} font-label-code text-caption font-bold`}>
-                          {aux.semestre === 1 ? 'I' : 'II'} / {aux.gestion}
-                        </span>
-                      </td>
-
-                      <td className="py-3.5 px-space-md">
-                        {aux.es_ratificacion ? (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-label-badge text-[11px] font-bold shadow-2xs">
-                            <span className="material-symbols-outlined text-xs text-emerald-600">verified</span>
-                            RATIFICADO DEL I
+                            verified
                           </span>
-                        ) : aux.estado === 'aprobado' ? (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 text-blue-900 border border-blue-200 font-label-badge text-[11px] font-bold shadow-2xs">
-                            <span className="material-symbols-outlined text-xs text-blue-700">military_tech</span>
-                            GANADOR DE EXAMEN
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 text-amber-900 border border-amber-200 font-label-badge text-[11px] font-bold shadow-2xs">
-                            <span className="material-symbols-outlined text-xs text-amber-700">schedule</span>
-                            PROPUESTA CONSEJO
-                          </span>
-                        )}
-                      </td>
-
-                      <td className="py-3.5 px-space-lg text-right">
-                        <div className="inline-flex items-center gap-1">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedAuxId(aux.id);
-                              handlePrintConstancia(aux);
-                            }}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface-container-lowest text-[#0b2545] border border-slate-200 shadow-2xs hover:bg-[#0b2545] hover:text-white transition-all font-label-code text-caption font-bold cursor-pointer"
-                            type="button"
-                            title="Emitir constancia"
-                          >
-                            <span className="material-symbols-outlined text-sm">visibility</span>
-                            <span>Ver respaldo</span>
-                          </button>
-                          <button
-                            onClick={(e) => handleDelete(aux.id, aux.nombre, e)}
-                            className="p-1.5 rounded-lg text-outline-variant hover:text-error hover:bg-error-container/40 transition-colors cursor-pointer"
-                            title="Eliminar antecedente"
-                            type="button"
-                          >
-                            <span className="material-symbols-outlined text-base">delete</span>
-                          </button>
                         </div>
-                      </td>
-                    </tr>
-                  );
-                })
+                        <div className="flex items-center gap-2 font-label-code text-xs text-slate-500 font-medium mt-0.5 flex-wrap">
+                          <span className="text-[#0B2545] font-bold">RU: {aux.nro_registro || 'En trámite'}</span>
+                          <span>·</span>
+                          <span>Ref: {aux.nro_convocatoria || 'CONV-S/N'}</span>
+                          <span>·</span>
+                          <span>Gestión {aux.gestion || gestion}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Insignias de Condición Legal y Calificación */}
+                    <div className="flex flex-col sm:flex-row items-end sm:items-center gap-1.5 shrink-0">
+                      <span className={`inline-block px-3 py-1 rounded-full text-[11px] font-semibold border ${
+                        isRatificado
+                          ? 'bg-amber-50 text-amber-800 border-amber-200'
+                          : 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                      }`}>
+                        {isRatificado ? 'Ratificación Semestral' : 'Concurso de Méritos'}
+                      </span>
+                      <span className="inline-block px-2.5 py-1 rounded-full text-[11px] bg-slate-100 text-slate-700 border border-slate-200 font-bold">
+                        {notaVal ? `Examen: ${notaVal}/100` : (isRatificado ? 'Ratificado' : 'Aprobado')}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Fila Media: Cátedra asignada en contenedor sutil */}
+                  <div className="mt-3.5 mb-4 px-3.5 py-2 rounded-xl bg-slate-50/90 border border-slate-100 text-xs text-slate-700 flex items-center justify-between flex-wrap gap-2">
+                    <div>
+                      <span className="font-bold text-slate-800 mr-1.5">Asignatura:</span>
+                      <span className="text-slate-600 font-medium">
+                        {aux.materia} {aux.materia_codigo ? `(${aux.materia_codigo})` : ''} · Semestre {aux.semestre === 1 ? 'I' : 'II'} ({aux.gestion})
+                      </span>
+                    </div>
+                    <span className="font-label-code text-[11px] text-slate-500 font-semibold">
+                      {aux.estado === 'aprobado' ? 'Designación Validada' : 'En Evaluación'}
+                    </span>
+                  </div>
+
+                  {/* Fila Inferior: Los 2 Botones Interactivos y Acciones Rápidas */}
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-100/80 gap-2">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                      
+                      {/* BOTÓN 1: Constancia Oficial */}
+                      <button
+                        onClick={() => {
+                          setSelectedAuxId(aux.id);
+                          setActiveTab('constancia');
+                        }}
+                        type="button"
+                        className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                          isSelected && activeTab === 'constancia'
+                            ? 'bg-[#0B2545] text-white shadow-sm ring-2 ring-[#0B2545]/20'
+                            : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                        }`}
+                      >
+                        <span className={`material-symbols-outlined text-base ${
+                          isSelected && activeTab === 'constancia' ? 'text-[#f7e7a9]' : 'text-slate-500'
+                        }`}>
+                          workspace_premium
+                        </span>
+                        <span>Constancia Oficial</span>
+                      </button>
+
+                      {/* BOTÓN 2: Informe Técnico */}
+                      <button
+                        onClick={() => {
+                          setSelectedAuxId(aux.id);
+                          setActiveTab('informe');
+                        }}
+                        type="button"
+                        className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                          isSelected && activeTab === 'informe'
+                            ? 'bg-[#0B2545] text-white shadow-sm ring-2 ring-[#0B2545]/20'
+                            : 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-200'
+                        }`}
+                      >
+                        <span className={`material-symbols-outlined text-base ${
+                          isSelected && activeTab === 'informe' ? 'text-[#f7e7a9]' : 'text-slate-500'
+                        }`}>
+                          article
+                        </span>
+                        <span>Informe Técnico</span>
+                      </button>
+                    </div>
+
+                    {/* Acciones Rápidas a la derecha */}
+                    <div className="flex items-center gap-1">
+                      {/* Imprimir Constancia Formal */}
+                      <button
+                        onClick={() => handlePrintConstancia(aux)}
+                        className="p-2 rounded-lg text-slate-500 hover:text-[#0B2545] hover:bg-slate-100 transition-colors cursor-pointer"
+                        title="Imprimir constancia de auxiliatura oficial"
+                        type="button"
+                      >
+                        <span className="material-symbols-outlined text-base">print</span>
+                      </button>
+
+                      {/* Imprimir Informe */}
+                      <button
+                        onClick={() => handlePrintInforme(aux)}
+                        className="p-2 rounded-lg text-slate-500 hover:text-[#0B2545] hover:bg-slate-100 transition-colors cursor-pointer"
+                        title="Imprimir informe técnico para Consejo"
+                        type="button"
+                      >
+                        <span className="material-symbols-outlined text-base">assignment</span>
+                      </button>
+
+                      {/* Editar */}
+                      <button
+                        onClick={() => {
+                          setEditFormData({
+                            id: aux.id,
+                            nombre: aux.nombre,
+                            nro_registro: aux.nro_registro || '',
+                            materia: aux.materia || '',
+                            semestre: String(aux.semestre || '1'),
+                            nota_examen: aux.nota_examen !== null ? aux.nota_examen : '',
+                            estado: aux.estado || 'aprobado',
+                            nro_convocatoria: aux.nro_convocatoria || '',
+                            es_ratificacion: Boolean(aux.es_ratificacion)
+                          });
+                          setIsEditModalOpen(true);
+                        }}
+                        className="p-2 rounded-lg text-slate-400 hover:text-[#0B2545] hover:bg-slate-100 transition-colors cursor-pointer"
+                        title="Editar antecedente del auxiliar"
+                        type="button"
+                      >
+                        <span className="material-symbols-outlined text-base">edit</span>
+                      </button>
+
+                      {/* Eliminar */}
+                      <button
+                        onClick={(e) => handleDelete(aux.id, aux.nombre, e)}
+                        className="p-2 rounded-lg text-slate-300 hover:text-[#C1121F] hover:bg-slate-100 transition-colors cursor-pointer"
+                        title="Eliminar registro"
+                        type="button"
+                      >
+                        <span className="material-symbols-outlined text-base">delete</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* 3. PANEL DERECHO DE EXPEDIENTE DEL AUXILIAR (DRAWER / INSPECTOR LATERAL CON ANIMACIÓN SUAVE) */}
+        {selectedAux && (
+          <div className="lg:w-[42%] w-full shrink-0 sticky top-24 transition-all duration-300 ease-in-out animate-in slide-in-from-right-6 fade-in duration-300">
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200/90 p-5 sm:p-6 flex flex-col gap-4 relative overflow-hidden">
+              
+              {/* Barra de Acento Superior Institucional */}
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#C1121F] via-[#c5a059] to-[#0B2545]"></div>
+
+              {/* Cabecera del Expediente Activo */}
+              <div className="flex items-start justify-between gap-2 pt-1 border-b border-slate-100 pb-3">
+                <div className="flex flex-col min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="font-label-code text-[11px] font-bold text-slate-700 bg-slate-100 px-2.5 py-0.5 rounded border border-slate-200 uppercase tracking-wide">
+                      EXPEDIENTE DE DOCENCIA AUXILIAR #{selectedAux.nro_registro || 'AUX'}
+                    </span>
+                  </div>
+                  <h2 className="font-institutional-serif text-lg sm:text-xl font-bold text-slate-900 uppercase tracking-wide mt-1.5 truncate">
+                    {selectedAux.nombre}
+                  </h2>
+                  <p className="font-body-sm text-xs text-slate-500 font-medium truncate mt-0.5">
+                    Cátedra: {selectedAux.materia} · Convocatoria: {selectedAux.nro_convocatoria || 'CONV-S/N'}
+                  </p>
+                </div>
+
+                {/* Botón Cerrar Panel ✕ */}
+                <button
+                  onClick={() => setSelectedAuxId(null)}
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
+                  title="Cerrar panel"
+                  type="button"
+                >
+                  <span className="material-symbols-outlined text-xl">close</span>
+                </button>
+              </div>
+
+              {/* Tabs de Cambio Rápido: "Constancia de Cátedra" vs "Informe Técnico" */}
+              <div className="grid grid-cols-2 gap-2 bg-slate-100/80 p-1 rounded-xl">
+                <button
+                  onClick={() => setActiveTab('constancia')}
+                  type="button"
+                  className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'constancia'
+                      ? 'bg-white text-slate-800 shadow-sm border border-slate-200'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base text-[#C1121F]">
+                    workspace_premium
+                  </span>
+                  <span>Constancia de Cátedra</span>
+                </button>
+
+                <button
+                  onClick={() => setActiveTab('informe')}
+                  type="button"
+                  className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'informe'
+                      ? 'bg-white text-slate-800 shadow-sm border border-slate-200'
+                      : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  <span className="material-symbols-outlined text-base text-slate-600">
+                    article
+                  </span>
+                  <span>Informe Técnico</span>
+                </button>
+              </div>
+
+              {/* CONTENIDO DE LA PESTAÑA 1: CONSTANCIA OFICIAL DE CÁTEDRA */}
+              {activeTab === 'constancia' && (
+                <div className="flex flex-col gap-3">
+                  <span className="font-body-sm text-xs font-bold text-slate-700 pt-1">
+                    Ficha de Acreditación Docente Institucional
+                  </span>
+
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-2.5">
+                    <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/60">
+                      <span className="text-slate-500 font-medium">Auxiliar Designado:</span>
+                      <strong className="text-slate-900">{selectedAux.nombre}</strong>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/60">
+                      <span className="text-slate-500 font-medium">Registro Universitario (RU):</span>
+                      <span className="font-label-code font-bold text-slate-800">{selectedAux.nro_registro || 'No registrado'}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/60">
+                      <span className="text-slate-500 font-medium">Asignatura Oficial:</span>
+                      <strong className="text-[#0B2545]">{selectedAux.materia}</strong>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/60">
+                      <span className="text-slate-500 font-medium">Ciclo Académico:</span>
+                      <span className="font-label-code font-bold text-slate-800">
+                        Semestre {selectedAux.semestre === 1 ? 'I' : 'II'} / {selectedAux.gestion || gestion}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/60">
+                      <span className="text-slate-500 font-medium">Condición de Ingreso:</span>
+                      <span className="font-semibold text-slate-800">
+                        {selectedAux.es_ratificacion ? 'Ratificación de Semestre Anterior' : 'Concurso de Méritos y Examen'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/60">
+                      <span className="text-slate-500 font-medium">Convocatoria de Origen:</span>
+                      <span className="font-label-code font-bold text-[#C1121F]">{selectedAux.nro_convocatoria || 'CONV-S/N'}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-slate-500 font-medium">Calificación Evaluada:</span>
+                      <strong className="text-emerald-700 text-sm">
+                        {selectedAux.nota_examen ? `${selectedAux.nota_examen} / 100 pts` : (selectedAux.es_ratificacion ? 'Ratificado' : 'Aprobado')}
+                      </strong>
+                    </div>
+                  </div>
+
+                  {/* Botón Imprimir Constancia Oficial */}
+                  <button
+                    onClick={() => handlePrintConstancia(selectedAux)}
+                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#0B2545] to-[#15418c] hover:shadow-md text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm border border-[#c5a059]/30 mt-1"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-base text-[#c5a059]">print</span>
+                    <span>Imprimir Constancia Oficial de Auxiliatura</span>
+                  </button>
+                </div>
               )}
-            </tbody>
-          </table>
-        </div>
 
-        {/* Paginación / Footer Tabla */}
-        <div className="p-space-md bg-surface-container-lowest flex flex-col sm:flex-row items-center justify-between gap-space-sm text-caption font-caption text-on-surface-variant border-t border-slate-100">
-          <span>
-            Mostrando {filteredAuxiliares.length} de {auxiliares.length} registros históricos de cátedra oficial
-          </span>
-          <div className="flex items-center gap-1">
-            <span className="font-label-code font-bold text-[#0b2545]">
-              Gestión {gestion} · Archivo FINI UAGRM
-            </span>
+              {/* CONTENIDO DE LA PESTAÑA 2: INFORME TÉCNICO DE ANTECEDENTES */}
+              {activeTab === 'informe' && (
+                <div className="flex flex-col gap-3">
+                  <span className="font-body-sm text-xs font-bold text-slate-700 pt-1">
+                    Informe Reglamentario Elevado a Decanato / Consejo
+                  </span>
+
+                  <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-3 text-xs leading-relaxed text-slate-700">
+                    <p>
+                      Se hace constar ante la autoridad facultativa correspondiente que el auxiliar <strong className="text-slate-900">{selectedAux.nombre}</strong> cumplió con la totalidad de exigencias del Estatuto Orgánico de la UAGRM para el dictado y apoyo en la cátedra de <strong className="text-[#0B2545]">{selectedAux.materia}</strong>.
+                    </p>
+
+                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200/80">
+                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+                        <span className="material-symbols-outlined text-sm">check_circle</span>
+                        Resolución C.C. Validada
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+                        <span className="material-symbols-outlined text-sm">check_circle</span>
+                        Acta de Examen Notariada
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+                        <span className="material-symbols-outlined text-sm">check_circle</span>
+                        Formulario CPD Activo
+                      </div>
+                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
+                        <span className="material-symbols-outlined text-sm">check_circle</span>
+                        Cómputo Horario en Regla
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Botón Imprimir Informe Técnico */}
+                  <button
+                    onClick={() => handlePrintInforme(selectedAux)}
+                    className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#C1121F] to-[#93000a] hover:shadow-md text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm border border-white/20 mt-1"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-base">assignment</span>
+                    <span>Imprimir Informe Técnico de Cátedra</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Pie Informativo de Auditoría */}
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400 font-label-code">
+                <span className="flex items-center gap-1.5 text-emerald-700 font-semibold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                  Servidor Yapacaní: En línea
+                </span>
+                <span>Última modif: {formatFecha(selectedAux.updatedAt)}</span>
+              </div>
+
+            </div>
           </div>
-        </div>
+        )}
+
       </div>
 
-      {/* Sección Inferior: Dossier de Antecedente Seleccionado (Estilo Carpeta/Diploma Oficial UAGRM FINI) */}
-      {selectedAux && (
-        <div className="bg-surface-container-lowest rounded-2xl shadow-lg border border-surface-container p-space-xl flex flex-col gap-space-lg relative overflow-hidden">
-          {/* Ribetes angulares geométricos institucionales del folder */}
-          <div className="absolute -right-8 -top-8 w-40 h-40 bg-gradient-to-bl from-[#c1121f] to-[#8b0000] transform rotate-45 pointer-events-none opacity-90"></div>
-          <div className="absolute -right-10 -top-10 w-44 h-44 border-2 border-[#c5a059] pointer-events-none transform rotate-45"></div>
-          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
-          
-          {/* Filigrana escudo UAGRM */}
-          <img 
-            alt="Marca de agua escudo" 
-            className="absolute -left-6 -bottom-6 w-44 h-44 object-contain opacity-[0.04] pointer-events-none" 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDykYJ-CVNMB6j05IjX7kpB5rpaBNBZ89FKkK3PuiXrBRa00ad8OJ9bmTDX4PGYF0xo_QiDByufBV5nYpkiBij2eR2FOMFoHgj63-pajn9mDXCj26ttDL6Z_jv3a8mzoheg5UgMYEsKtSuC7z2joBd2Kf7L8v_ZmyzQlbZUJA5EwrDpVBaJwxW8k9IoRpS6WD18IZcWEVStAHJPDLGg0h67kIGi2EqRK4G4NNddRQiSoC3K28vQHuouuCeOTb1TT1Vn" 
-          />
-
-          {/* Header del Antecedente Activo */}
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-space-md pb-space-md border-b border-slate-100">
-            <div className="flex items-start gap-space-md">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-[#0b2545] to-[#15418c] text-white flex items-center justify-center font-institutional-serif text-2xl font-bold shadow-md ring-2 ring-[#c5a059]/40">
-                {getInitials(selectedAux.nombre)}
-              </div>
-              <div className="flex flex-col">
-                <div className="flex items-center gap-space-sm flex-wrap">
-                  <span className="font-label-badge text-caption uppercase tracking-wider text-[#c1121f] font-bold">
-                    Expediente Seleccionado
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-surface-container text-[#0b2545] font-label-code text-caption font-bold border border-slate-200">
-                    ID: {selectedAux.nro_registro || `DEMO-AUX-${selectedAux.id}`}
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[11px] font-label-badge font-bold border border-emerald-200">
-                    Semestre {selectedAux.semestre === 1 ? 'I' : 'II'} / {selectedAux.gestion}
-                  </span>
-                </div>
-                <h2 className="font-institutional-serif text-xl md:text-2xl font-bold text-[#0b2545] mt-0.5">
-                  {selectedAux.nombre} — Semestre {selectedAux.semestre === 1 ? 'I' : 'II'} / {selectedAux.gestion}
-                </h2>
-                <p className="font-body-sm text-body-sm text-on-surface-variant">
-                  Cátedra: <strong className="text-[#0b2545]">{selectedAux.materia}</strong> · Condición de designación:{' '}
-                  <span className="font-semibold text-emerald-800">
-                    {selectedAux.es_ratificacion ? 'Ratificado del Semestre I' : 'Convocatoria y Examen de Méritos'}
-                  </span>
-                </p>
-              </div>
-            </div>
-
-            {/* Acciones de Impresión con Estilo Protocolar */}
-            <div className="flex items-center gap-space-xs flex-wrap sm:flex-nowrap">
-              <button
-                onClick={() => handlePrintConstancia(selectedAux)}
-                className="inline-flex items-center gap-space-xs px-space-md py-2.5 rounded-lg bg-surface-container-low text-[#0b2545] hover:bg-surface-container hover:text-[#c1121f] transition-all font-body-sm text-body-sm font-semibold border border-slate-200 shadow-2xs cursor-pointer"
-                type="button"
-              >
-                <span className="material-symbols-outlined text-lg text-[#0b2545]">print</span>
-                <span>Imprimir constancia</span>
-              </button>
-              <button
-                onClick={() => handlePrintInforme(selectedAux)}
-                className="inline-flex items-center gap-space-xs px-space-md py-2.5 rounded-lg bg-gradient-to-r from-[#0b2545] to-[#15418c] text-white hover:shadow-md transition-all font-body-sm text-body-sm font-semibold border border-white/20 shadow-xs cursor-pointer"
-                type="button"
-              >
-                <span className="material-symbols-outlined text-lg text-[#c5a059]">description</span>
-                <span>Imprimir informe</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Panel de Documentación de Respaldo con Tarjetas de Protocolo */}
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-space-md">
-            {/* Documento 1: Formulario CPD */}
-            <div className="bg-surface-container-low/60 rounded-xl p-space-md flex flex-col justify-between hover:bg-surface-container-low hover:border-[#c5a059]/40 border border-slate-200/80 transition-all shadow-sm group">
-              <div>
-                <div className="flex items-start justify-between gap-space-sm mb-space-sm">
-                  <div className="w-10 h-10 rounded-lg bg-white text-[#0b2545] flex items-center justify-center shadow-xs border border-slate-200 group-hover:scale-105 transition-transform">
-                    <span className="material-symbols-outlined text-xl text-[#0b2545]">assignment_turned_in</span>
-                  </div>
-                  <span className="px-2 py-0.5 rounded bg-white text-[#0b2545] font-label-code text-caption font-bold border border-slate-200 shadow-2xs">
-                    CPD-{selectedAux.gestion}-088
-                  </span>
-                </div>
-                <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545]">Formulario oficial CPD</div>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-snug">
-                  Carga horaria asignada de 32 hrs/mes. Certificación presupuestaria aprobada por la DAF.
-                </p>
-              </div>
-              <div className="mt-space-md pt-space-xs flex items-center justify-between border-t border-slate-200/60">
-                <span className="font-caption text-caption text-on-surface-variant font-medium flex items-center gap-1">
-                  <span className="material-symbols-outlined text-xs text-emerald-600">verified</span> PDF firmado
-                </span>
-                <button
-                  onClick={() => handlePrintConstancia(selectedAux)}
-                  className="text-[#c1121f] hover:text-[#8b0000] font-body-sm text-caption font-bold inline-flex items-center gap-0.5 cursor-pointer"
-                  type="button"
-                >
-                  Descargar <span className="material-symbols-outlined text-sm">download</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Documento 2: Convocatoria y evaluación */}
-            <div className="bg-surface-container-low/60 rounded-xl p-space-md flex flex-col justify-between hover:bg-surface-container-low hover:border-[#c5a059]/40 border border-slate-200/80 transition-all shadow-sm group">
-              <div>
-                <div className="flex items-start justify-between gap-space-sm mb-space-sm">
-                  <div className="w-10 h-10 rounded-lg bg-white text-[#c1121f] flex items-center justify-center shadow-xs border border-slate-200 group-hover:scale-105 transition-transform">
-                    <span className="material-symbols-outlined text-xl text-[#c1121f]">gavel</span>
-                  </div>
-                  <span className="px-2 py-0.5 rounded bg-white text-[#c1121f] font-label-code text-caption font-bold border border-slate-200 shadow-2xs">
-                    {selectedAux.nro_convocatoria || 'ACTA-EX-14'}
-                  </span>
-                </div>
-                <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545]">Convocatoria y evaluación</div>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-snug">
-                  Acta de concurso de méritos y examen de competencia. Nota certificada por tribunal: {selectedAux.nota_examen != null ? `${selectedAux.nota_examen}/100` : '86/100'}.
-                </p>
-              </div>
-              <div className="mt-space-md pt-space-xs flex items-center justify-between border-t border-slate-200/60">
-                <span className="font-caption text-caption text-on-surface-variant font-medium flex items-center gap-1">
-                  <span className="material-symbols-outlined text-xs text-[#c5a059]">history_edu</span> Acta notariada
-                </span>
-                <button
-                  onClick={() => handlePrintInforme(selectedAux)}
-                  className="text-[#c1121f] hover:text-[#8b0000] font-body-sm text-caption font-bold inline-flex items-center gap-0.5 cursor-pointer"
-                  type="button"
-                >
-                  Descargar <span className="material-symbols-outlined text-sm">download</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Documento 3: Carta de ratificación */}
-            <div className="bg-surface-container-low/60 rounded-xl p-space-md flex flex-col justify-between hover:bg-surface-container-low hover:border-[#c5a059]/40 border border-slate-200/80 transition-all shadow-sm group">
-              <div>
-                <div className="flex items-start justify-between gap-space-sm mb-space-sm">
-                  <div className="w-10 h-10 rounded-lg bg-white text-[#15418c] flex items-center justify-center shadow-xs border border-slate-200 group-hover:scale-105 transition-transform">
-                    <span className="material-symbols-outlined text-xl text-[#15418c]">verified_user</span>
-                  </div>
-                  <span className="px-2 py-0.5 rounded bg-white text-[#15418c] font-label-code text-caption font-bold border border-slate-200 shadow-2xs">
-                    RES-CC-09/{String(selectedAux.gestion || gestion).slice(-2)}
-                  </span>
-                </div>
-                <div className="font-institutional-serif text-body-lg font-bold text-[#0b2545]">
-                  {selectedAux.es_ratificacion ? 'Carta de ratificación' : 'Resolución de designación'}
-                </div>
-                <p className="font-body-sm text-body-sm text-on-surface-variant mt-1.5 leading-snug">
-                  Resolución de Consejo de Carrera que aprueba la designación reglamentaria para el Semestre {selectedAux.semestre === 1 ? 'I' : 'II'}.
-                </p>
-              </div>
-              <div className="mt-space-md pt-space-xs flex items-center justify-between border-t border-slate-200/60">
-                <span className="font-caption text-caption text-on-surface-variant font-medium flex items-center gap-1">
-                  <span className="material-symbols-outlined text-xs text-blue-600">policy</span> Resolución CC
-                </span>
-                <button
-                  onClick={() => handlePrintConstancia(selectedAux)}
-                  className="text-[#c1121f] hover:text-[#8b0000] font-body-sm text-caption font-bold inline-flex items-center gap-0.5 cursor-pointer"
-                  type="button"
-                >
-                  Descargar <span className="material-symbols-outlined text-sm">download</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Modal: Nuevo Registro de Antecedente de Auxiliar */}
+      {/* MODAL: REGISTRAR ANTECEDENTE DE AUXILIAR */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 bg-black/60 backdrop-blur-md">
-          <div className="bg-surface-container-lowest rounded-xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-100px)] animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
-            {/* Header */}
-            <div className="bg-primary text-on-primary px-space-lg py-space-md flex items-center justify-between shrink-0">
-              <div className="flex items-center gap-space-xs">
-                <span className="material-symbols-outlined text-secondary-fixed">badge</span>
-                <span className="font-headline-md text-headline-md font-bold">Registrar Antecedente de Auxiliar</span>
+          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-100px)] border border-[#c5a059]/40 animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
+            <div className="bg-gradient-to-r from-[#07162b] via-[#0B2545] to-[#15418c] text-white px-6 py-4 flex items-center justify-between border-b border-[#c5a059]/30 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#c5a059]">add_circle</span>
+                <span className="font-institutional-serif text-base font-bold">Registrar Auxiliar de Cátedra</span>
               </div>
               <button
-                className="text-on-primary/70 hover:text-on-primary cursor-pointer"
+                className="text-white/70 hover:text-white cursor-pointer"
                 onClick={() => !submitting && setIsModalOpen(false)}
                 type="button"
               >
@@ -888,25 +893,15 @@ const Auxiliares = () => {
               </button>
             </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit}>
-              <div className="p-space-lg flex flex-col gap-space-md max-h-[75vh] overflow-y-auto">
-                <div className="bg-surface-container-low p-space-sm rounded-lg flex items-center justify-between">
-                  <span className="font-caption text-caption text-on-surface-variant font-semibold">
-                    Período Académico:
-                  </span>
-                  <span className="font-label-code text-label-code font-bold text-secondary bg-surface-container px-2 py-0.5 rounded">
-                    Gestión {gestion} · Carrera Sistemas
-                  </span>
-                </div>
-
+            <form onSubmit={handleCreateSubmit}>
+              <div className="p-6 flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
-                  <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
-                    Nombre Completo del Postulante / Auxiliar *
+                  <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                    Nombre Completo del Auxiliar *
                   </label>
                   <input
-                    className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                    placeholder="Ej. Valeria Méndez Soto"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20"
+                    placeholder="Ej. Univ. Andrea Silvestre Paz"
                     value={formData.nombre}
                     onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
                     required
@@ -914,14 +909,14 @@ const Auxiliares = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
-                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
+                    <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
                       Registro Universitario (RU)
                     </label>
                     <input
-                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                      placeholder="Ej. DEMO-AUX-01"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20"
+                      placeholder="Ej. 220038471"
                       value={formData.nro_registro}
                       onChange={(e) => setFormData({ ...formData, nro_registro: e.target.value })}
                       type="text"
@@ -929,11 +924,45 @@ const Auxiliares = () => {
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
-                      Semestre de Designación
+                    <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                      Convocatoria de Origen
+                    </label>
+                    <input
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20"
+                      placeholder="Ej. CONV-01/2026"
+                      value={formData.nro_convocatoria}
+                      onChange={(e) => setFormData({ ...formData, nro_convocatoria: e.target.value })}
+                      type="text"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                      Materia / Cátedra Asignada *
                     </label>
                     <select
-                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20 cursor-pointer"
+                      value={formData.materia}
+                      onChange={(e) => setFormData({ ...formData, materia: e.target.value })}
+                      required
+                    >
+                      <option value="">-- Seleccionar asignatura --</option>
+                      {materiasDisponibles.map((m) => (
+                        <option key={m.nombre} value={m.nombre}>
+                          {m.codigo ? `[${m.codigo}] ` : ''}{m.nombre}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                      Semestre Académico *
+                    </label>
+                    <select
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20 cursor-pointer"
                       value={formData.semestre}
                       onChange={(e) => setFormData({ ...formData, semestre: e.target.value })}
                     >
@@ -943,86 +972,55 @@ const Auxiliares = () => {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
-                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
-                      Materia / Cátedra *
+                    <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                      Nota de Examen (1-100)
                     </label>
                     <input
-                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                      placeholder="Ej. Programación I, Base de datos I..."
-                      value={formData.materia}
-                      onChange={(e) => setFormData({ ...formData, materia: e.target.value })}
-                      required
-                      type="text"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1">
-                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
-                      Calificación (0 - 100)
-                    </label>
-                    <input
-                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                      placeholder="Ej. 86"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20"
+                      placeholder="Ej. 92"
                       max="100"
-                      min="0"
+                      min="51"
                       step="0.1"
                       value={formData.nota_examen}
                       onChange={(e) => setFormData({ ...formData, nota_examen: e.target.value })}
                       type="number"
                     />
                   </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
-                  <div className="flex flex-col gap-1">
-                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
-                      N.° Convocatoria / Referencia
-                    </label>
-                    <input
-                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
-                      placeholder="Ej. CONV-01/2026"
-                      value={formData.nro_convocatoria}
-                      onChange={(e) => setFormData({ ...formData, nro_convocatoria: e.target.value })}
-                      type="text"
-                    />
-                  </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="font-caption text-caption uppercase tracking-wider font-bold text-on-surface-variant">
-                      Estado de Designación
+                    <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                      Estado de Acreditación
                     </label>
                     <select
-                      className="w-full px-space-sm py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-secondary/20"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20 cursor-pointer"
                       value={formData.estado}
                       onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
                     >
-                      <option value="aprobado">🟢 Aprobado / Ganador de Examen</option>
-                      <option value="pendiente">🟡 Propuesta en Consejo</option>
-                      <option value="reprobado">🔴 Rechazado / Sin cupo</option>
+                      <option value="aprobado">Aprobado / Designado</option>
+                      <option value="pendiente">En Proceso / Pendiente</option>
                     </select>
                   </div>
                 </div>
 
-                <div className="bg-surface-container-low p-space-md rounded-lg flex items-center gap-space-sm">
+                <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl">
                   <input
-                    checked={formData.es_ratificacion}
-                    className="w-4 h-4 rounded text-secondary focus:ring-secondary"
-                    id="chk_ratificacion"
-                    onChange={(e) => setFormData({ ...formData, es_ratificacion: e.target.checked })}
                     type="checkbox"
+                    id="es_ratificacion"
+                    checked={formData.es_ratificacion}
+                    onChange={(e) => setFormData({ ...formData, es_ratificacion: e.target.checked })}
+                    className="w-4 h-4 text-[#0B2545] rounded cursor-pointer"
                   />
-                  <label className="text-body-sm font-body-sm text-on-surface cursor-pointer select-none" htmlFor="chk_ratificacion">
-                    <strong>¿Es ratificación para el Semestre II?</strong> (Continuidad reglamentaria sin nuevo examen)
+                  <label htmlFor="es_ratificacion" className="text-xs text-slate-700 font-semibold cursor-pointer">
+                    Es ratificación reglamentaria del semestre anterior (sin examen de concurso)
                   </label>
                 </div>
               </div>
 
-              {/* Footer */}
-              <div className="px-space-lg py-space-md bg-surface-container-low flex items-center justify-end gap-space-sm">
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
                 <button
-                  className="px-space-md py-2 rounded-lg font-body-sm text-body-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
                   disabled={submitting}
                   onClick={() => setIsModalOpen(false)}
                   type="button"
@@ -1030,11 +1028,11 @@ const Auxiliares = () => {
                   Cancelar
                 </button>
                 <button
-                  className="px-space-md py-2 bg-secondary text-on-secondary rounded-lg font-body-sm text-body-sm font-semibold shadow-sm hover:bg-primary transition-colors disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2.5 bg-gradient-to-r from-[#C1121F] to-[#93000a] text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all disabled:opacity-50 cursor-pointer"
                   disabled={submitting}
                   type="submit"
                 >
-                  {submitting ? 'Guardando...' : 'Guardar Antecedente'}
+                  {submitting ? 'Guardando...' : 'Registrar Antecedente'}
                 </button>
               </div>
             </form>
@@ -1042,7 +1040,169 @@ const Auxiliares = () => {
         </div>
       )}
 
-      {/* Modal de Éxito con Animación Lordicon */}
+      {/* MODAL: EDITAR AUXILIAR */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 bg-black/60 backdrop-blur-md">
+          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-100px)] border border-[#c5a059]/40 animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
+            <div className="bg-gradient-to-r from-[#07162b] via-[#0B2545] to-[#15418c] text-white px-6 py-4 flex items-center justify-between border-b border-[#c5a059]/30 shrink-0">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-[#c5a059]">edit</span>
+                <span className="font-institutional-serif text-base font-bold">Editar Antecedente de Auxiliar</span>
+              </div>
+              <button
+                className="text-white/70 hover:text-white cursor-pointer"
+                onClick={() => !submitting && setIsEditModalOpen(false)}
+                type="button"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit}>
+              <div className="p-6 flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                    Nombre Completo del Auxiliar *
+                  </label>
+                  <input
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20"
+                    value={editFormData.nombre}
+                    onChange={(e) => setEditFormData({ ...editFormData, nombre: e.target.value })}
+                    required
+                    type="text"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                      Registro Universitario (RU)
+                    </label>
+                    <input
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20"
+                      value={editFormData.nro_registro}
+                      onChange={(e) => setEditFormData({ ...editFormData, nro_registro: e.target.value })}
+                      type="text"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                      Convocatoria de Origen
+                    </label>
+                    <input
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20"
+                      value={editFormData.nro_convocatoria}
+                      onChange={(e) => setEditFormData({ ...editFormData, nro_convocatoria: e.target.value })}
+                      type="text"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                      Materia / Cátedra Asignada *
+                    </label>
+                    <select
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20 cursor-pointer"
+                      value={editFormData.materia}
+                      onChange={(e) => setEditFormData({ ...editFormData, materia: e.target.value })}
+                      required
+                    >
+                      <option value="">-- Seleccionar asignatura --</option>
+                      {materiasDisponibles.map((m) => (
+                        <option key={m.nombre} value={m.nombre}>
+                          {m.codigo ? `[${m.codigo}] ` : ''}{m.nombre}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                      Semestre Académico *
+                    </label>
+                    <select
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20 cursor-pointer"
+                      value={editFormData.semestre}
+                      onChange={(e) => setEditFormData({ ...editFormData, semestre: e.target.value })}
+                    >
+                      <option value="1">Semestre I</option>
+                      <option value="2">Semestre II</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                      Nota de Examen (1-100)
+                    </label>
+                    <input
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20"
+                      placeholder="Ej. 92"
+                      max="100"
+                      min="51"
+                      step="0.1"
+                      value={editFormData.nota_examen}
+                      onChange={(e) => setEditFormData({ ...editFormData, nota_examen: e.target.value })}
+                      type="number"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
+                      Estado de Acreditación
+                    </label>
+                    <select
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20 cursor-pointer"
+                      value={editFormData.estado}
+                      onChange={(e) => setEditFormData({ ...editFormData, estado: e.target.value })}
+                    >
+                      <option value="aprobado">Aprobado / Designado</option>
+                      <option value="pendiente">En Proceso / Pendiente</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                  <input
+                    type="checkbox"
+                    id="edit_es_ratificacion"
+                    checked={editFormData.es_ratificacion}
+                    onChange={(e) => setEditFormData({ ...editFormData, es_ratificacion: e.target.checked })}
+                    className="w-4 h-4 text-[#0B2545] rounded cursor-pointer"
+                  />
+                  <label htmlFor="edit_es_ratificacion" className="text-xs text-slate-700 font-semibold cursor-pointer">
+                    Es ratificación reglamentaria del semestre anterior
+                  </label>
+                </div>
+              </div>
+
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-end gap-3">
+                <button
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-200 transition-colors cursor-pointer"
+                  disabled={submitting}
+                  onClick={() => setIsEditModalOpen(false)}
+                  type="button"
+                >
+                  Cancelar
+                </button>
+                <button
+                  className="px-5 py-2.5 bg-gradient-to-r from-[#0B2545] to-[#15418c] text-white rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all disabled:opacity-50 cursor-pointer"
+                  disabled={submitting}
+                  type="submit"
+                >
+                  {submitting ? 'Actualizando...' : 'Guardar Cambios'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Éxito con Animación */}
       <SuccessModal
         isOpen={!!successModalData}
         onClose={() => setSuccessModalData(null)}

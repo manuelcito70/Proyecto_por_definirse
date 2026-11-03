@@ -38,3 +38,6 @@ test.pdf
 test.docx
 reproduce_issue.js
 test_no_verification.js
+
+# ===== DATABASE DUMPS =====
+*.dump

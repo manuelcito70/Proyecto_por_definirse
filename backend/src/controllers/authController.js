@@ -1,69 +1,141 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { Op } = require('sequelize');
+const { Usuario, Rol, Carrera } = require('../models');
+const { SECRET_KEY } = require('../middleware/auth');
 
 const login = async (req, res) => {
-  const { username, password } = req.body;
-  if (!username || !password) {
-    return res.status(400).json({ mensaje: 'Usuario y contraseña son requeridos' });
+  const { email, username, password } = req.body;
+  const identifier = (email || username || '').trim();
+
+  if (!identifier || !password) {
+    return res.status(400).json({ mensaje: 'Correo electrónico y contraseña son requeridos' });
   }
+
   try {
-    const user = await User.findOne({ where: { username } });
-    if (!user) return res.status(401).json({ mensaje: 'Credenciales incorrectas' });
+    // Buscar por email exacto o por prefijo de usuario (ej. 'directora' -> 'directora@uagrm.edu.bo')
+    const user = await Usuario.findOne({
+      where: {
+        [Op.or]: [
+          { email: { [Op.iLike]: identifier } },
+          { email: { [Op.iLike]: `${identifier}@%` } }
+        ]
+      },
+      include: [
+        { model: Rol, as: 'rol' },
+        { model: Carrera, as: 'carrera' }
+      ]
+    });
+
+    if (!user) {
+      return res.status(401).json({ mensaje: 'Credenciales incorrectas' });
+    }
+
+    if (!user.activo) {
+      return res.status(401).json({ mensaje: 'Usuario inactivo. Contacte al administrador.' });
+    }
 
     const valid = await user.verificarPassword(password);
-    if (!valid) return res.status(401).json({ mensaje: 'Credenciales incorrectas' });
+    if (!valid) {
+      return res.status(401).json({ mensaje: 'Credenciales incorrectas' });
+    }
 
-    const token = jwt.sign(
-      { id: user.id, username: user.username },
-      process.env.SECRET_KEY || 'secretkey',
-      { expiresIn: '12h' }
-    );
+    // Actualizar fecha de último acceso
+    await user.update({ ultimo_acceso: new Date() });
+
+    const roleName = user.rol?.nombre || 'usuario';
+    const payload = {
+      id: user.id_usuario,
+      email: user.email,
+      rol: roleName,
+      id_carrera: user.id_carrera
+    };
+
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '12h' });
 
     return res.json({
       token,
       user: {
-        id: user.id,
-        username: user.username,
+        id: user.id_usuario,
+        email: user.email,
+        username: user.email.split('@')[0], // Retrocompatibilidad para vistas que muestren username
         nombre: user.nombre,
-        cargo: user.cargo
+        rol: roleName,
+        cargo: roleName, // Retrocompatibilidad con UI previa que leía user.cargo
+        carrera: user.carrera?.nombre || 'Ingeniería de Sistemas',
+        id_carrera: user.id_carrera
       }
     });
   } catch (err) {
     console.error('Login error:', err);
-    return res.status(500).json({ mensaje: 'Error del servidor' });
+    return res.status(500).json({ mensaje: 'Error del servidor al procesar inicio de sesión' });
   }
 };
 
 const register = async (req, res) => {
-  const { username, password, nombre, cargo } = req.body;
-  if (!username || !password || !nombre) {
-    return res.status(400).json({ mensaje: 'Usuario, contraseña y nombre son requeridos' });
-  }
-  try {
-    const existe = await User.findOne({ where: { username } });
-    if (existe) return res.status(400).json({ mensaje: 'El nombre de usuario ya está en uso' });
+  const { email, username, password, nombre, rol, id_rol, id_carrera } = req.body;
+  const finalEmail = (email || (username ? (username.includes('@') ? username : `${username}@uagrm.edu.bo`) : '')).trim();
 
-    const user = await User.create({
-      username,
-      password_hash: password,
-      nombre,
-      cargo: cargo || 'Directora'
+  if (!finalEmail || !password || !nombre) {
+    return res.status(400).json({ mensaje: 'Correo electrónico, contraseña y nombre son requeridos' });
+  }
+
+  try {
+    const existe = await Usuario.findOne({ where: { email: { [Op.iLike]: finalEmail } } });
+    if (existe) {
+      return res.status(400).json({ mensaje: 'El correo electrónico ya está registrado' });
+    }
+
+    // Resolver rol
+    let resolvedRolId = id_rol;
+    if (!resolvedRolId) {
+      const targetRol = (rol || 'director').toLowerCase();
+      const rolRecord = await Rol.findOne({ where: { nombre: targetRol } }) 
+                     || await Rol.findOne({ where: { nombre: 'director' } });
+      resolvedRolId = rolRecord ? rolRecord.id_rol : null;
+    }
+
+    // Resolver carrera
+    let resolvedCarreraId = id_carrera;
+    if (!resolvedCarreraId) {
+      const carreraRecord = await Carrera.findOne({ where: { nombre: 'Ingeniería de Sistemas' } })
+                         || await Carrera.findOne();
+      resolvedCarreraId = carreraRecord ? carreraRecord.id_carrera : null;
+    }
+
+    if (!resolvedRolId || !resolvedCarreraId) {
+      return res.status(500).json({ mensaje: 'No se pudo asignar rol o carrera predeterminada' });
+    }
+
+    const newUser = await Usuario.create({
+      email: finalEmail,
+      password_hash: password, // El hook beforeCreate aplica bcrypt.hash
+      nombre: nombre.trim(),
+      id_rol: resolvedRolId,
+      id_carrera: resolvedCarreraId,
+      activo: true
     });
 
-    const token = jwt.sign(
-      { id: user.id, username: user.username },
-      process.env.SECRET_KEY || 'secretkey',
-      { expiresIn: '12h' }
-    );
+    const createdWithRels = await Usuario.findByPk(newUser.id_usuario, {
+      include: [
+        { model: Rol, as: 'rol' },
+        { model: Carrera, as: 'carrera' }
+      ]
+    });
 
     return res.status(201).json({
-      token,
-      user: { id: user.id, username: user.username, nombre: user.nombre, cargo: user.cargo },
-      mensaje: 'Usuario registrado exitosamente'
+      mensaje: 'Usuario registrado exitosamente',
+      user: {
+        id: createdWithRels.id_usuario,
+        email: createdWithRels.email,
+        username: createdWithRels.email.split('@')[0],
+        nombre: createdWithRels.nombre,
+        rol: createdWithRels.rol?.nombre,
+        carrera: createdWithRels.carrera?.nombre
+      }
     });
   } catch (err) {
     console.error('Register error:', err);
-    return res.status(500).json({ mensaje: 'Error del servidor' });
+    return res.status(500).json({ mensaje: 'Error del servidor al registrar usuario' });
   }
 };
 

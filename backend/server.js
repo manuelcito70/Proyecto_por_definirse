@@ -6,6 +6,7 @@ const fs = require('fs');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { sequelize } = require('./src/models');
+const { iniciarCronAlertas } = require('./src/utils/mailer');
 
 const app = express();
 
@@ -52,6 +53,9 @@ app.use('/api/recibidos', require('./src/routes/recibidosRoutes'));
 app.use('/api/actas', require('./src/routes/actasRoutes'));
 app.use('/api/auxiliares', require('./src/routes/auxiliaresRoutes'));
 app.use('/api/docentes', require('./src/routes/docentesRoutes'));
+app.use('/api/materias', require('./src/routes/materiasRoutes'));
+app.use('/api/convocatorias', require('./src/routes/convocatoriasRoutes'));
+app.use('/api/notificaciones', require('./src/routes/notificacionesRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', sistema: 'SIGAD - Dirección de Carrera FINI' }));
@@ -62,6 +66,7 @@ const alterDatabase = process.env.NODE_ENV !== 'production';
 sequelize.sync({ alter: alterDatabase })
   .then(() => {
     console.log(`✅ Base de datos sincronizada (alter: ${alterDatabase})`);
+    iniciarCronAlertas();
     app.listen(PORT, () => {
       console.log(`🚀 Servidor SIGAD corriendo en http://localhost:${PORT}`);
     });

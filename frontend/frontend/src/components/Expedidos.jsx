@@ -20,6 +20,7 @@ const Expedidos = () => {
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState('');
   const [filterEstado, setFilterEstado] = useState('all');
+  const [filterCategoria, setFilterCategoria] = useState('all');
   const [successModalData, setSuccessModalData] = useState(null);
 
   // Pagination
@@ -34,6 +35,7 @@ const Expedidos = () => {
     destinatario: '',
     asunto: '',
     descripcion: '',
+    categoria: 'otro',
     fecha: new Date().toISOString().split('T')[0],
     estado: 'completado',
     archivo: null
@@ -46,7 +48,8 @@ const Expedidos = () => {
         getExpedidos({
           gestion,
           busqueda: busqueda || undefined,
-          estado: filterEstado !== 'all' ? filterEstado : undefined
+          estado: filterEstado !== 'all' ? filterEstado : undefined,
+          categoria: filterCategoria !== 'all' ? filterCategoria : undefined
         }),
         getNextExpedidoNumber(gestion)
       ]);
@@ -63,7 +66,7 @@ const Expedidos = () => {
   useEffect(() => {
     fetchData();
     setCurrentPage(1);
-  }, [gestion, filterEstado]);
+  }, [gestion, filterEstado, filterCategoria]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -76,6 +79,7 @@ const Expedidos = () => {
       destinatario: '',
       asunto: '',
       descripcion: '',
+      categoria: 'otro',
       fecha: new Date().toISOString().split('T')[0],
       estado: 'completado',
       archivo: null
@@ -89,6 +93,7 @@ const Expedidos = () => {
       destinatario: doc.destinatario || '',
       asunto: doc.asunto || '',
       descripcion: doc.descripcion || '',
+      categoria: doc.categoria || 'otro',
       fecha: doc.fecha || new Date().toISOString().split('T')[0],
       estado: doc.estado || 'completado',
       nro_oficio: doc.nro_oficio,
@@ -111,6 +116,7 @@ const Expedidos = () => {
           destinatario: formData.destinatario,
           asunto: formData.asunto,
           descripcion: formData.descripcion,
+          categoria: formData.categoria,
           fecha: formData.fecha,
           estado: formData.estado
         });
@@ -124,6 +130,7 @@ const Expedidos = () => {
         data.append('destinatario', formData.destinatario);
         data.append('asunto', formData.asunto);
         data.append('descripcion', formData.descripcion || '');
+        data.append('categoria', formData.categoria || 'otro');
         data.append('fecha', formData.fecha);
         data.append('estado', formData.estado);
         data.append('gestion', gestion);
@@ -143,6 +150,24 @@ const Expedidos = () => {
       alert('Error al guardar oficio: ' + err.message);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleArchivar = async (doc) => {
+    try {
+      await updateExpedido(doc.id, { estado: 'archivado' });
+      fetchData();
+    } catch (err) {
+      alert('Error al archivar oficio: ' + err.message);
+    }
+  };
+
+  const handleDesarchivar = async (doc) => {
+    try {
+      await updateExpedido(doc.id, { estado: 'completado' });
+      fetchData();
+    } catch (err) {
+      alert('Error al desarchivar oficio: ' + err.message);
     }
   };
 
@@ -177,6 +202,13 @@ const Expedidos = () => {
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-900 border border-amber-200">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
             En curso
+          </span>
+        );
+      case 'archivado':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300">
+            <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+            Archivado
           </span>
         );
       case 'pendiente':
@@ -347,6 +379,25 @@ const Expedidos = () => {
               <div className="relative">
                 <select 
                   className="appearance-none bg-surface-container-low pl-3 pr-8 py-2.5 rounded-lg font-body-sm text-body-sm font-medium text-on-surface hover:bg-surface-container focus:outline-none focus:ring-2 focus:ring-[#0b2545]/20 cursor-pointer border border-slate-200/80"
+                  value={filterCategoria}
+                  onChange={(e) => setFilterCategoria(e.target.value)}
+                  title="Filtrar por categoría"
+                >
+                  <option value="all">Todas las categorías</option>
+                  <option value="carta">Carta</option>
+                  <option value="solicitud">Solicitud</option>
+                  <option value="informe">Informe</option>
+                  <option value="memorandum">Memorándum</option>
+                  <option value="otro">Otro</option>
+                </select>
+                <span className="material-symbols-outlined pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-on-surface-variant">
+                  category
+                </span>
+              </div>
+
+              <div className="relative">
+                <select 
+                  className="appearance-none bg-surface-container-low pl-3 pr-8 py-2.5 rounded-lg font-body-sm text-body-sm font-medium text-on-surface hover:bg-surface-container focus:outline-none focus:ring-2 focus:ring-[#0b2545]/20 cursor-pointer border border-slate-200/80"
                   value={filterEstado}
                   onChange={(e) => setFilterEstado(e.target.value)}
                 >
@@ -354,6 +405,7 @@ const Expedidos = () => {
                   <option value="completado">Completado</option>
                   <option value="en_curso">En curso</option>
                   <option value="pendiente">Pendiente</option>
+                  <option value="archivado">Archivado</option>
                 </select>
                 <span className="material-symbols-outlined pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-sm text-on-surface-variant">
                   filter_list
@@ -379,6 +431,7 @@ const Expedidos = () => {
                 <th className="py-3 px-space-md font-bold">N.° de Oficio</th>
                 <th className="py-3 px-space-sm font-bold">Gestión</th>
                 <th className="py-3 px-space-sm font-bold">Fecha</th>
+                <th className="py-3 px-space-sm font-bold">Categoría</th>
                 <th className="py-3 px-space-md font-bold min-w-[280px]">Asunto</th>
                 <th className="py-3 px-space-md font-bold">Destinatario</th>
                 <th className="py-3 px-space-sm font-bold">Estado</th>
@@ -389,13 +442,13 @@ const Expedidos = () => {
             <tbody className="divide-y divide-slate-100 text-on-surface font-body-sm text-body-sm">
               {loading ? (
                 <tr>
-                  <td colSpan="8" className="py-6 px-4">
+                  <td colSpan="9" className="py-6 px-4">
                     <LoadingState message={`Sincronizando oficios expedidos (${gestion})...`} />
                   </td>
                 </tr>
               ) : currentExpedidos.length === 0 ? (
                 <tr>
-                  <td colSpan="8" className="py-6 px-4">
+                  <td colSpan="9" className="py-6 px-4">
                     <EmptyState
                       title={`No se encontraron oficios expedidos en ${gestion}`}
                       message={busqueda ? `No hay oficios que coincidan con la búsqueda "${busqueda}".` : "No existen oficios registrados para la gestión seleccionada."}
@@ -426,6 +479,11 @@ const Expedidos = () => {
                     </td>
                     <td className="py-3.5 px-space-sm font-mono text-xs text-on-surface-variant">
                       {doc.fecha}
+                    </td>
+                    <td className="py-3.5 px-space-sm whitespace-nowrap">
+                      <span className="font-label-code text-[11px] font-bold uppercase px-2 py-0.5 rounded border border-slate-200 bg-surface-container-high text-[#0b2545]">
+                        {doc.categoria || 'otro'}
+                      </span>
                     </td>
                     <td className="py-3.5 px-space-md">
                       <div className="flex flex-col">
@@ -462,6 +520,26 @@ const Expedidos = () => {
                     </td>
                     <td className="py-3.5 px-space-md text-center">
                       <div className="inline-flex items-center justify-center gap-1">
+                        {doc.estado === 'completado' && (
+                          <button
+                            onClick={() => handleArchivar(doc)}
+                            className="p-1.5 rounded-md text-slate-600 hover:bg-surface-container hover:text-[#0b2545] transition-colors cursor-pointer"
+                            title="Archivar oficio en resguardo"
+                            type="button"
+                          >
+                            <span className="material-symbols-outlined text-base">archive</span>
+                          </button>
+                        )}
+                        {doc.estado === 'archivado' && (
+                          <button
+                            onClick={() => handleDesarchivar(doc)}
+                            className="p-1.5 rounded-md text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer"
+                            title="Desarchivar (volver a completado)"
+                            type="button"
+                          >
+                            <span className="material-symbols-outlined text-base">unarchive</span>
+                          </button>
+                        )}
                         <button 
                           onClick={() => handleOpenEditModal(doc)}
                           className="p-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-[#c1121f] transition-colors cursor-pointer" 
@@ -701,29 +779,35 @@ const Expedidos = () => {
                   </div>
                 </div>
 
-                {/* Row: Two columns for Date & Status */}
+                {/* Row: Category selector */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {/* Date Picker Element */}
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="fecha-input">
-                      Fecha de Emisión <span className="text-[#c1121f]">*</span>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="categoria-select">
+                      Categoría del Oficio <span className="text-[#c1121f]">*</span>
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#0b2545]">
-                        <span className="material-symbols-outlined text-lg">calendar_today</span>
+                        <span className="material-symbols-outlined text-lg">folder_open</span>
                       </div>
-                      <input 
-                        className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none" 
-                        id="fecha-input" 
-                        type="date"
-                        value={formData.fecha}
-                        onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
+                      <select 
+                        className="w-full pl-10 pr-8 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none appearance-none cursor-pointer" 
+                        id="categoria-select"
+                        value={formData.categoria}
+                        onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
                         required
-                      />
+                      >
+                        <option value="carta">Carta</option>
+                        <option value="solicitud">Solicitud</option>
+                        <option value="informe">Informe</option>
+                        <option value="memorandum">Memorándum</option>
+                        <option value="otro">Otro</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
+                        <span className="material-symbols-outlined text-base">expand_more</span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Status Selector */}
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="estado-select">
                       Estado del Trámite <span className="text-[#c1121f]">*</span>
@@ -741,11 +825,32 @@ const Expedidos = () => {
                         <option value="completado">Completado (Listo para despacho)</option>
                         <option value="en_curso">En curso / Revisión preliminar</option>
                         <option value="pendiente">Pendiente de firma directiva</option>
+                        <option value="archivado">Archivado en resguardo</option>
                       </select>
                       <div className="absolute inset-y-0 right-0 pr-3.5 flex items-center pointer-events-none text-slate-400">
                         <span className="material-symbols-outlined text-base">expand_more</span>
                       </div>
                     </div>
+                  </div>
+                </div>
+
+                {/* Row: Date Picker */}
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5" htmlFor="fecha-input">
+                    Fecha de Emisión <span className="text-[#c1121f]">*</span>
+                  </label>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#0b2545]">
+                      <span className="material-symbols-outlined text-lg">calendar_today</span>
+                    </div>
+                    <input 
+                      className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none" 
+                      id="fecha-input" 
+                      type="date"
+                      value={formData.fecha}
+                      onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
+                      required
+                    />
                   </div>
                 </div>
 

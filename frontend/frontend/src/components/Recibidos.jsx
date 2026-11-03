@@ -19,6 +19,8 @@ const Recibidos = () => {
   const [recibidos, setRecibidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState('');
+  const [filterEstado, setFilterEstado] = useState('all');
+  const [filterCategoria, setFilterCategoria] = useState('all');
   const [successModalData, setSuccessModalData] = useState(null);
   
   // Pagination
@@ -99,6 +101,7 @@ const Recibidos = () => {
     oficio_original: '',
     asunto: '',
     fecha: new Date().toISOString().split('T')[0],
+    categoria: 'otro',
     tipo_atencion: 'Requiere respuesta',
     archivo: null
   });
@@ -108,7 +111,9 @@ const Recibidos = () => {
       setLoading(true);
       const list = await getRecibidos({
         gestion,
-        busqueda: busqueda || undefined
+        busqueda: busqueda || undefined,
+        estado: filterEstado !== 'all' ? filterEstado : undefined,
+        categoria: filterCategoria !== 'all' ? filterCategoria : undefined
       });
       const safeList = Array.isArray(list) ? list : [];
       setRecibidos(safeList);
@@ -123,7 +128,7 @@ const Recibidos = () => {
   useEffect(() => {
     fetchData();
     setCurrentPage(1);
-  }, [gestion]);
+  }, [gestion, filterEstado, filterCategoria]);
 
   // Toast helper
   const showToast = (title, desc) => {
@@ -145,6 +150,7 @@ const Recibidos = () => {
       const data = new FormData();
       data.append('remitente', formData.remitente);
       data.append('asunto', formData.asunto);
+      data.append('categoria', formData.categoria || 'otro');
       data.append('descripcion', formData.oficio_original ? `Oficio original: ${formData.oficio_original}` : '');
       data.append('fecha', formData.fecha);
       data.append('estado', formData.tipo_atencion.includes('Requiere') ? 'pendiente' : 'completado');
@@ -160,6 +166,7 @@ const Recibidos = () => {
         remitente: '',
         oficio_original: '',
         asunto: '',
+        categoria: 'otro',
         fecha: new Date().toISOString().split('T')[0],
         tipo_atencion: 'Requiere respuesta',
         archivo: null
@@ -183,10 +190,39 @@ const Recibidos = () => {
     }
   };
 
+    const handleArchivar = async (doc) => {
+    try {
+      await updateRecibido(doc.id, { estado: 'archivado' });
+      showToast(
+        'Documento archivado',
+        `El recibido #${String(doc.nro_recibido).padStart(2, '0')} se movió a custodia archivada.`
+      );
+      fetchData();
+    } catch (err) {
+      alert('Error al archivar documento: ' + err.message);
+    }
+  };
+
+  const handleDesarchivar = async (doc) => {
+    try {
+      await updateRecibido(doc.id, { estado: 'completado' });
+      showToast(
+        'Documento reactivado',
+        `El recibido #${String(doc.nro_recibido).padStart(2, '0')} volvió al estado COMPLETADO.`
+      );
+      fetchData();
+    } catch (err) {
+      alert('Error al desarchivar documento: ' + err.message);
+    }
+  };
+
   const handleToggleEstado = async (doc) => {
     const nuevoEstado = doc.estado === 'completado' ? 'pendiente' : 'completado';
     try {
-      await updateRecibido(doc.id, { estado: nuevoEstado });
+      await updateRecibido(doc.id, {
+        estado: nuevoEstado,
+        tipo_respuesta: nuevoEstado === 'pendiente' ? 'requiere_respuesta' : 'para_conocimiento'
+      });
       showToast(
         'Estado actualizado',
         `El documento #${String(doc.nro_recibido).padStart(2, '0')} ahora está ${nuevoEstado.toUpperCase()}.`
@@ -394,18 +430,43 @@ const Recibidos = () => {
             </span>
           </div>
 
-          <div className="flex items-center gap-space-sm w-full sm:w-auto">
-            <div className="relative w-full sm:w-72">
+          <div className="flex flex-wrap items-center gap-space-xs w-full sm:w-auto">
+            <div className="relative w-full sm:w-56">
               <input 
                 className="w-full bg-surface-container-low text-on-surface placeholder:text-on-surface-variant font-body-sm text-body-sm pl-9 pr-3 py-1.5 rounded-lg focus:outline-none focus:bg-surface-container-lowest border border-slate-200 shadow-2xs" 
                 id="filtro-recibidos" 
-                placeholder="Filtrar por oficio, remitente..." 
+                placeholder="Filtrar..." 
                 type="text"
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
               />
               <span className="material-symbols-outlined absolute left-2.5 top-2 text-on-surface-variant text-base">search</span>
             </div>
+            <select
+              className="bg-surface-container-low text-on-surface font-body-sm text-body-sm px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs focus:outline-none cursor-pointer"
+              value={filterCategoria}
+              onChange={(e) => setFilterCategoria(e.target.value)}
+              title="Filtrar por categoría"
+            >
+              <option value="all">Categorías (Todas)</option>
+              <option value="carta">Carta</option>
+              <option value="solicitud">Solicitud</option>
+              <option value="informe">Informe</option>
+              <option value="memorandum">Memorándum</option>
+              <option value="otro">Otro</option>
+            </select>
+            <select
+              className="bg-surface-container-low text-on-surface font-body-sm text-body-sm px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs focus:outline-none cursor-pointer"
+              value={filterEstado}
+              onChange={(e) => setFilterEstado(e.target.value)}
+              title="Filtrar por estado"
+            >
+              <option value="all">Estados (Todos)</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="en_curso">En curso</option>
+              <option value="completado">Completado</option>
+              <option value="archivado">Archivado</option>
+            </select>
             <button
               onClick={fetchData}
               className="p-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant border border-slate-200 cursor-pointer"
@@ -423,6 +484,7 @@ const Recibidos = () => {
               <tr>
                 <th className="py-3.5 px-space-lg font-bold text-[#0b2545]">N.° Interno</th>
                 <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Fecha recepción</th>
+                <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Categoría</th>
                 <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Remitente / Oficio original</th>
                 <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Asunto / Referencia documental</th>
                 <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Estado</th>
@@ -432,13 +494,13 @@ const Recibidos = () => {
             <tbody className="divide-y divide-slate-100 font-body-sm text-body-sm text-on-surface">
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="py-6 px-4">
+                  <td colSpan="7" className="py-6 px-4">
                     <LoadingState message={`Sincronizando correspondencia recibida (${gestion})...`} />
                   </td>
                 </tr>
               ) : currentRecibidos.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="py-6 px-4">
+                  <td colSpan="7" className="py-6 px-4">
                     <EmptyState
                       title={`No se encontraron documentos en ${gestion}`}
                       message={busqueda ? `No hay documentos que coincidan con la búsqueda "${busqueda}".` : "No existen registros de correspondencia externa para esta gestión."}
@@ -474,6 +536,12 @@ const Recibidos = () => {
                         {doc.fecha}
                       </td>
 
+                      <td className="py-4 px-space-md whitespace-nowrap">
+                        <span className="font-label-code text-[11px] font-bold uppercase px-2 py-0.5 rounded border border-slate-200 bg-surface-container-high text-[#0b2545]">
+                          {doc.categoria || 'otro'}
+                        </span>
+                      </td>
+
                       <td className="py-4 px-space-md">
                         <div className="font-semibold text-[#0b2545]">{doc.remitente}</div>
                         {doc.descripcion && (
@@ -504,6 +572,10 @@ const Recibidos = () => {
                         ) : doc.estado === 'en_curso' ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-label-badge text-caption font-bold bg-amber-50 text-amber-800 border border-amber-200">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span> EN CURSO
+                          </span>
+                        ) : doc.estado === 'archivado' ? (
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-label-badge text-caption font-bold bg-slate-100 text-slate-700 border border-slate-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span> ARCHIVADO
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-label-badge text-caption font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
@@ -547,6 +619,27 @@ const Recibidos = () => {
                               {esPendiente ? 'check_circle' : 'replay'}
                             </span>
                           </button>
+
+                          {doc.estado === 'completado' && (
+                            <button
+                              className="p-1.5 rounded-lg text-slate-600 hover:text-[#0b2545] hover:bg-surface-container-high transition-colors cursor-pointer"
+                              onClick={() => handleArchivar(doc)}
+                              title="Archivar documento en resguardo"
+                              type="button"
+                            >
+                              <span className="material-symbols-outlined text-lg">archive</span>
+                            </button>
+                          )}
+                          {doc.estado === 'archivado' && (
+                            <button
+                              className="p-1.5 rounded-lg text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 transition-colors cursor-pointer"
+                              onClick={() => handleDesarchivar(doc)}
+                              title="Desarchivar (volver a completado)"
+                              type="button"
+                            >
+                              <span className="material-symbols-outlined text-lg">unarchive</span>
+                            </button>
+                          )}
 
                           <button 
                             className="p-1.5 rounded-lg text-on-surface-variant hover:text-[#c1121f] hover:bg-surface-container-high transition-colors cursor-pointer"
@@ -685,8 +778,32 @@ const Recibidos = () => {
           </div>
 
           <div className="md:col-span-6 flex flex-col gap-1.5">
+            <label className="font-body-sm text-body-sm font-semibold text-[#0b2545] flex items-center gap-1" htmlFor="categoria-recibido">
+              <span>Categoría documental</span>
+              <span className="text-[#c1121f]">*</span>
+            </label>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-lg">folder_open</span>
+              <select 
+                className="w-full bg-surface-container-low text-on-surface font-body-md text-body-md pl-10 pr-3 py-2 rounded-lg focus:outline-none focus:bg-surface-container-lowest border border-slate-200 shadow-2xs appearance-none cursor-pointer" 
+                id="categoria-recibido" 
+                required
+                value={formData.categoria}
+                onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
+              >
+                <option value="carta">Carta</option>
+                <option value="solicitud">Solicitud</option>
+                <option value="informe">Informe</option>
+                <option value="memorandum">Memorándum</option>
+                <option value="otro">Otro</option>
+              </select>
+              <span className="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant pointer-events-none text-lg">expand_more</span>
+            </div>
+          </div>
+
+          <div className="md:col-span-6 flex flex-col gap-1.5">
             <label className="font-body-sm text-body-sm font-semibold text-[#0b2545] flex items-center gap-1" htmlFor="tipo-atencion">
-              <span>Tipo de atención</span>
+              <span>Tipo de atención (Estado inicial)</span>
               <span className="text-[#c1121f]">*</span>
             </label>
             <div className="relative">
@@ -698,8 +815,8 @@ const Recibidos = () => {
                 value={formData.tipo_atencion}
                 onChange={(e) => setFormData({ ...formData, tipo_atencion: e.target.value })}
               >
-                <option value="Requiere respuesta">Requiere respuesta (En trámite)</option>
-                <option value="Solo conocimiento">Solo conocimiento (Para archivo institucional)</option>
+                <option value="Requiere respuesta">Requiere respuesta (Estado: PENDIENTE — Notifica por correo)</option>
+                <option value="Solo conocimiento">Solo conocimiento (Estado: COMPLETADO — Archivo institucional)</option>
               </select>
               <span className="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant pointer-events-none text-lg">expand_more</span>
             </div>

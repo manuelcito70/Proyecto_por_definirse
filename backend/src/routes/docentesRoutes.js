@@ -23,6 +23,7 @@ router.use(verifyToken);
 router.get('/', ctrl.getAll);
 router.post('/', ctrl.create);
 router.put('/:id', ctrl.update);
+router.delete('/:id', ctrl.remove);
 router.get('/:id/archivos', ctrl.getArchivos);
 router.post('/:id/archivos', upload.single('archivo'), ctrl.uploadArchivo);
 router.get('/:id/archivos/:archivoId/download', ctrl.downloadArchivo);

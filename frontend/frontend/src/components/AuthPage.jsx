@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { login } from '../services/auth';
 import './AuthPage.css';
 
 function AuthPage({ onLoginSuccess }) {
@@ -6,7 +7,7 @@ function AuthPage({ onLoginSuccess }) {
   const [isLoading, setIsLoading] = useState(false);
 
   const [loginData, setLoginData] = useState({
-    username: '',
+    email: '',
     password: ''
   });
 
@@ -33,22 +34,14 @@ function AuthPage({ onLoginSuccess }) {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (!loginData.username || !loginData.password) {
+    if (!loginData.email || !loginData.password) {
       alert('Por favor completa todos los campos');
       return;
     }
 
     try {
       setIsLoading(true);
-      const response = await fetch('http://localhost:3000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginData),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.mensaje || 'Error al iniciar sesión');
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      const data = await login(loginData.email, loginData.password);
       onLoginSuccess(data.user);
     } catch (error) {
       console.error(error);
@@ -176,11 +169,11 @@ function AuthPage({ onLoginSuccess }) {
             </div>
 
             <div style={{ background: '#f0fdf4', padding: '10px', borderRadius: '6px', fontSize: '0.8rem', color: '#166534', border: '1px solid #bbf7d0', textAlign: 'center', marginBottom: '14px' }}>
-              🔑 Acceso de Prueba: Usuario <strong>directora</strong> · Contraseña <strong>1234</strong>
+              🔑 Acceso de Prueba: Correo <strong>directora@uagrm.edu.bo</strong> · Contraseña <strong>1234</strong>
             </div>
 
             <div className="input-group">
-              <label>Usuario</label>
+              <label>Correo Electrónico</label>
               <div className="input-with-icon">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
@@ -188,9 +181,9 @@ function AuthPage({ onLoginSuccess }) {
                 </svg>
                 <input
                   type="text"
-                  name="username"
-                  placeholder="Ej: directora"
-                  value={loginData.username}
+                  name="email"
+                  placeholder="Ej: directora@uagrm.edu.bo"
+                  value={loginData.email}
                   onChange={handleLoginChange}
                   required
                 />

@@ -44,7 +44,7 @@ export const createExpedido = async (formData) => {
 export const updateExpedido = async (id, data) => {
   const res = await fetchWithAuth(`/expedidos/${id}`, {
     method: 'PUT',
-    body: JSON.stringify(data)
+    body: (data instanceof FormData ? data : JSON.stringify(data))
   });
   if (!res.ok) throw new Error('Error al actualizar oficio expedido');
   return res.json();
@@ -82,7 +82,7 @@ export const createRecibido = async (formData) => {
 export const updateRecibido = async (id, data) => {
   const res = await fetchWithAuth(`/recibidos/${id}`, {
     method: 'PUT',
-    body: JSON.stringify(data)
+    body: (data instanceof FormData ? data : JSON.stringify(data))
   });
   if (!res.ok) throw new Error('Error al actualizar documento recibido');
   return res.json();
@@ -120,7 +120,7 @@ export const createActa = async (formData) => {
 export const updateActa = async (id, data) => {
   const res = await fetchWithAuth(`/actas/${id}`, {
     method: 'PUT',
-    body: JSON.stringify(data)
+    body: (data instanceof FormData ? data : JSON.stringify(data))
   });
   if (!res.ok) throw new Error('Error al actualizar acta');
   return res.json();
@@ -146,7 +146,7 @@ export const getAuxiliares = async (params = {}) => {
 export const createAuxiliar = async (data) => {
   const res = await fetchWithAuth('/auxiliares', {
     method: 'POST',
-    body: JSON.stringify(data)
+    body: (data instanceof FormData ? data : JSON.stringify(data))
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -158,7 +158,7 @@ export const createAuxiliar = async (data) => {
 export const updateAuxiliar = async (id, data) => {
   const res = await fetchWithAuth(`/auxiliares/${id}`, {
     method: 'PUT',
-    body: JSON.stringify(data)
+    body: (data instanceof FormData ? data : JSON.stringify(data))
   });
   if (!res.ok) throw new Error('Error al actualizar auxiliar');
   return res.json();
@@ -184,11 +184,34 @@ export const getDocentes = async (params = {}) => {
 export const createDocente = async (data) => {
   const res = await fetchWithAuth('/docentes', {
     method: 'POST',
-    body: JSON.stringify(data)
+    body: (data instanceof FormData ? data : JSON.stringify(data))
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.mensaje || 'Error al registrar docente');
+  }
+  return res.json();
+};
+
+export const updateDocente = async (id, data) => {
+  const res = await fetchWithAuth(`/docentes/${id}`, {
+    method: 'PUT',
+    body: (data instanceof FormData ? data : JSON.stringify(data))
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.mensaje || 'Error al actualizar docente');
+  }
+  return res.json();
+};
+
+export const deleteDocente = async (id) => {
+  const res = await fetchWithAuth(`/docentes/${id}`, {
+    method: 'DELETE'
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.mensaje || 'Error al eliminar docente');
   }
   return res.json();
 };
@@ -274,3 +297,28 @@ export const getDownloadUrl = (pathWithId) => {
   return `${API_BASE}${pathWithId}?token=${encodeURIComponent(token || '')}`;
 };
 
+// ============================================
+// MATERIAS Y CONVOCATORIAS
+// ============================================
+export const getMaterias = async (params = {}) => {
+  const res = await fetchWithAuth(`/materias${toQueryString(params)}`);
+  if (!res.ok) throw new Error('Error al obtener materias');
+  return res.json();
+};
+
+export const getConvocatorias = async (params = {}) => {
+  const res = await fetchWithAuth(`/convocatorias${toQueryString(params)}`);
+  if (!res.ok) throw new Error('Error al obtener convocatorias');
+  return res.json();
+};
+
+
+
+// ============================================
+// NOTIFICACIONES Y ALERTAS
+// ============================================
+export const getNotificaciones = async () => {
+  const res = await fetchWithAuth('/notificaciones');
+  if (!res.ok) throw new Error('Error al obtener notificaciones');
+  return res.json();
+};

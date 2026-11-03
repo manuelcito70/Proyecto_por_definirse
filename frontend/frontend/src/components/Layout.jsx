@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useGestion } from '../context/GestionContext';
 import { getRecibidos } from '../services/api';
 import TopNavDockTabs from './TopNavDockTabs';
+import NotificationBell from './NotificationBell';
 
 const Layout = ({ user, onLogout, children }) => {
   const { gestion, setGestion, currentSystemYear } = useGestion();

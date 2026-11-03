@@ -22,7 +22,7 @@ const upload = multer({ storage, limits: { fileSize: 20 * 1024 * 1024 } });
 router.use(verifyToken);
 router.get('/', ctrl.getAll);
 router.post('/', upload.single('archivo'), ctrl.create);
-router.put('/:id', ctrl.update);
+router.put('/:id', upload.single('archivo'), ctrl.update);
 router.get('/:id/download', ctrl.download);
 router.delete('/:id', ctrl.remove);
 

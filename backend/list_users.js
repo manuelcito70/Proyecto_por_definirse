@@ -1,55 +1,25 @@
-const { Sequelize, Op } = require('sequelize');
-const sequelize = require('./src/config/database');
-const User = require('./src/models/User');
+require('dotenv').config();
+const { sequelize, Usuario, Rol, Carrera } = require('./src/models');
 
 async function listUsers() {
-    try {
-        await sequelize.authenticate();
-        console.log('Conexión exitosa.');
+  try {
+    await sequelize.authenticate();
+    const users = await Usuario.findAll({
+      include: [
+        { model: Rol, as: 'rol' },
+        { model: Carrera, as: 'carrera' }
+      ]
+    });
 
-        const users = await User.findAll({
-            attributes: ['id', 'username', 'nombre', 'cargo'],
-        });
-
-        console.log(`Encontrados ${users.length} usuarios:`);
-        users.forEach(u => {
-            console.log(`- [${u.id}] ${u.username} (${u.nombre}) - Cargo: ${u.cargo}`);
-        });
-
-        // Prueba de búsqueda simulada
-        const query = 'Juan';
-        console.log(`\nProbando búsqueda con query="${query}"...`);
-
-        try {
-            const results = await User.findAll({
-                where: {
-                    [Op.or]: [
-                        { nombre: { [Op.iLike]: `%${query}%` } },
-                        { cargo: { [Op.iLike]: `%${query}%` } },
-                        { username: { [Op.iLike]: `%${query}%` } }
-                    ]
-                }
-            });
-            console.log(`Resultados de búsqueda: ${results.length}`);
-        } catch (searchError) {
-            console.error("Error en simulacion de búsqueda con iLike:", searchError.message);
-            // Intentar con like normal para ver si es problema de operador
-            console.log("Intentando con op.like...");
-            const resultsLike = await User.findAll({
-                where: {
-                    [Op.or]: [
-                        { nombre: { [Op.like]: `%${query}%` } },
-                    ]
-                }
-            });
-            console.log(`Resultados con Op.like: ${resultsLike.length}`);
-        }
-
-    } catch (error) {
-        console.error('Error:', error);
-    } finally {
-        await sequelize.close();
-    }
+    console.log(`\n📋 Encontrados ${users.length} usuarios registrados en SIGAD:`);
+    users.forEach(u => {
+      console.log(`- Email: ${u.email} | Nombre: ${u.nombre} | Rol: ${u.rol?.nombre} (${u.rol?.cargo}) | Activo: ${u.activo}`);
+    });
+  } catch (error) {
+    console.error('Error al listar usuarios:', error.message);
+  } finally {
+    await sequelize.close();
+  }
 }
 
 listUsers();

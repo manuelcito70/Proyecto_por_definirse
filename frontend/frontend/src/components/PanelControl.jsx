@@ -19,8 +19,13 @@ const PanelControl = () => {
 
   const [metrics, setMetrics] = useState({
     expedidos: 0,
+    expedidosPendientes: 0,
+    expedidosCompletados: 0,
+    expedidosArchivados: 0,
     recibidos: 0,
     recibidosPendientes: 0,
+    recibidosCompletados: 0,
+    recibidosArchivados: 0,
     actas: 0,
     auxiliares: 0,
     docentes: 0,
@@ -62,11 +67,22 @@ const PanelControl = () => {
         const nextOf = (nextOfRaw && typeof nextOfRaw === 'object') ? nextOfRaw : { next: 1 };
 
         const pendRec = recList.filter(r => r && r.estado === 'pendiente').length;
+        const compRec = recList.filter(r => r && r.estado === 'completado').length;
+        const archRec = recList.filter(r => r && r.estado === 'archivado').length;
+
+        const pendExp = expList.filter(e => e && e.estado === 'pendiente').length;
+        const compExp = expList.filter(e => e && e.estado === 'completado').length;
+        const archExp = expList.filter(e => e && e.estado === 'archivado').length;
 
         setMetrics({
           expedidos: expList.length,
+          expedidosPendientes: pendExp,
+          expedidosCompletados: compExp,
+          expedidosArchivados: archExp,
           recibidos: recList.length,
           recibidosPendientes: pendRec,
+          recibidosCompletados: compRec,
+          recibidosArchivados: archRec,
           actas: actList.length,
           auxiliares: auxList.length,
           docentes: docList.length,
@@ -87,8 +103,8 @@ const PanelControl = () => {
           ...recList.slice(0, 2).map(r => ({
             id: `rec-${r.id}`,
             tipo: 'recibido',
-            color: r.estado === 'pendiente' ? 'bg-amber-500' : 'bg-emerald-500',
-            ringColor: r.estado === 'pendiente' ? 'ring-amber-50' : 'ring-emerald-50',
+            color: r.estado === 'pendiente' ? 'bg-[#c1121f]' : r.estado === 'archivado' ? 'bg-slate-500' : 'bg-emerald-500',
+            ringColor: r.estado === 'pendiente' ? 'ring-red-50' : r.estado === 'archivado' ? 'ring-slate-100' : 'ring-emerald-50',
             titulo: `Recepción: Interno #${String(r.nro_recibido).padStart(2, '0')}`,
             desc: `${r.asunto} · ${r.remitente}`,
             fecha: r.fecha || 'Reciente'
@@ -251,7 +267,7 @@ const PanelControl = () => {
             onClick={() => navigate('/recibidos')}
             className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-amber-600 to-amber-700 text-white shadow-sm">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#c1121f] to-[#8b0000] text-white shadow-sm">
               <span className="material-symbols-outlined text-2xl">move_to_inbox</span>
             </div>
             <div>
@@ -264,7 +280,7 @@ const PanelControl = () => {
                 </span>
                 <span className={`font-label-code text-[11px] px-1.5 py-0.5 rounded font-bold border ${
                   metrics.recibidosPendientes > 0
-                    ? 'text-amber-800 bg-amber-50 border-amber-200'
+                    ? 'text-[#c1121f] bg-red-50 border-red-200'
                     : 'text-emerald-700 bg-emerald-50 border-emerald-200'
                 }`}>
                   {metrics.recibidosPendientes > 0 ? `${metrics.recibidosPendientes} Pendiente` : 'Al día'}
@@ -380,6 +396,22 @@ const PanelControl = () => {
                   <span className="font-label-code text-caption text-on-surface-variant font-semibold">/ GESTIÓN {gestion}</span>
                 </div>
               </div>
+
+              {/* Control de Grupos (Requisito Ing. Serrano) */}
+              <div className="grid grid-cols-3 gap-1.5 py-2 px-2.5 rounded-lg bg-surface-container-low/60 border border-slate-200/80 mb-space-sm font-label-code text-[11px]">
+                <div className="text-center p-1 rounded bg-red-50 border border-red-200 text-[#c1121f]">
+                  <span className="block font-bold text-sm leading-none">{metrics.expedidosPendientes}</span>
+                  <span className="text-[10px] uppercase font-bold">Pendientes</span>
+                </div>
+                <div className="text-center p-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-800">
+                  <span className="block font-bold text-sm leading-none">{metrics.expedidosCompletados}</span>
+                  <span className="text-[10px] uppercase font-bold">Emitidos</span>
+                </div>
+                <div className="text-center p-1 rounded bg-slate-100 border border-slate-300 text-slate-700">
+                  <span className="block font-bold text-sm leading-none">{metrics.expedidosArchivados}</span>
+                  <span className="text-[10px] uppercase font-bold">Archivados</span>
+                </div>
+              </div>
               <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
                 <strong className="text-on-surface font-semibold">{metrics.expedidos} oficios emitidos</strong> bajo consecutivo legal estricto. Registro inmutable de correspondencia oficial remitida.
               </p>
@@ -405,8 +437,8 @@ const PanelControl = () => {
 
           {/* CARD 2: DOCUMENTOS RECIBIDOS */}
           <div className="group relative flex flex-col justify-between rounded-xl bg-surface-container-lowest p-space-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-surface-container overflow-hidden">
-            <div className="absolute -top-12 -right-12 w-28 h-28 bg-gradient-to-bl from-amber-600 to-amber-700 transform rotate-45 pointer-events-none opacity-90"></div>
-            <div className="absolute -top-14 -right-14 w-32 h-32 border-2 border-amber-300/60 pointer-events-none transform rotate-45"></div>
+            <div className="absolute -top-12 -right-12 w-28 h-28 bg-gradient-to-bl from-[#c1121f] to-[#8b0000] transform rotate-45 pointer-events-none opacity-90"></div>
+            <div className="absolute -top-14 -right-14 w-32 h-32 border-2 border-[#c5a059]/40 pointer-events-none transform rotate-45"></div>
             
             <img 
               alt="Filigrana" 
@@ -414,7 +446,7 @@ const PanelControl = () => {
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQiMcjjl81LiDusLYwNzVCfvGUsQDoVqxd3cQizcnsxOLE2cNcLwZlo_sxrNeia2SKc7wB36KrWMwQFrViefGkYZ5-ElVlfe7tcybBODmWl3_0arfnQlUCPNaoNAl10CQABBGjadxs1kSCDJlmh8V4SvcRAvFXxC-P3C5BfG8GaZKT_UI53F6XmGGd1Arat8sB8EdSoh6T5SORw5csO55Rbmxk4OWByKhmIAkiT332pcGZAZzlHPEKDx3o-xjqhmfA"
             />
             
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 via-[#c5a059] to-[#0b2545]"></div>
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
 
             <div>
               <div className="flex items-start justify-between mb-space-md">
@@ -423,11 +455,11 @@ const PanelControl = () => {
                 </div>
                 <span className={`inline-flex items-center gap-1.5 rounded-full px-space-sm py-0.5 font-label-badge text-caption font-bold mr-6 border ${
                   metrics.recibidosPendientes > 0
-                    ? 'bg-amber-50 text-amber-900 border-amber-200'
+                    ? 'bg-red-50 text-red-700 border-red-200'
                     : 'bg-emerald-50 text-emerald-800 border-emerald-200'
                 }`}>
-                  <span className={`h-1.5 w-1.5 rounded-full ${metrics.recibidosPendientes > 0 ? 'bg-amber-600' : 'bg-emerald-600'}`}></span>
-                  {metrics.recibidosPendientes > 0 ? `${metrics.recibidosPendientes} Requiere Acción` : 'Al día'}
+                  <span className={`h-1.5 w-1.5 rounded-full ${metrics.recibidosPendientes > 0 ? 'bg-[#c1121f] animate-pulse' : 'bg-emerald-600'}`}></span>
+                  {metrics.recibidosPendientes > 0 ? `${metrics.recibidosPendientes} Pendientes` : 'Al día'}
                 </span>
               </div>
               <span className="font-caption text-caption uppercase tracking-wider text-amber-800 font-bold">Módulo 02</span>
@@ -443,8 +475,23 @@ const PanelControl = () => {
                   <span className="font-label-code text-caption text-on-surface-variant font-semibold">/ {gestion} FINI-REC</span>
                 </div>
               </div>
+              {/* Control de Grupos (Requisito Ing. Serrano) */}
+              <div className="grid grid-cols-3 gap-1.5 py-2 px-2.5 rounded-lg bg-surface-container-low/60 border border-slate-200/80 my-space-sm font-label-code text-[11px]">
+                <div className="text-center p-1 rounded bg-red-50 border border-red-200 text-[#c1121f]">
+                  <span className="block font-bold text-sm leading-none">{metrics.recibidosPendientes}</span>
+                  <span className="text-[10px] uppercase font-bold">Pendientes</span>
+                </div>
+                <div className="text-center p-1 rounded bg-emerald-50 border border-emerald-200 text-emerald-800">
+                  <span className="block font-bold text-sm leading-none">{metrics.recibidosCompletados}</span>
+                  <span className="text-[10px] uppercase font-bold">Respondidos</span>
+                </div>
+                <div className="text-center p-1 rounded bg-slate-100 border border-slate-300 text-slate-700">
+                  <span className="block font-bold text-sm leading-none">{metrics.recibidosArchivados}</span>
+                  <span className="text-[10px] uppercase font-bold">Archivados</span>
+                </div>
+              </div>
               <p className="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
-                <strong className="text-on-surface font-semibold">{metrics.recibidos} documentos archivados</strong>. Respaldo íntegro de escaneos y control de respuestas pendientes.
+                <strong className="text-on-surface font-semibold">{metrics.recibidos} registros en total</strong>. Control oficial de correspondencia institucional.
               </p>
             </div>
 

@@ -41,3 +41,6 @@ test_no_verification.js
 
 # ===== DATABASE DUMPS =====
 *.dump
+
+# ===== RESPALDOS DEL SCRIPT db:actualizar =====
+backend/respaldos/

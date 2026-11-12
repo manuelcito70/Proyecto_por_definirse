@@ -8,7 +8,8 @@
     "dev": "node --watch server.js",
     "db:setup": "node setup_database.js",
     "db:seed": "node seed_demo_data.js",
-    "users:list": "node list_users.js"
+    "users:list": "node list_users.js",
+    "db:actualizar": "node database/actualizar_bd_v4.js"
   },
   "keywords": [],
   "author": "",

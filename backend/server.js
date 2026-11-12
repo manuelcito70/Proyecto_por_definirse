@@ -63,7 +63,24 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', sistema: 'SIGAD - 
 const PORT = process.env.PORT || 3000;
 const alterDatabase = process.env.NODE_ENV !== 'production';
 
-sequelize.sync({ alter: alterDatabase })
+// Si la base todavía es de la versión antigua, sincronizar modificaría sus tablas viejas
+// (users, documents, roles...) y podría perder datos: hay que migrarla primero.
+const verificarBaseActualizada = async () => {
+  const [filas] = await sequelize.query(`
+    SELECT t.table_name AS nombre FROM information_schema.tables t
+    WHERE t.table_schema = 'public' AND t.table_name IN ('Expedidos', 'Users', 'gestiones')`);
+  const tablas = new Set(filas.map((f) => f.nombre));
+  if ((tablas.has('Expedidos') || tablas.has('Users')) && !tablas.has('gestiones')) {
+    const error = new Error(
+      'La base de datos es de la versión antigua de SIGAD. Antes de arrancar el backend, ejecuta: npm run db:actualizar'
+    );
+    error.baseAntigua = true;
+    throw error;
+  }
+};
+
+verificarBaseActualizada()
+  .then(() => sequelize.sync({ alter: alterDatabase }))
   .then(() => {
     console.log(`✅ Base de datos sincronizada (alter: ${alterDatabase})`);
     iniciarCronAlertas();
@@ -72,5 +89,9 @@ sequelize.sync({ alter: alterDatabase })
     });
   })
   .catch((error) => {
+    if (error.baseAntigua) {
+      console.error(`\n❌ ${error.message}\n   (Instrucciones: backend/database/ACTUALIZAR_BASE_ANTIGUA.md)\n`);
+      process.exit(1);
+    }
     console.error('❌ Error al conectar con la base de datos:', error.message);
   });

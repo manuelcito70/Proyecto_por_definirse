@@ -312,6 +312,33 @@ export const getConvocatorias = async (params = {}) => {
   return res.json();
 };
 
+// Avance de una convocatoria por sus 4 fases (fases_proceso / convocatoria_fases)
+const leerRespuestaFases = async (res, mensajePorDefecto) => {
+  const datos = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(datos.mensaje || mensajePorDefecto);
+  return datos;
+};
+
+export const getFasesConvocatoria = async (idConvocatoria) => {
+  const res = await fetchWithAuth(`/convocatorias/${idConvocatoria}/fases`);
+  return leerRespuestaFases(res, 'Error al obtener el avance de la convocatoria');
+};
+
+export const registrarFaseConvocatoria = async (idConvocatoria, idFase, { fecha, observaciones }) => {
+  const res = await fetchWithAuth(`/convocatorias/${idConvocatoria}/fases/${idFase}`, {
+    method: 'PUT',
+    body: JSON.stringify({ fecha, observaciones })
+  });
+  return leerRespuestaFases(res, 'Error al registrar la fase');
+};
+
+export const quitarFaseConvocatoria = async (idConvocatoria, idFase) => {
+  const res = await fetchWithAuth(`/convocatorias/${idConvocatoria}/fases/${idFase}`, {
+    method: 'DELETE'
+  });
+  return leerRespuestaFases(res, 'Error al deshacer la fase');
+};
+
 
 
 // ============================================

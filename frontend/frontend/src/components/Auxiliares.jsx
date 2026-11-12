@@ -11,6 +11,7 @@ import {
 import EmptyState from './EmptyState';
 import LoadingState from './LoadingState';
 import SuccessModal from './SuccessModal';
+import AvanceConvocatoria from './AvanceConvocatoria';
 
 const Auxiliares = () => {
   const { gestion, setGestion } = useGestion();
@@ -462,6 +463,9 @@ const Auxiliares = () => {
 
         </div>
       </div>
+
+      {/* AVANCE DE LA CONVOCATORIA POR FASES */}
+      <AvanceConvocatoria convocatorias={catalogoConvocatorias} gestion={gestion} />
 
       {/* 2. CONTENEDOR PRINCIPAL CON ANIMACIÓN SUAVE DE DESPLAZAMIENTO (SPLIT VIEW) */}
       <div className="flex flex-col lg:flex-row items-start gap-6 w-full transition-all duration-300 ease-in-out">

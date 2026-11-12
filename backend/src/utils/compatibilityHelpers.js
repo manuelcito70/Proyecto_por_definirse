@@ -129,6 +129,7 @@ function formatAuxiliar(aux) {
   const mat = aux.materia || {};
   return {
     id: aux.id_auxiliar,
+    id_convocatoria: aux.id_convocatoria,
     gestion: conv.gestion ? conv.gestion.anio : null,
     semestre: conv.semestre || 1,
     nombre: aux.nombre,

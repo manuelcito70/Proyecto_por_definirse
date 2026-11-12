@@ -5,14 +5,24 @@ import {
   createAuxiliar, 
   updateAuxiliar, 
   deleteAuxiliar, 
-  getMaterias, 
-  getConvocatorias 
+  getMaterias,
+  getConvocatorias,
+  getFasesConvocatoria
 } from '../services/api';
 import EmptyState from './EmptyState';
 import LoadingState from './LoadingState';
 import SuccessModal from './SuccessModal';
-import { imprimirDocumentoOficial, FIRMAS, esc } from '../utils/documentoOficial';
+import {
+  imprimirDocumentoOficial,
+  abrirVentanaImpresion,
+  tablaProcesoHtml,
+  formatearFechaIso,
+  citarRespaldo,
+  FIRMAS,
+  esc
+} from '../utils/documentoOficial';
 import AvanceConvocatoria from './AvanceConvocatoria';
+import ProcesoDesignacion from './ProcesoDesignacion';
 
 const Auxiliares = () => {
   const { gestion, setGestion } = useGestion();
@@ -133,6 +143,9 @@ const Auxiliares = () => {
     });
   }, [auxiliares, materiaFiltro, semestreFiltro, busqueda]);
 
+  // Proceso (fases y respaldos) de la convocatoria del auxiliar abierto en el expediente
+  const [procesoExpediente, setProcesoExpediente] = useState({ avance: null, cargando: false, error: '' });
+
   // Auxiliar seleccionado actualmente
   const selectedAux = useMemo(() => {
     if (!selectedAuxId) return null;
@@ -237,13 +250,58 @@ const Auxiliares = () => {
   const semestreRomano = (s) => (Number(s) === 2 ? 'II' : 'I');
   const materiaConCodigo = (aux) => `${aux.materia}${aux.materia_codigo ? ` (${aux.materia_codigo})` : ''}`;
 
+  const idConvocatoriaExpediente = selectedAux?.id_convocatoria || null;
+  useEffect(() => {
+    if (!idConvocatoriaExpediente) {
+      setProcesoExpediente({ avance: null, cargando: false, error: '' });
+      return;
+    }
+    let cancelado = false;
+    setProcesoExpediente((p) => ({ ...p, cargando: true, error: '' }));
+    getFasesConvocatoria(idConvocatoriaExpediente)
+      .then((avance) => { if (!cancelado) setProcesoExpediente({ avance, cargando: false, error: '' }); })
+      .catch((err) => { if (!cancelado) setProcesoExpediente({ avance: null, cargando: false, error: err.message }); });
+    return () => { cancelado = true; };
+  }, [idConvocatoriaExpediente]);
+
+  // Si se registra una fase arriba, refrescar el expediente abierto si es de la misma convocatoria
+  const handleCambioAvance = (avance) => {
+    if (avance && avance.id === idConvocatoriaExpediente) {
+      setProcesoExpediente({ avance, cargando: false, error: '' });
+    }
+  };
+
+  // Obtiene el proceso de la convocatoria del auxiliar (usa el ya cargado si coincide)
+  const obtenerProceso = async (aux) => {
+    if (!aux?.id_convocatoria) return null;
+    if (procesoExpediente.avance?.id === aux.id_convocatoria) return procesoExpediente.avance;
+    try {
+      return await getFasesConvocatoria(aux.id_convocatoria);
+    } catch {
+      return null;
+    }
+  };
+
+  // "la propuesta de materia el 03/02/2026 (Of. Exp. N° 15/2026), ..." solo con fases cumplidas
+  const resumenProceso = (avance) => {
+    const hechas = (avance?.fases || []).filter((f) => f.cumplida);
+    if (!hechas.length) return '';
+    const items = hechas.map((f) =>
+      `${esc(f.nombre.toLowerCase())} el ${esc(formatearFechaIso(f.fecha))}${f.documento ? ` (${esc(citarRespaldo(f.documento))})` : ''}`
+    );
+    return `<p>El proceso de la convocatoria ${esc(avance.nro_convocatoria)} registra: ${items.join('; ')}.</p>`;
+  };
+
   // Imprimir constancia de auxiliatura con el formato oficial de la Dirección de Carrera
-  const handlePrintConstancia = (aux) => {
+  const handlePrintConstancia = async (aux) => {
     if (!aux) return;
     if (aux.estado && aux.estado !== 'aprobado') {
       alert(`Solo se emite constancia para auxiliares aprobados. Estado actual: ${ESTADOS_AUX[aux.estado] || aux.estado}.`);
       return;
     }
+    const ventana = abrirVentanaImpresion();
+    if (!ventana) return;
+    const avance = await obtenerProceso(aux);
     const anio = new Date().getFullYear();
     const condicion = aux.es_ratificacion
       ? 'por ratificación reglamentaria del semestre anterior'
@@ -257,16 +315,22 @@ const Auxiliares = () => {
         <p>La suscrita Directora de la Carrera de Ingeniería en Sistemas de la Facultad Integral de Ichilo, de la Universidad Autónoma "Gabriel René Moreno", a solicitud del interesado(a):</p>
         <p class="destacado">HACE CONSTAR:</p>
         <p class="sin-sangria">Que el(la) universitario(a) <strong>${esc(aux.nombre.toUpperCase())}</strong>, con Registro Universitario <strong>${esc(aux.nro_registro || 'S/N')}</strong>, ejerció funciones de <strong>AUXILIAR DE DOCENCIA</strong> en la materia <strong>${esc(materiaConCodigo(aux))}</strong>, durante el Semestre ${semestreRomano(aux.semestre)} de la Gestión ${esc(aux.gestion)}, designado(a) ${condicion}.</p>
+        ${resumenProceso(avance)}
         <p>Se extiende la presente constancia a solicitud del interesado(a), para los fines que viere conveniente.</p>`,
       firmas: [FIRMAS.directora, FIRMAS.vicedecano]
-    });
+    }, ventana);
   };
 
   // Imprimir informe de antecedentes de auxiliatura dirigido al Consejo Facultativo
-  const handlePrintInforme = (aux) => {
+  const handlePrintInforme = async (aux) => {
     if (!aux) return;
+    const ventana = abrirVentanaImpresion();
+    if (!ventana) return;
+    const avance = await obtenerProceso(aux);
     const anio = new Date().getFullYear();
-    const fila = (campo, valor) => `<tr><td class="campo">${campo}</td><td>${esc(valor)}</td></tr>`;
+    // Dos datos por fila para que el oficio quepa en una hoja
+    const fila = (c1, v1, c2, v2) =>
+      `<tr><td class="campo">${c1}</td><td>${esc(v1)}</td><td class="campo">${c2}</td><td>${esc(v2)}</td></tr>`;
 
     imprimirDocumentoOficial({
       tituloVentana: `Informe de Auxiliatura - ${aux.nombre}`,
@@ -276,21 +340,17 @@ const Auxiliares = () => {
       referencia: `Informe de antecedentes de auxiliatura – Univ. ${aux.nombre}`,
       cuerpo: `
         <p class="sin-sangria">Distinguidos miembros del Consejo:</p>
-        <p>Mediante la presente me dirijo a ustedes para informar sobre los antecedentes del(la) auxiliar de docencia que se detalla a continuación, registrado(a) en la Dirección de Carrera:</p>
-        <table class="datos">
-          ${fila('Auxiliar', aux.nombre)}
-          ${fila('Registro Universitario', aux.nro_registro || 'S/N')}
-          ${fila('Materia', materiaConCodigo(aux))}
-          ${fila('Semestre / Gestión', `${semestreRomano(aux.semestre)} / ${aux.gestion}`)}
-          ${fila('Calificación del examen', aux.nota_examen ? `${aux.nota_examen}/100` : 'Sin examen (ratificación)')}
-          ${fila('Modalidad de designación', aux.es_ratificacion ? 'Ratificación del semestre anterior' : 'Concurso de méritos y examen')}
-          ${fila('Convocatoria', aux.nro_convocatoria || 'S/N')}
-          ${fila('Estado', ESTADOS_AUX[aux.estado] || aux.estado || 'S/D')}
+        <p>Mediante la presente informo los antecedentes del(la) siguiente auxiliar de docencia:</p>
+        <table class="datos doble">
+          ${fila('Auxiliar', aux.nombre, 'R.U.', aux.nro_registro || 'S/N')}
+          ${fila('Materia', materiaConCodigo(aux), 'Ciclo', `Sem. ${semestreRomano(aux.semestre)} / ${aux.gestion}`)}
+          ${fila('Designación', aux.es_ratificacion ? 'Ratificación' : 'Concurso de méritos y examen', 'Calificación', aux.nota_examen ? `${aux.nota_examen}/100` : 'Sin examen')}
+          ${fila('Convocatoria', aux.nro_convocatoria || 'S/N', 'Estado', ESTADOS_AUX[aux.estado] || aux.estado || 'S/D')}
         </table>
-        <p>Se eleva el presente informe para su consideración y fines consiguientes.</p>
-        <p>Sin otro particular, me despido con las consideraciones más distinguidas.</p>`,
+        ${tablaProcesoHtml(avance)}
+        <p>Se eleva el presente informe para su consideración y fines consiguientes. Sin otro particular, me despido con las consideraciones más distinguidas.</p>`,
       firmas: [FIRMAS.directora]
-    });
+    }, ventana);
   };
 
   return (
@@ -388,7 +448,7 @@ const Auxiliares = () => {
       </div>
 
       {/* AVANCE DE LA CONVOCATORIA POR FASES */}
-      <AvanceConvocatoria convocatorias={catalogoConvocatorias} gestion={gestion} />
+      <AvanceConvocatoria convocatorias={catalogoConvocatorias} gestion={gestion} onCambio={handleCambioAvance} />
 
       {/* 2. CONTENEDOR PRINCIPAL CON ANIMACIÓN SUAVE DE DESPLAZAMIENTO (SPLIT VIEW) */}
       <div className="flex flex-col lg:flex-row items-start gap-6 w-full transition-all duration-300 ease-in-out">
@@ -648,6 +708,13 @@ const Auxiliares = () => {
                 </button>
               </div>
 
+              {/* Proceso de la convocatoria por la que fue designado (fechas y oficios de respaldo) */}
+              <ProcesoDesignacion
+                avance={procesoExpediente.avance}
+                cargando={procesoExpediente.cargando}
+                error={procesoExpediente.error}
+              />
+
               {/* Tabs de Cambio Rápido: "Constancia de Cátedra" vs "Informe Técnico" */}
               <div className="grid grid-cols-2 gap-2 bg-slate-100/80 p-1 rounded-xl">
                 <button
@@ -752,27 +819,14 @@ const Auxiliares = () => {
 
                   <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-3 text-xs leading-relaxed text-slate-700">
                     <p>
-                      Se hace constar ante la autoridad facultativa correspondiente que el auxiliar <strong className="text-slate-900">{selectedAux.nombre}</strong> cumplió con la totalidad de exigencias del Estatuto Orgánico de la UAGRM para el dictado y apoyo en la cátedra de <strong className="text-[#0B2545]">{selectedAux.materia}</strong>.
+                      Oficio dirigido al <strong className="text-slate-900">Honorable Consejo Facultativo</strong> con los antecedentes de <strong className="text-slate-900">{selectedAux.nombre}</strong> en la cátedra de <strong className="text-[#0B2545]">{selectedAux.materia}</strong>: datos del auxiliar, estado de su evaluación y el proceso de la convocatoria con sus documentos de respaldo.
                     </p>
-
-                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-200/80">
-                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
-                        <span className="material-symbols-outlined text-sm">check_circle</span>
-                        Resolución C.C. Validada
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
-                        <span className="material-symbols-outlined text-sm">check_circle</span>
-                        Acta de Examen Notariada
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
-                        <span className="material-symbols-outlined text-sm">check_circle</span>
-                        Formulario CPD Activo
-                      </div>
-                      <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-700">
-                        <span className="material-symbols-outlined text-sm">check_circle</span>
-                        Cómputo Horario en Regla
-                      </div>
-                    </div>
+                    {procesoExpediente.avance && procesoExpediente.avance.fases.some((f) => f.cumplida && !f.documento) && (
+                      <p className="flex items-start gap-1.5 text-[11px] font-medium text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5">
+                        <span className="material-symbols-outlined text-sm">warning</span>
+                        Hay fases sin documento de respaldo. Puedes adjuntarlo en "Expediente del proceso de convocatoria", arriba.
+                      </p>
+                    )}
                   </div>
 
                   {/* Botón Imprimir Informe Técnico */}

@@ -49,10 +49,11 @@ async function setupDatabase() {
     await DocenteMateria.sync({ alter: true });
     await FaseProceso.sync({ alter: true });
     await Convocatoria.sync({ alter: true });
-    await ConvocatoriaFase.sync({ alter: true });
     await AuxiliarV4.sync({ alter: true });
     await DocumentType.sync({ alter: true });
     await Document.sync({ alter: true });
+    // Después de documents, porque cada fase puede apuntar a su documento de respaldo
+    await ConvocatoriaFase.sync({ alter: true });
     await ActaDetalle.sync({ alter: true });
     await DocumentAttachment.sync({ alter: true });
     console.log('✅ Modelos V4 sincronizados correctamente.');

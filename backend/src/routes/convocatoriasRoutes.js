@@ -6,6 +6,7 @@ const ctrl = require('../controllers/convocatoriasController');
 router.use(verifyToken);
 router.get('/', ctrl.getAll);
 router.get('/:id/fases', ctrl.getFases);
+router.get('/:id/documentos-respaldo', ctrl.getDocumentosRespaldo);
 router.put('/:id/fases/:idFase', ctrl.registrarFase);
 router.delete('/:id/fases/:idFase', ctrl.quitarFase);
 

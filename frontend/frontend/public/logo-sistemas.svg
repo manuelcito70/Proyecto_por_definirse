@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 124 124" width="124" height="124" role="img" aria-label="Logo Ingeniería en Sistemas">
+  <title>Ingeniería en Sistemas</title>
+  <defs>
+    <linearGradient id="flecha" x1="0.3" y1="1" x2="0.6" y2="0">
+      <stop offset="0" stop-color="#0d47a1"/>
+      <stop offset="0.45" stop-color="#1976d2"/>
+      <stop offset="1" stop-color="#4fc3f7"/>
+    </linearGradient>
+    <radialGradient id="punto" cx="0.35" cy="0.3" r="0.8">
+      <stop offset="0" stop-color="#d4ee7a"/>
+      <stop offset="0.6" stop-color="#8bc34a"/>
+      <stop offset="1" stop-color="#5a9a2c"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Flecha circular: nace abajo a la derecha, rodea por la izquierda y apunta a la derecha arriba -->
+  <path fill="url(#flecha)"
+        d="M86 106.1
+           A44 44 0 1 1 65.5 24
+           L65.5 12
+           L91 28.5
+           L65 45
+           L65.2 33
+           A35 35 0 1 0 76 100.9
+           Z"/>
+
+  <!-- Globo terráqueo en malla -->
+  <g fill="none" stroke="#7cb342" stroke-width="3" stroke-linecap="round">
+    <circle cx="70" cy="70" r="26"/>
+    <ellipse cx="70" cy="70" rx="13" ry="26"/>
+    <line x1="70" y1="44" x2="70" y2="96"/>
+    <line x1="44" y1="70" x2="96" y2="70"/>
+    <path d="M47.5 57 Q70 62 92.5 57"/>
+    <path d="M47.5 83 Q70 78 92.5 83"/>
+    <path d="M54 49 Q70 52.5 86 49"/>
+    <path d="M54 91 Q70 87.5 86 91"/>
+  </g>
+
+  <!-- Puntos que salen hacia la derecha -->
+  <g fill="url(#punto)">
+    <circle cx="108.5" cy="57" r="6.6"/>
+    <circle cx="116" cy="40" r="5.6"/>
+    <circle cx="102" cy="40" r="4.2"/>
+    <circle cx="110" cy="28" r="3.2"/>
+  </g>
+</svg>

@@ -21,6 +21,11 @@ const ConvocatoriaFase = sequelize.define('ConvocatoriaFase', {
   },
   observaciones: {
     type: DataTypes.TEXT
+  },
+  // Oficio o resolución (tabla documents) que respalda el cumplimiento de la fase
+  id_documento: {
+    type: DataTypes.UUID,
+    allowNull: true
   }
 }, {
   tableName: 'convocatoria_fases',

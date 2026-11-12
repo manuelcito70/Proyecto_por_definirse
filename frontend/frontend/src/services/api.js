@@ -324,12 +324,25 @@ export const getFasesConvocatoria = async (idConvocatoria) => {
   return leerRespuestaFases(res, 'Error al obtener el avance de la convocatoria');
 };
 
-export const registrarFaseConvocatoria = async (idConvocatoria, idFase, { fecha, observaciones }) => {
+export const registrarFaseConvocatoria = async (idConvocatoria, idFase, { fecha, observaciones, id_documento }) => {
   const res = await fetchWithAuth(`/convocatorias/${idConvocatoria}/fases/${idFase}`, {
     method: 'PUT',
-    body: JSON.stringify({ fecha, observaciones })
+    body: JSON.stringify({ fecha, observaciones, id_documento: id_documento || null })
   });
   return leerRespuestaFases(res, 'Error al registrar la fase');
+};
+
+// Oficios expedidos y recibidos que se pueden elegir como respaldo de una fase
+export const getDocumentosRespaldo = async (idConvocatoria) => {
+  const res = await fetchWithAuth(`/convocatorias/${idConvocatoria}/documentos-respaldo`);
+  return leerRespuestaFases(res, 'Error al obtener los documentos de respaldo');
+};
+
+// Abre el archivo de un documento de respaldo (oficio expedido o recibido)
+export const abrirDocumentoRespaldo = (documento) => {
+  if (!documento?.tiene_archivo) return Promise.resolve();
+  const ruta = documento.tipo === 'recibido' ? 'recibidos' : 'expedidos';
+  return downloadFile(`/${ruta}/${documento.id}/download`, documento.nombre_archivo || 'documento.pdf');
 };
 
 export const quitarFaseConvocatoria = async (idConvocatoria, idFase) => {

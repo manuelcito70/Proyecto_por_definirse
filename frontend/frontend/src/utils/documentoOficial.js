@@ -35,6 +35,20 @@ const MESES = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', '
 export const lugarYFecha = (fecha = new Date()) =>
   `${INSTITUCION.ciudad}, ${fecha.getDate()} de ${MESES[fecha.getMonth()]} de ${fecha.getFullYear()}`;
 
+// Convierte 'AAAA-MM-DD' a 'DD/MM/AAAA' sin pasar por Date (evita el desfase de zona horaria)
+export const formatearFechaIso = (fecha) => {
+  if (!fecha) return '';
+  const [anio, mes, dia] = String(fecha).slice(0, 10).split('-');
+  return `${dia}/${mes}/${anio}`;
+};
+
+// Texto corto para citar un documento de respaldo: "Of. Exp. 015/2026" / "Of. Rec. 20"
+export const citarRespaldo = (doc) => {
+  if (!doc) return '';
+  const tipo = doc.tipo === 'recibido' ? 'Of. Rec.' : doc.tipo === 'expedido' ? 'Of. Exp.' : 'Doc.';
+  return `${tipo} N° ${doc.nro_documento}`;
+};
+
 // Escapa texto para insertarlo en el HTML del documento
 export const esc = (valor) =>
   String(valor ?? '')
@@ -71,13 +85,40 @@ const ICONOS = {
  * @param {string} doc.cuerpo         HTML del cuerpo (los datos ya deben venir escapados)
  * @param {Array}  doc.firmas         Lista de firmas (objetos de FIRMAS)
  */
-export function imprimirDocumentoOficial(doc) {
-  const base = window.location.origin;
+// Abre la ventana de impresión. Debe llamarse directamente en el clic (antes de cualquier await),
+// o el navegador la bloquea como ventana emergente.
+export function abrirVentanaImpresion() {
   const ventana = window.open('', '_blank');
   if (!ventana) {
     alert('El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes para este sitio.');
-    return;
+    return null;
   }
+  ventana.document.write('<p style="font-family:Arial,sans-serif;padding:24px;color:#555">Preparando documento...</p>');
+  return ventana;
+}
+
+// Tabla con las fases de la convocatoria (fecha y documento de respaldo) para los imprimibles
+export const tablaProcesoHtml = (avance) => {
+  if (!avance?.fases?.length) return '';
+  const filas = avance.fases.map((f) => `
+    <tr>
+      <td>${f.orden}. ${esc(f.nombre)}</td>
+      <td style="white-space:nowrap">${f.cumplida ? esc(formatearFechaIso(f.fecha)) : 'Pendiente'}</td>
+      <td>${f.cumplida && f.documento ? esc(citarRespaldo(f.documento)) : f.cumplida ? 'Sin respaldo registrado' : '—'}</td>
+    </tr>`).join('');
+  return `
+    <table class="datos proceso">
+      <tr><td class="titulo-tabla" colspan="3">Proceso de la convocatoria ${esc(avance.nro_convocatoria)}</td></tr>
+      <tr><td class="campo">Fase</td><td class="campo">Fecha</td><td class="campo">Respaldo</td></tr>
+      ${filas}
+    </table>`;
+};
+
+export function imprimirDocumentoOficial(doc, ventanaPrevia = null) {
+  const base = window.location.origin;
+  const ventana = ventanaPrevia || abrirVentanaImpresion();
+  if (!ventana) return;
+  ventana.document.open();
 
   const bloqueA = doc.destinatario ? `
     <div class="bloque">
@@ -109,8 +150,7 @@ export function imprimirDocumentoOficial(doc) {
     .espacio-pie { height: 16mm; }
     .membrete { display: grid; grid-template-columns: 70px 1fr 70px; align-items: center; gap: 10px; }
     .membrete img.escudo { width: 66px; height: auto; }
-    .membrete .emblema { width: 52px; height: 70px; overflow: hidden; justify-self: end; }
-    .membrete .emblema img { height: 70px; width: auto; display: block; margin-left: -4px; }
+    .membrete img.logo-carrera { width: 72px; height: 72px; justify-self: end; }
     .membrete .textos { text-align: center; font-family: "Monotype Corsiva", "Pinyon Script", "Edwardian Script ITC", cursive; line-height: 1.12; }
     .membrete .u { font-size: 20pt; color: #5b5f6b; white-space: nowrap; }
     .membrete .f { font-size: 18pt; color: #c1121f; }
@@ -129,6 +169,12 @@ export function imprimirDocumentoOficial(doc) {
     table.datos { width: 88%; margin: 8px auto 12px; border-collapse: collapse; font-size: 11pt; line-height: 1.3; }
     table.datos td { border: 1px solid #555; padding: 3px 10px; }
     table.datos td.campo { width: 42%; font-weight: bold; background: #f2f2f2; }
+    table.datos.doble td.campo { width: 17%; }
+    table.datos.proceso { font-size: 10pt; }
+    table.datos.proceso td { padding: 2px 10px; }
+    table.datos.proceso td.campo { width: auto; }
+    table.datos.proceso td.titulo-tabla { font-weight: bold; text-align: center; background: #e4e6ea; }
+    .subtitulo { font-weight: bold; margin: 10px 0 2px; text-indent: 0 !important; }
     .cierre { break-inside: avoid; page-break-inside: avoid; }
     .atentamente { margin-top: 14px; }
     .firmas { display: flex; justify-content: space-around; gap: 30px; margin-top: 48px; text-align: center; }
@@ -157,7 +203,7 @@ export function imprimirDocumentoOficial(doc) {
       <div class="f">${esc(INSTITUCION.facultad)}</div>
       <div class="c">${esc(INSTITUCION.carrera)}</div>
     </div>
-    <div class="emblema"><img src="${base}/logo-ichilo.png" alt="Emblema FINI" /></div>
+    <img class="logo-carrera" src="${base}/logo-sistemas.svg" alt="Logo Ingeniería en Sistemas" />
   </header>
 
   <div class="lugar">${esc(lugarYFecha())}</div>

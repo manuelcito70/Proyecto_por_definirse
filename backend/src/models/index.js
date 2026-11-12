@@ -67,6 +67,10 @@ Convocatoria.hasMany(ConvocatoriaFase, { foreignKey: 'id_convocatoria', as: 'fas
 ConvocatoriaFase.belongsTo(FaseProceso, { foreignKey: 'id_fase', as: 'fase' });
 FaseProceso.hasMany(ConvocatoriaFase, { foreignKey: 'id_fase', as: 'convocatorias_fase' });
 
+// Documento de respaldo de cada fase (opcional); si se borra el documento, la fase queda sin respaldo
+ConvocatoriaFase.belongsTo(Document, { foreignKey: 'id_documento', as: 'documento', onDelete: 'SET NULL' });
+Document.hasMany(ConvocatoriaFase, { foreignKey: 'id_documento', as: 'fases_convocatoria', onDelete: 'SET NULL' });
+
 // Auxiliares
 AuxiliarV4.belongsTo(Convocatoria, { foreignKey: 'id_convocatoria', as: 'convocatoria' });
 Convocatoria.hasMany(AuxiliarV4, { foreignKey: 'id_convocatoria', as: 'auxiliares' });

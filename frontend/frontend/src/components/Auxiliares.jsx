@@ -11,6 +11,7 @@ import {
 import EmptyState from './EmptyState';
 import LoadingState from './LoadingState';
 import SuccessModal from './SuccessModal';
+import { imprimirDocumentoOficial, FIRMAS, esc } from '../utils/documentoOficial';
 import AvanceConvocatoria from './AvanceConvocatoria';
 
 const Auxiliares = () => {
@@ -232,142 +233,64 @@ const Auxiliares = () => {
     }
   };
 
-  // Imprimir Constancia Oficial con membrete UAGRM
+  const ESTADOS_AUX = { aprobado: 'Aprobado', pendiente: 'Pendiente de evaluación', reprobado: 'Reprobado' };
+  const semestreRomano = (s) => (Number(s) === 2 ? 'II' : 'I');
+  const materiaConCodigo = (aux) => `${aux.materia}${aux.materia_codigo ? ` (${aux.materia_codigo})` : ''}`;
+
+  // Imprimir constancia de auxiliatura con el formato oficial de la Dirección de Carrera
   const handlePrintConstancia = (aux) => {
     if (!aux) return;
-    const vent = window.open('', '_blank');
-    vent.document.write(`
-      <!DOCTYPE html>
-      <html lang="es">
-        <head>
-          <meta charset="utf-8" />
-          <title>Constancia de Auxiliatura - ${aux.nombre}</title>
-          <style>
-            @page { size: letter; margin: 25mm 20mm; }
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #001026; line-height: 1.7; }
-            .header { text-align: center; border-bottom: 3px double #001026; padding-bottom: 15px; margin-bottom: 30px; }
-            .header h2 { margin: 0; font-size: 19px; text-transform: uppercase; letter-spacing: 1.2px; color: #001026; }
-            .header h3 { margin: 5px 0; font-size: 15px; color: #1d4ed8; font-weight: 600; }
-            .header p { margin: 0; font-size: 12px; color: #64748b; }
-            .title-box { text-align: center; margin: 30px 0; }
-            .title-box h1 { font-size: 19px; font-weight: 800; text-transform: uppercase; margin: 0; letter-spacing: 2px; }
-            .content { font-size: 15px; text-align: justify; margin-bottom: 40px; }
-            .highlight-name { text-align: center; font-size: 18px; font-weight: 800; color: #001026; margin: 20px 0; letter-spacing: 0.5px; }
-            .highlight-materia { text-align: center; font-size: 17px; font-weight: bold; color: #1d4ed8; margin: 15px 0; }
-            .footer { margin-top: 80px; display: flex; justify-content: space-around; text-align: center; }
-            .signature { border-top: 1px solid #334155; width: 230px; padding-top: 8px; font-size: 12px; }
-            .seal { font-family: monospace; font-size: 10px; color: #64748b; margin-top: 50px; text-align: center; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h2>UNIVERSIDAD AUTÓNOMA GABRIEL RENÉ MORENO</h2>
-            <h3>FACULTAD INTEGRAL DEL ICHILO (FINI)</h3>
-            <p>DIRECCIÓN DE CARRERA DE INGENIERÍA DE SISTEMAS · SEDE ICHILO (YAPACANÍ)</p>
-          </div>
+    if (aux.estado && aux.estado !== 'aprobado') {
+      alert(`Solo se emite constancia para auxiliares aprobados. Estado actual: ${ESTADOS_AUX[aux.estado] || aux.estado}.`);
+      return;
+    }
+    const anio = new Date().getFullYear();
+    const condicion = aux.es_ratificacion
+      ? 'por ratificación reglamentaria del semestre anterior'
+      : `como ganador(a) de la convocatoria ${esc(aux.nro_convocatoria || '')} por concurso de méritos y examen de competencia${aux.nota_examen ? `, con una calificación de <strong>${esc(aux.nota_examen)}/100 puntos</strong>` : ''}`;
 
-          <div class="title-box">
-            <h1>CONSTANCIA DE AUXILIATURA DE CÁTEDRA</h1>
-            <p style="font-size: 12px; color: #1d4ed8; font-weight: bold; margin-top: 4px;">REF: ${aux.nro_convocatoria || `CONV-DIR-${aux.gestion}`}</p>
-          </div>
-
-          <div class="content">
-            <p>La Dirección de Carrera de <strong>Ingeniería de Sistemas</strong> de la Facultad Integral del Ichilo de la Universidad Autónoma Gabriel René Moreno, a solicitud del interesado y a los fines que estime pertinentes, hace constar que:</p>
-
-            <div class="highlight-name">${aux.nombre.toUpperCase()}</div>
-
-            <p>Con Registro Universitario (RU) <strong>${aux.nro_registro || 'En trámite institucional'}</strong>, ejerció funciones oficiales como <strong>AUXILIAR DE DOCENCIA / CÁTEDRA</strong> en la asignatura de:</p>
-
-            <div class="highlight-materia">${aux.materia}</div>
-
-            <p>Durante la <strong>Gestión Académica ${aux.gestion}</strong> (Semestre ${aux.semestre === 1 ? 'I' : 'II'}), habiendo cumplido satisfactoriamente las actividades de apoyo a la docencia con una calificación evaluada de <strong>${aux.nota_examen ? `${aux.nota_examen}/100 puntos` : 'Aprobada'}</strong>, bajo la condición de <strong>${aux.es_ratificacion ? 'Ratificación reglamentaria del Semestre anterior' : 'Concurso de méritos y examen de competencia'}</strong>, conforme a resolución de Consejo Facultativo.</p>
-
-            <p>Se expide la presente constancia para acreditar experiencia docente y antecedentes académicos y laborales.</p>
-          </div>
-
-          <div class="footer">
-            <div class="signature">
-              <strong>Ing. Alicia Serrano Rodríguez</strong><br/>
-              Directora de Carrera<br/>
-              Ingeniería de Sistemas — FINI
-            </div>
-            <div class="signature">
-              <strong>Decanatura FINI</strong><br/>
-              Facultad Integral del Ichilo<br/>
-              UAGRM
-            </div>
-          </div>
-
-          <div class="seal">
-            Identificador único de verificación: AUX-FINI-${aux.id}-${aux.gestion} · Yapacaní, Santa Cruz, Bolivia
-          </div>
-
-          <script>
-            window.onload = function() { window.print(); }
-          </script>
-        </body>
-      </html>
-    `);
-    vent.document.close();
+    imprimirDocumentoOficial({
+      tituloVentana: `Constancia de Auxiliatura - ${aux.nombre}`,
+      cite: `CONST. No. ______/${anio}`,
+      titulo: 'CONSTANCIA',
+      cuerpo: `
+        <p>La suscrita Directora de la Carrera de Ingeniería en Sistemas de la Facultad Integral de Ichilo, de la Universidad Autónoma "Gabriel René Moreno", a solicitud del interesado(a):</p>
+        <p class="destacado">HACE CONSTAR:</p>
+        <p class="sin-sangria">Que el(la) universitario(a) <strong>${esc(aux.nombre.toUpperCase())}</strong>, con Registro Universitario <strong>${esc(aux.nro_registro || 'S/N')}</strong>, ejerció funciones de <strong>AUXILIAR DE DOCENCIA</strong> en la materia <strong>${esc(materiaConCodigo(aux))}</strong>, durante el Semestre ${semestreRomano(aux.semestre)} de la Gestión ${esc(aux.gestion)}, designado(a) ${condicion}.</p>
+        <p>Se extiende la presente constancia a solicitud del interesado(a), para los fines que viere conveniente.</p>`,
+      firmas: [FIRMAS.directora, FIRMAS.vicedecano]
+    });
   };
 
-  // Imprimir Informe Técnico para Consejo Facultativo
+  // Imprimir informe de antecedentes de auxiliatura dirigido al Consejo Facultativo
   const handlePrintInforme = (aux) => {
     if (!aux) return;
-    const vent = window.open('', '_blank');
-    vent.document.write(`
-      <!DOCTYPE html>
-      <html lang="es">
-        <head>
-          <meta charset="utf-8" />
-          <title>Informe de Cátedra - ${aux.nombre}</title>
-          <style>
-            @page { size: letter; margin: 25mm 20mm; }
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #001026; line-height: 1.6; }
-            .header { text-align: center; border-bottom: 2px solid #001026; padding-bottom: 12px; margin-bottom: 25px; }
-            .header h2 { margin: 0; font-size: 17px; text-transform: uppercase; }
-            .header h4 { margin: 4px 0; color: #1d4ed8; }
-            .content { font-size: 14px; text-align: justify; }
-            table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; }
-            th, td { border: 1px solid #cbd5e1; padding: 8px 12px; }
-            th { background: #f1f5f9; text-align: left; }
-            .signature { margin-top: 60px; text-align: center; border-top: 1px solid #334155; width: 230px; margin-left: auto; margin-right: auto; padding-top: 6px; font-size: 12px; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h2>UNIVERSIDAD AUTÓNOMA GABRIEL RENÉ MORENO</h2>
-            <h4>INFORME TÉCNICO DE ANTECEDENTES DE AUXILIATURA</h4>
-            <p style="font-size: 12px; color: #64748b; margin: 0;">Dirección de Carrera de Ingeniería de Sistemas — FINI Ichilo</p>
-          </div>
-          <div class="content">
-            <p><strong>A:</strong> Honorable Consejo de Carrera / Decanatura FINI</p>
-            <p><strong>DE:</strong> Ing. Alicia Serrano Rodríguez — Directora de Carrera</p>
-            <p><strong>FECHA:</strong> Gestión ${aux.gestion} · Semestre ${aux.semestre === 1 ? 'I' : 'II'}</p>
-            <p><strong>ASUNTO:</strong> Elevación de informe de auxiliatura y verificación de antecedentes académicos.</p>
+    const anio = new Date().getFullYear();
+    const fila = (campo, valor) => `<tr><td class="campo">${campo}</td><td>${esc(valor)}</td></tr>`;
 
-            <table>
-              <tr><th>Auxiliar Designado</th><td><strong>${aux.nombre}</strong></td></tr>
-              <tr><th>Registro Universitario</th><td>${aux.nro_registro || 'S/N'}</td></tr>
-              <tr><th>Materia Asignada</th><td><strong>${aux.materia}</strong></td></tr>
-              <tr><th>Semestre / Gestión</th><td>Semestre ${aux.semestre === 1 ? 'I' : 'II'} / ${aux.gestion}</td></tr>
-              <tr><th>Calificación de Examen</th><td>${aux.nota_examen ? `${aux.nota_examen}/100` : 'Sin examen (Ratificación)'}</td></tr>
-              <tr><th>Condición Legal</th><td>${aux.es_ratificacion ? 'Ratificado del Semestre anterior' : 'Ganador de Convocatoria Pública'}</td></tr>
-              <tr><th>Convocatoria de Origen</th><td>${aux.nro_convocatoria || 'CONV-01'}</td></tr>
-              <tr><th>Estado Administrativo</th><td><span style="color: #166534; font-weight: bold;">DESIGNACIÓN VÁLIDA</span></td></tr>
-            </table>
-
-            <p>Se informa que el expediente del auxiliar cuenta con los respaldos de rigor: Formulario CPD, Acta notariada y Resolución de designación correspondiente, cumpliendo con la normativa del Estatuto Orgánico de la UAGRM.</p>
-          </div>
-          <div class="signature">
-            <strong>Ing. Alicia Serrano Rodríguez</strong><br/>
-            Directora de Carrera — Sistemas FINI
-          </div>
-          <script>window.onload = function() { window.print(); }</script>
-        </body>
-      </html>
-    `);
-    vent.document.close();
+    imprimirDocumentoOficial({
+      tituloVentana: `Informe de Auxiliatura - ${aux.nombre}`,
+      cite: `OF. No. ______/${anio}`,
+      destinatario: { nombre: 'Honorable Consejo Facultativo', cargo: 'Facultad Integral de Ichilo – U.A.G.R.M.' },
+      conRemitente: true,
+      referencia: `Informe de antecedentes de auxiliatura – Univ. ${aux.nombre}`,
+      cuerpo: `
+        <p class="sin-sangria">Distinguidos miembros del Consejo:</p>
+        <p>Mediante la presente me dirijo a ustedes para informar sobre los antecedentes del(la) auxiliar de docencia que se detalla a continuación, registrado(a) en la Dirección de Carrera:</p>
+        <table class="datos">
+          ${fila('Auxiliar', aux.nombre)}
+          ${fila('Registro Universitario', aux.nro_registro || 'S/N')}
+          ${fila('Materia', materiaConCodigo(aux))}
+          ${fila('Semestre / Gestión', `${semestreRomano(aux.semestre)} / ${aux.gestion}`)}
+          ${fila('Calificación del examen', aux.nota_examen ? `${aux.nota_examen}/100` : 'Sin examen (ratificación)')}
+          ${fila('Modalidad de designación', aux.es_ratificacion ? 'Ratificación del semestre anterior' : 'Concurso de méritos y examen')}
+          ${fila('Convocatoria', aux.nro_convocatoria || 'S/N')}
+          ${fila('Estado', ESTADOS_AUX[aux.estado] || aux.estado || 'S/D')}
+        </table>
+        <p>Se eleva el presente informe para su consideración y fines consiguientes.</p>
+        <p>Sin otro particular, me despido con las consideraciones más distinguidas.</p>`,
+      firmas: [FIRMAS.directora]
+    });
   };
 
   return (

@@ -4,6 +4,7 @@ import { getActas, createActa, updateActa, deleteActa, downloadFile } from '../s
 import EmptyState from './EmptyState';
 import LoadingState from './LoadingState';
 import SuccessModal from './SuccessModal';
+import { imprimirDocumentoOficial, FIRMAS, esc } from '../utils/documentoOficial';
 import FileDropzone from './FileDropzone';
 
 const MODALIDADES = [
@@ -255,111 +256,33 @@ const Actas = () => {
     }
   };
 
-  // Imprimir certificación formal con membrete UAGRM
+  // Imprimir certificación de graduación con el formato oficial de la Dirección de Carrera
   const handlePrintConstancia = (acta) => {
     if (!acta) return;
-    const vent = window.open('', '_blank');
-    vent.document.write(`
-      <!DOCTYPE html>
-      <html lang="es">
-        <head>
-          <meta charset="utf-8" />
-          <title>Constancia de Graduación - ${acta.nombre_estudiante}</title>
-          <style>
-            @page { size: letter; margin: 20mm; }
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #001026; line-height: 1.6; }
-            .header { text-align: center; border-bottom: 3px double #001026; padding-bottom: 15px; margin-bottom: 25px; }
-            .header h2 { margin: 0; font-size: 18px; text-transform: uppercase; letter-spacing: 1px; color: #001026; }
-            .header h3 { margin: 4px 0; font-size: 15px; color: #1d4ed8; font-weight: 600; }
-            .header p { margin: 0; font-size: 12px; color: #64748b; font-weight: 500; }
-            .title-box { text-align: center; margin: 25px 0; }
-            .title-box h1 { font-size: 18px; font-weight: 800; text-transform: uppercase; margin: 0; letter-spacing: 2px; }
-            .content { font-size: 14px; text-align: justify; margin-bottom: 30px; }
-            .data-grid { width: 100%; border-collapse: collapse; margin: 20px 0; }
-            .data-grid td { padding: 8px 12px; border: 1px solid #cbd5e1; font-size: 13px; }
-            .data-grid td.label { font-weight: bold; background: #f8f9ff; width: 35%; color: #334155; }
-            .footer { margin-top: 60px; display: flex; justify-content: space-around; text-align: center; }
-            .signature { border-top: 1px solid #334155; width: 220px; padding-top: 6px; font-size: 12px; }
-            .seal { font-family: monospace; font-size: 10px; color: #64748b; margin-top: 40px; text-align: center; }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h2>UNIVERSIDAD AUTÓNOMA GABRIEL RENÉ MORENO</h2>
-            <h3>FACULTAD INTEGRAL DEL ICHILO (FINI) — SEDE YAPACANÍ</h3>
-            <p>DIRECCIÓN DE CARRERA DE INGENIERÍA DE SISTEMAS · ARCHIVO OFICIAL DE GRADUADOS</p>
-          </div>
+    const anio = new Date().getFullYear();
+    const fila = (campo, valor) => `<tr><td class="campo">${campo}</td><td>${esc(valor)}</td></tr>`;
 
-          <div class="title-box">
-            <h1>CERTIFICACIÓN DE ACTA DE GRADUACIÓN</h1>
-            <p style="font-size: 12px; color: #1d4ed8; font-weight: bold; margin-top: 4px;">CPD OFICIAL · REF: ${acta.codigo_cpd || 'CPD-FINI-UAGRM'}</p>
-          </div>
-
-          <div class="content">
-            <p>La Dirección de la Carrera de <strong>INGENIERÍA DE SISTEMAS</strong> de la Facultad Integral del Ichilo de la Universidad Autónoma Gabriel René Moreno, a petición de parte interesada y conforme a los antecedentes que cursan en el archivo oficial, certifica que:</p>
-
-            <table class="data-grid">
-              <tr>
-                <td class="label">Postulante Titulado:</td>
-                <td style="font-size: 15px; font-weight: bold; color: #001026;">${acta.nombre_estudiante}</td>
-              </tr>
-              <tr>
-                <td class="label">Registro Universitario (RU):</td>
-                <td><strong>${acta.nro_registro || 'No registrado'}</strong></td>
-              </tr>
-              <tr>
-                <td class="label">Cédula de Identidad (CI):</td>
-                <td><strong>${acta.ci || 'No registrada'}</strong></td>
-              </tr>
-              <tr>
-                <td class="label">N.° Acta Original:</td>
-                <td><strong style="color: #1d4ed8;">#${acta.nro_acta}</strong></td>
-              </tr>
-              <tr>
-                <td class="label">Código Único CPD:</td>
-                <td>${acta.codigo_cpd || 'S/N'}</td>
-              </tr>
-              <tr>
-                <td class="label">Modalidad de Graduación:</td>
-                <td><strong>${getModalidadLabel(acta.modalidad)}</strong></td>
-              </tr>
-              <tr>
-                <td class="label">Calificación Final Obtenida:</td>
-                <td><strong style="font-size: 14px; color: #001026;">${acta.nota ? `${acta.nota} / 100 puntos` : 'Aprobado'}</strong></td>
-              </tr>
-              <tr>
-                <td class="label">Gestión de Egreso / Archivo:</td>
-                <td>${acta.gestion || gestion}</td>
-              </tr>
-            </table>
-
-            <p>El presente documento refrenda la copia oficial custodiada en el archivo digital de la Dirección de Carrera para los fines legales, de tramitación de Título en Provisión Nacional o requerimientos pertinentes.</p>
-          </div>
-
-          <div class="footer">
-            <div class="signature">
-              <strong>Ing. Alicia Serrano Rodríguez</strong><br/>
-              Directora de Carrera<br/>
-              Ingeniería de Sistemas — FINI
-            </div>
-            <div class="signature">
-              <strong>Secretaría Académica</strong><br/>
-              Facultad Integral del Ichilo<br/>
-              UAGRM
-            </div>
-          </div>
-
-          <div class="seal">
-            Hash de verificación: SHA256-${acta.id}-${acta.nro_acta}-FINI · Yapacaní, Santa Cruz, Bolivia
-          </div>
-
-          <script>
-            window.onload = function() { window.print(); }
-          </script>
-        </body>
-      </html>
-    `);
-    vent.document.close();
+    imprimirDocumentoOficial({
+      tituloVentana: `Certificación de Graduación - ${acta.nombre_estudiante}`,
+      cite: `CERT. No. ______/${anio}`,
+      titulo: 'CERTIFICACIÓN',
+      cuerpo: `
+        <p>La suscrita Directora de la Carrera de Ingeniería en Sistemas de la Facultad Integral de Ichilo, de la Universidad Autónoma "Gabriel René Moreno", a solicitud de parte interesada y de acuerdo a los antecedentes que cursan en el archivo de esta Dirección:</p>
+        <p class="destacado">CERTIFICA:</p>
+        <p class="sin-sangria">Que <strong>${esc(acta.nombre_estudiante)}</strong> se encuentra registrado(a) como graduado(a) de la Carrera, con los siguientes datos:</p>
+        <table class="datos">
+          ${fila('Nombre completo', acta.nombre_estudiante)}
+          ${fila('Registro Universitario (R.U.)', acta.nro_registro || 'No registrado')}
+          ${fila('Cédula de Identidad (C.I.)', acta.ci || 'No registrada')}
+          ${fila('N.° de Acta', acta.nro_acta)}
+          ${fila('Código CPD', acta.codigo_cpd || 'S/N')}
+          ${fila('Modalidad de graduación', getModalidadLabel(acta.modalidad))}
+          ${fila('Calificación final', acta.nota ? `${acta.nota} / 100 puntos` : 'Aprobado')}
+          ${fila('Gestión', acta.gestion || gestion)}
+        </table>
+        <p>Es cuanto se certifica en honor a la verdad, para los fines que convengan al interesado(a).</p>`,
+      firmas: [FIRMAS.directora, FIRMAS.vicedecano]
+    });
   };
 
   return (

@@ -1,4 +1,5 @@
 const { Op } = require('sequelize');
+const { esErrorDeValidacion, responderValidacion } = require('../utils/errores');
 const { v4: uuidv4 } = require('uuid');
 const {
   sequelize,
@@ -163,6 +164,7 @@ const create = async (req, res) => {
     return res.status(201).json(formatAuxiliar(createdAux));
   } catch (err) {
     await t.rollback();
+    if (esErrorDeValidacion(err)) return responderValidacion(res, err);
     console.error('Error create auxiliar:', err);
     return res.status(500).json({ mensaje: 'Error al registrar auxiliar', error: err.message });
   }

@@ -911,7 +911,7 @@ const Docentes = () => {
                   type="button"
                 >
                   <span className="material-symbols-outlined text-base text-slate-700">folder_zip</span>
-                  <span>Descargar Expediente Completo (.ZIP)</span>
+                  <span>Descargar expediente completo</span>
                 </button>
               </div>
 
@@ -1291,7 +1291,7 @@ const Docentes = () => {
                     file={archivoForm.archivo}
                     onFileChange={(file) => setArchivoForm({ ...archivoForm, archivo: file })}
                     label="Archivo Digital (PDF o Escaneo) *"
-                    hint="Formatos admitidos: PDF/A hasta 25MB"
+                    hint="Formatos admitidos: PDF/A hasta 20 MB"
                   />
                 </div>
               </div>

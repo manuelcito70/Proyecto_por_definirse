@@ -1,4 +1,5 @@
 const path = require('path');
+const { esErrorDeValidacion, responderValidacion } = require('../utils/errores');
 const fs = require('fs');
 const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
@@ -156,6 +157,7 @@ const create = async (req, res) => {
     return res.status(201).json(formatDocente(createdDocente));
   } catch (err) {
     await t.rollback();
+    if (esErrorDeValidacion(err)) return responderValidacion(res, err);
     console.error('Error create docente:', err);
     return res.status(500).json({ mensaje: 'Error al registrar docente', error: err.message });
   }

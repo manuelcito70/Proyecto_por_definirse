@@ -881,7 +881,7 @@ const Expedidos = () => {
                     file={formData.archivo}
                     onFileChange={(file) => setFormData({ ...formData, archivo: file })}
                     label="Digitalización (PDF Opcional)"
-                    hint="PDF/A hasta 25 MB"
+                    hint="PDF/A hasta 20 MB"
                   />
                 </div>
 

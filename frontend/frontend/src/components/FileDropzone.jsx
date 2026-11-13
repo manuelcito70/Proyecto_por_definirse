@@ -10,9 +10,9 @@ export default function FileDropzone({
   file = null,
   onFileChange,
   accept = ".pdf,.png,.jpg,.jpeg",
-  maxSizeMB = 25,
+  maxSizeMB = 20, // mismo límite que el servidor (multer: 20 MB)
   label = "Archivo digital adjunto",
-  hint = "Formatos admitidos: PDF, JPG, PNG / Máx 25 MB"
+  hint = "Formatos admitidos: PDF, JPG, PNG / Máx 20 MB"
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);

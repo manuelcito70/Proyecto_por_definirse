@@ -57,6 +57,9 @@ app.use('/api/materias', require('./src/routes/materiasRoutes'));
 app.use('/api/convocatorias', require('./src/routes/convocatoriasRoutes'));
 app.use('/api/notificaciones', require('./src/routes/notificacionesRoutes'));
 
+// Errores de subida de archivos (tamaño máximo, etc.)
+app.use(require('./src/middleware/erroresSubida'));
+
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', sistema: 'SIGAD - Dirección de Carrera FINI' }));
 

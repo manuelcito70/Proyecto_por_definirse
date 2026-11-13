@@ -98,7 +98,7 @@ const NotificationBell = () => {
 
       {/* Menú Desplegable (Dropdown) */}
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+        <div className="fixed right-4 top-[76px] w-80 sm:w-96 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
           {/* Header del Dropdown */}
           <div className="bg-gradient-to-r from-[#07162b] via-[#0b2545] to-[#134074] p-3.5 text-white flex items-center justify-between border-b border-[#c5a059]/30 relative">
             <div className="flex items-center gap-2">

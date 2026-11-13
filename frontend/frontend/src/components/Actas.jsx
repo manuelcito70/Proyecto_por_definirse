@@ -968,7 +968,7 @@ const Actas = () => {
                     file={formData.archivo}
                     onFileChange={(file) => setFormData({ ...formData, archivo: file })}
                     label="Digitalización de Acta (PDF Escaneado)"
-                    hint="Formato oficial admitido: PDF hasta 25MB"
+                    hint="Formato oficial admitido: PDF hasta 20 MB"
                   />
                 </div>
               </div>
@@ -1191,7 +1191,7 @@ const Actas = () => {
                     file={formData.archivo}
                     onFileChange={(file) => setFormData({ ...formData, archivo: file })}
                     label="Archivo PDF Oficial *"
-                    hint="Formatos admitidos: PDF/A hasta 25MB"
+                    hint="Formatos admitidos: PDF/A hasta 20 MB"
                   />
                 </div>
               </div>

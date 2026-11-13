@@ -1,4 +1,5 @@
 const path = require('path');
+const { esErrorDeValidacion, responderValidacion } = require('../utils/errores');
 const fs = require('fs');
 const { Op } = require('sequelize');
 const { v4: uuidv4 } = require('uuid');
@@ -83,6 +84,10 @@ const create = async (req, res) => {
   const anio = req.body.gestion ? parseInt(req.body.gestion, 10) : (fecha ? new Date(fecha).getFullYear() : new Date().getFullYear());
   const catSanitized = sanitizeCategoria(categoria);
 
+  if (!String(remitente || '').trim() || !String(asunto || '').trim()) {
+    return res.status(400).json({ mensaje: 'El remitente y el asunto son obligatorios.' });
+  }
+
   let attempts = 0;
   let recibidoDoc = null;
 
@@ -158,6 +163,7 @@ const create = async (req, res) => {
       break;
     } catch (err) {
       await t.rollback();
+      if (esErrorDeValidacion(err)) return responderValidacion(res, err);
       if (attempts >= 3) {
         console.error('Error create recibido tras reintentos:', err);
         return res.status(500).json({ mensaje: 'Error al crear recibido', error: err.message });
@@ -255,6 +261,8 @@ const update = async (req, res) => {
 
     return res.json(formatRecibido(reloaded));
   } catch (err) {
+    // Dato fuera de los valores permitidos (estado, categoría...): error del cliente, no del servidor
+    if (esErrorDeValidacion(err)) return responderValidacion(res, err);
     console.error('Error update recibido:', err);
     return res.status(500).json({ mensaje: 'Error al actualizar recibido', error: err.message });
   }

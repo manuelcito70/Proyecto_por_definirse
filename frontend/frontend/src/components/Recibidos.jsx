@@ -843,7 +843,7 @@ const Recibidos = () => {
               file={formData.archivo}
               onFileChange={(f) => setFormData({ ...formData, archivo: f })}
               label="Archivo escaneado (PDF digitalizado o Imagen)"
-              hint="Formatos admitidos: PDF, JPG, PNG / Máx 25 MB"
+              hint="Formatos admitidos: PDF, JPG, PNG / Máx 20 MB"
             />
           </div>
 

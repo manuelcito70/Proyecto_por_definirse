@@ -113,6 +113,8 @@ const Layout = ({ user, onLogout, children }) => {
 
             {/* Perfil Oficial */}
             <div className="flex items-center gap-space-md pl-space-md border-l border-white/10">
+              {/* Campana de notificaciones: oficios pendientes y alertas (GET /api/notificaciones) */}
+              <NotificationBell />
               <div className="hidden lg:flex flex-col text-right">
                 <span className="font-body-sm text-body-sm font-semibold text-white leading-snug">
                   {user?.nombre || 'Dirección de Carrera'}

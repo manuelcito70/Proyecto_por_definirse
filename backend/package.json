@@ -9,7 +9,8 @@
     "db:setup": "node setup_database.js",
     "db:seed": "node seed_demo_data.js",
     "users:list": "node list_users.js",
-    "db:actualizar": "node database/actualizar_bd_v4.js"
+    "db:actualizar": "node database/actualizar_bd_v4.js",
+    "db:materias": "node database/seed_materias_sistemas.js"
   },
   "keywords": [],
   "author": "",

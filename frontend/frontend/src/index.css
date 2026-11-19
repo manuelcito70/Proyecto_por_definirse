@@ -203,3 +203,57 @@ code {
   position: relative;
   z-index: 2;
 }
+/* ==========================================================================
+   MODAL EFECTO CRISTAL INSTITUCIONAL (GLASSMORPHISM FINI UAGRM)
+   ========================================================================== */
+.modal-glass-backdrop {
+  background: radial-gradient(circle at 50% 15%, rgba(11, 37, 69, 0.55) 0%, rgba(5, 17, 33, 0.8) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.modal-glass-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 25px 60px -15px rgba(11, 37, 69, 0.3),
+    0 0 0 1px rgba(197, 160, 89, 0.35),
+    inset 0 1px 2px rgba(255, 255, 255, 0.95);
+}
+
+.modal-glass-header {
+  background: linear-gradient(135deg, rgba(7, 22, 43, 0.97) 0%, rgba(11, 37, 69, 0.92) 50%, rgba(19, 64, 116, 0.95) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.modal-glass-input {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(203, 213, 225, 0.85) !important;
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.modal-glass-input:focus {
+  background: #ffffff !important;
+  border-color: #0b2545 !important;
+  box-shadow: 0 0 0 3px rgba(11, 37, 69, 0.12), 0 2px 8px rgba(11, 37, 69, 0.06);
+}
+
+.modal-glass-badge {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+}
+
+.modal-glass-inner-card {
+  background: rgba(248, 250, 252, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}

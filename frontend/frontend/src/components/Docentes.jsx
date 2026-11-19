@@ -273,12 +273,14 @@ const Docentes = () => {
       const data = new FormData();
       data.append('tipo', archivoForm.tipo);
       data.append('gestion', archivoForm.gestion);
-      if (archivoForm.tipo !== 'curriculum') {
+      const requiereSemestre = archivoForm.tipo === 'informe_final' || archivoForm.tipo === 'lista_asistencia' || (activeTab === 'semestral' && archivoForm.tipo === 'otro');
+      if (requiereSemestre) {
         data.append('semestre', archivoForm.semestre);
       }
       data.append('archivo', archivoForm.archivo);
 
       await uploadDocenteArchivo(selectedDocente.id, data);
+      setDocentes(prev => prev.map(d => d.id === selectedDocente.id ? { ...d, updatedAt: new Date().toISOString() } : d));
       setSuccessModalData({
         badge: `${archivoForm.tipo.toUpperCase().replace(/_/g, ' ')} · ${selectedDocente.nombre}`,
         title: '¡Documento Anexado al Expediente!',
@@ -299,6 +301,7 @@ const Docentes = () => {
     if (!window.confirm(`¿Estás seguro de eliminar el archivo "${nombreOriginal || 'documento'}"?`)) return;
     try {
       await deleteDocenteArchivo(selectedDocente.id, archivoId);
+      setDocentes(prev => prev.map(d => d.id === selectedDocente.id ? { ...d, updatedAt: new Date().toISOString() } : d));
       await fetchArchivos(selectedDocente.id);
       await fetchDocentes(); // Actualizar conteos
     } catch (err) {
@@ -750,12 +753,14 @@ const Docentes = () => {
                       const isProg = docItem.tipo === 'programa_analitico';
                       const isAnexos = docItem.tipo === 'anexos_cv';
                       
-                      let docTitle = isCv ? 'Curriculum Vitae' : isProg ? 'Programa Analítico' : isAnexos ? 'Anexos y Títulos' : (docItem.tipo_nombre || 'Documento Oficial');
-                      let badgeText = isCv ? 'VIGENTE' : isProg ? 'MALLA 2024' : isAnexos ? 'COTEJADO' : 'CUSTODIA';
+                      let docTitle = isCv ? 'Curriculum Vitae' : isProg ? 'Programa Analítico' : isAnexos ? 'Anexos y Títulos' : docItem.tipo === 'otro' ? 'Certificado / Respaldo' : (docItem.tipo_nombre || 'Documento Oficial');
+                      let badgeText = isCv ? 'VIGENTE' : isProg ? 'MALLA 2024' : isAnexos ? 'COTEJADO' : docItem.tipo === 'otro' ? 'RESPALDO' : 'CUSTODIA';
                       let badgeColor = isCv 
                         ? 'bg-emerald-100 text-emerald-800 border-emerald-200' 
                         : isAnexos 
                         ? 'bg-slate-200 text-slate-700 border-slate-300' 
+                        : docItem.tipo === 'otro'
+                        ? 'bg-purple-100 text-purple-800 border-purple-200'
                         : 'bg-blue-100 text-blue-800 border-blue-200';
 
                       return (
@@ -849,20 +854,42 @@ const Docentes = () => {
                           <div className={`w-9 h-9 rounded-lg ${
                             docItem.tipo === 'lista_asistencia'
                               ? 'bg-amber-100 text-amber-800 border-amber-200'
+                              : docItem.tipo === 'otro'
+                              ? 'bg-purple-100 text-purple-800 border-purple-200'
                               : 'bg-red-100 text-[#C1121F] border-red-200'
                           } flex items-center justify-center shrink-0 border shadow-xs`}>
                             <span className="material-symbols-outlined text-xl">
-                              {docItem.tipo === 'lista_asistencia' ? 'fact_check' : 'picture_as_pdf'}
+                              {docItem.tipo === 'lista_asistencia' ? 'fact_check' : docItem.tipo === 'otro' ? 'verified' : 'picture_as_pdf'}
                             </span>
                           </div>
 
                           <div className="flex flex-col min-w-0">
                             <div className="flex items-center gap-2">
                               <span className="font-body-md text-xs font-bold text-slate-800 truncate">
-                                {docItem.tipo === 'lista_asistencia' ? 'Lista de Asistencia' : 'Informe Final de Cátedra'}
+                                {docItem.tipo === 'lista_asistencia' 
+                                  ? 'Lista de Asistencia' 
+                                  : docItem.tipo === 'informe_final' 
+                                  ? 'Informe Final de Cátedra'
+                                  : docItem.tipo === 'otro'
+                                  ? 'Certificado / Respaldo'
+                                  : docItem.tipo === 'programa_analitico'
+                                  ? 'Programa Analítico'
+                                  : docItem.tipo === 'anexos_cv'
+                                  ? 'Anexos y Títulos'
+                                  : (docItem.tipo_nombre || 'Documento Semestral')}
                               </span>
-                              <span className="font-label-badge text-[9px] px-1.5 py-0.2 rounded font-bold border bg-blue-100 text-blue-800 border-blue-200">
-                                {docItem.tipo === 'lista_asistencia' ? 'CUSTODIA' : 'ARCHIVADO'}
+                              <span className={`font-label-badge text-[9px] px-1.5 py-0.2 rounded font-bold border ${
+                                docItem.tipo === 'lista_asistencia'
+                                  ? 'bg-amber-100 text-amber-800 border-amber-200'
+                                  : docItem.tipo === 'otro'
+                                  ? 'bg-purple-100 text-purple-800 border-purple-200'
+                                  : 'bg-blue-100 text-blue-800 border-blue-200'
+                              }`}>
+                                {docItem.tipo === 'lista_asistencia' 
+                                  ? 'CUSTODIA' 
+                                  : docItem.tipo === 'otro'
+                                  ? 'RESPALDO'
+                                  : 'ARCHIVADO'}
                               </span>
                             </div>
                             <span className="font-label-code text-[11px] text-slate-500 truncate mt-0.5">
@@ -930,21 +957,23 @@ const Docentes = () => {
 
       </div>
 
-      {/* MODAL: REGISTRAR NUEVO DOCENTE */}
+      {/* MODAL: REGISTRAR NUEVO DOCENTE (CON EFECTO CRISTAL) */}
       {isDocenteModalOpen && (
-        <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 bg-black/60 backdrop-blur-md">
-          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-100px)] border border-[#c5a059]/40 animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
-            <div className="bg-gradient-to-r from-[#07162b] via-[#0B2545] to-[#15418c] text-white px-6 py-4 flex items-center justify-between border-b border-[#c5a059]/30 shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#c5a059]">person_add</span>
+        <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 modal-glass-backdrop transition-all duration-300">
+          <div className="modal-glass-card rounded-2xl max-w-xl w-full overflow-hidden flex flex-col max-h-[calc(100vh-100px)] animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
+            <div className="modal-glass-header text-white px-6 py-4 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl modal-glass-badge flex items-center justify-center text-[#c5a059]">
+                  <span className="material-symbols-outlined text-lg">person_add</span>
+                </div>
                 <span className="font-institutional-serif text-base font-bold">Registrar Nuevo Docente</span>
               </div>
               <button
-                className="text-white/70 hover:text-white cursor-pointer"
+                className="text-white/70 hover:text-white modal-glass-badge p-1.5 rounded-xl cursor-pointer"
                 onClick={() => !submitting && setIsDocenteModalOpen(false)}
                 type="button"
               >
-                <span className="material-symbols-outlined">close</span>
+                <span className="material-symbols-outlined text-base">close</span>
               </button>
             </div>
 
@@ -1070,21 +1099,23 @@ const Docentes = () => {
         </div>
       )}
 
-      {/* MODAL: EDITAR DOCENTE */}
+      {/* MODAL: EDITAR DOCENTE (CON EFECTO CRISTAL) */}
       {isEditDocenteModalOpen && (
-        <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 bg-black/60 backdrop-blur-md">
-          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-100px)] border border-[#c5a059]/40 animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
-            <div className="bg-gradient-to-r from-[#07162b] via-[#0B2545] to-[#15418c] text-white px-6 py-4 flex items-center justify-between border-b border-[#c5a059]/30 shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#c5a059]">edit</span>
+        <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 modal-glass-backdrop transition-all duration-300">
+          <div className="modal-glass-card rounded-2xl max-w-xl w-full overflow-hidden flex flex-col max-h-[calc(100vh-100px)] animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
+            <div className="modal-glass-header text-white px-6 py-4 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl modal-glass-badge flex items-center justify-center text-[#c5a059]">
+                  <span className="material-symbols-outlined text-lg">edit</span>
+                </div>
                 <span className="font-institutional-serif text-base font-bold">Editar Docente</span>
               </div>
               <button
-                className="text-white/70 hover:text-white cursor-pointer"
+                className="text-white/70 hover:text-white modal-glass-badge p-1.5 rounded-xl cursor-pointer"
                 onClick={() => !submitting && setIsEditDocenteModalOpen(false)}
                 type="button"
               >
-                <span className="material-symbols-outlined">close</span>
+                <span className="material-symbols-outlined text-base">close</span>
               </button>
             </div>
 
@@ -1208,21 +1239,23 @@ const Docentes = () => {
         </div>
       )}
 
-      {/* MODAL: CARGAR ARCHIVO AL EXPEDIENTE */}
+      {/* MODAL: CARGAR ARCHIVO AL EXPEDIENTE (CON EFECTO CRISTAL) */}
       {isArchivoModalOpen && selectedDocente && (
-        <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 bg-black/60 backdrop-blur-md">
-          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-100px)] border border-[#c5a059]/40 animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
-            <div className="bg-gradient-to-r from-[#07162b] via-[#0B2545] to-[#15418c] text-white px-6 py-4 flex items-center justify-between border-b border-[#c5a059]/30 shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#c5a059]">upload_file</span>
+        <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 modal-glass-backdrop transition-all duration-300">
+          <div className="modal-glass-card rounded-2xl max-w-xl w-full overflow-hidden flex flex-col max-h-[calc(100vh-100px)] animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
+            <div className="modal-glass-header text-white px-6 py-4 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl modal-glass-badge flex items-center justify-center text-[#c5a059]">
+                  <span className="material-symbols-outlined text-lg">upload_file</span>
+                </div>
                 <span className="font-institutional-serif text-base font-bold">Cargar Documento al Expediente</span>
               </div>
               <button
-                className="text-white/70 hover:text-white cursor-pointer"
+                className="text-white/70 hover:text-white modal-glass-badge p-1.5 rounded-xl cursor-pointer"
                 onClick={() => !submitting && setIsArchivoModalOpen(false)}
                 type="button"
               >
-                <span className="material-symbols-outlined">close</span>
+                <span className="material-symbols-outlined text-base">close</span>
               </button>
             </div>
 
@@ -1255,14 +1288,14 @@ const Docentes = () => {
                   </select>
                 </div>
 
-                {archivoForm.tipo !== 'curriculum' && (
+                {(archivoForm.tipo === 'informe_final' || archivoForm.tipo === 'lista_asistencia' || (activeTab === 'semestral' && archivoForm.tipo === 'otro')) && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1">
                       <label className="font-caption text-xs uppercase tracking-wider font-bold text-slate-600">
                         Gestión Académica
                       </label>
                       <input
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20"
+                        className="modal-glass-input w-full px-3.5 py-2.5 rounded-xl font-body-sm text-sm text-slate-800"
                         value={archivoForm.gestion}
                         onChange={(e) => setArchivoForm({ ...archivoForm, gestion: e.target.value })}
                         required
@@ -1275,7 +1308,7 @@ const Docentes = () => {
                         Semestre
                       </label>
                       <select
-                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-body-sm text-sm text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0B2545]/20 cursor-pointer"
+                        className="modal-glass-input w-full px-3.5 py-2.5 rounded-xl font-body-sm text-sm text-slate-800 cursor-pointer"
                         value={archivoForm.semestre}
                         onChange={(e) => setArchivoForm({ ...archivoForm, semestre: e.target.value })}
                       >

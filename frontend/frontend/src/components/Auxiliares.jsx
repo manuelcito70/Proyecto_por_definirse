@@ -856,21 +856,23 @@ const Auxiliares = () => {
 
       </div>
 
-      {/* MODAL: REGISTRAR ANTECEDENTE DE AUXILIAR */}
+      {/* MODAL: REGISTRAR ANTECEDENTE DE AUXILIAR (CON EFECTO CRISTAL) */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 bg-black/60 backdrop-blur-md">
-          <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl overflow-hidden flex flex-col max-h-[calc(100vh-100px)] border border-[#c5a059]/40 animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
-            <div className="bg-gradient-to-r from-[#07162b] via-[#0B2545] to-[#15418c] text-white px-6 py-4 flex items-center justify-between border-b border-[#c5a059]/30 shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="material-symbols-outlined text-[#c5a059]">add_circle</span>
+        <div className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-4 pt-16 sm:pt-20 pb-12 modal-glass-backdrop transition-all duration-300">
+          <div className="modal-glass-card rounded-2xl max-w-xl w-full overflow-hidden flex flex-col max-h-[calc(100vh-100px)] animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4">
+            <div className="modal-glass-header text-white px-6 py-4 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl modal-glass-badge flex items-center justify-center text-[#c5a059]">
+                  <span className="material-symbols-outlined text-lg">add_circle</span>
+                </div>
                 <span className="font-institutional-serif text-base font-bold">Registrar Auxiliar de Cátedra</span>
               </div>
               <button
-                className="text-white/70 hover:text-white cursor-pointer"
+                className="text-white/70 hover:text-white modal-glass-badge p-1.5 rounded-xl cursor-pointer"
                 onClick={() => !submitting && setIsModalOpen(false)}
                 type="button"
               >
-                <span className="material-symbols-outlined">close</span>
+                <span className="material-symbols-outlined text-base">close</span>
               </button>
             </div>
 

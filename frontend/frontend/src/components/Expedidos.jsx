@@ -642,23 +642,23 @@ const Expedidos = () => {
         </div>
       </div>
 
-      {/* MODAL: REGISTRO DE NUEVO OFICIO (HIGH-FIDELITY UAGRM FINI) */}
+      {/* MODAL: REGISTRO DE NUEVO OFICIO (HIGH-FIDELITY UAGRM FINI - EFECTO CRISTAL) */}
       {isModalOpen && (
         <div 
-          className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-3 sm:p-5 pt-16 sm:pt-20 pb-12 bg-black/60 backdrop-blur-md transition-all duration-300" 
+          className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-3 sm:p-5 pt-16 sm:pt-20 pb-12 modal-glass-backdrop transition-all duration-300" 
           onClick={() => !submitting && setIsModalOpen(false)}
         >
           <div 
             aria-labelledby="modal-title" 
             aria-modal="true" 
-            className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-[#c5a059]/40 overflow-hidden transform transition-all flex flex-col max-h-[calc(100vh-100px)] animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4" 
+            className="relative w-full max-w-2xl modal-glass-card rounded-2xl overflow-hidden transform transition-all flex flex-col max-h-[calc(100vh-100px)] animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4" 
             onClick={(e) => e.stopPropagation()} 
             role="dialog"
           >
-            {/* Modal Top Branding Bar (Navy Blue Gradient) */}
-            <div className="bg-gradient-to-r from-[#07162b] via-[#0b2545] to-[#134074] px-6 py-4 border-b border-[#c5a059]/30 flex items-center justify-between text-white relative shrink-0">
+            {/* Modal Top Branding Bar con Efecto Cristal */}
+            <div className="modal-glass-header px-6 py-4 flex items-center justify-between text-white relative shrink-0">
               <div className="flex items-center space-x-3 z-10">
-                <div className="w-9 h-9 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-[#c5a059] shadow-inner">
+                <div className="w-10 h-10 rounded-xl modal-glass-badge flex items-center justify-center text-[#c5a059] shadow-inner">
                   <span className="material-symbols-outlined text-xl">description</span>
                 </div>
                 <div>
@@ -677,7 +677,7 @@ const Expedidos = () => {
               {/* Close Button */}
               <button 
                 aria-label="Cerrar modal" 
-                className="text-slate-300 hover:text-white bg-white/10 hover:bg-white/20 p-2 rounded-xl border border-white/10 transition-all duration-150 cursor-pointer" 
+                className="text-white/70 hover:text-white modal-glass-badge hover:bg-white/20 p-2 rounded-xl transition-all duration-150 cursor-pointer" 
                 onClick={() => !submitting && setIsModalOpen(false)}
                 type="button"
               >
@@ -686,12 +686,12 @@ const Expedidos = () => {
             </div>
 
             {/* Modal Body */}
-            <div className="p-6 overflow-y-auto flex-1 space-y-5 bg-white">
-              {/* Correlative Assigned Banner */}
-              <div className="relative overflow-hidden bg-gradient-to-r from-slate-50 via-blue-50/40 to-slate-50 border border-slate-200 rounded-xl p-4 shadow-sm">
+            <div className="p-6 overflow-y-auto flex-1 space-y-5">
+              {/* Correlative Assigned Banner con Toque de Cristal */}
+              <div className="relative overflow-hidden modal-glass-inner-card rounded-xl p-4 shadow-2xs">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center space-x-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-[#0b2545] text-[#c5a059] flex items-center justify-center text-lg shadow-md shrink-0 font-bold font-mono">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#091a32] to-[#15418c] text-[#c5a059] flex items-center justify-center text-lg shadow-md shrink-0 font-bold font-mono border border-[#c5a059]/40">
                       #
                     </div>
                     <div>
@@ -705,7 +705,7 @@ const Expedidos = () => {
                     </div>
                   </div>
 
-                  <div className="inline-flex items-center self-start sm:self-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-2xs">
+                  <div className="inline-flex items-center self-start sm:self-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50/80 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-2xs">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span className="material-symbols-outlined text-xs text-emerald-600">lock</span>
                     <span>Consecutivo Legal</span>
@@ -728,7 +728,7 @@ const Expedidos = () => {
                       <span className="material-symbols-outlined text-lg">corporate_fare</span>
                     </div>
                     <input 
-                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none" 
+                      className="modal-glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 outline-none" 
                       id="destinatario-input" 
                       placeholder="Ej: DADSA, Decanato FINI, Consejo Facultativo..." 
                       required 
@@ -768,7 +768,7 @@ const Expedidos = () => {
                       <span className="material-symbols-outlined text-lg">description</span>
                     </div>
                     <input 
-                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 placeholder-slate-400 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none" 
+                      className="modal-glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-sm font-semibold text-slate-800 placeholder-slate-400 outline-none" 
                       id="asunto-input" 
                       placeholder="Título descriptivo o referencia resumida del trámite..." 
                       required 
@@ -790,7 +790,7 @@ const Expedidos = () => {
                         <span className="material-symbols-outlined text-lg">folder_open</span>
                       </div>
                       <select 
-                        className="w-full pl-10 pr-8 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none appearance-none cursor-pointer" 
+                        className="modal-glass-input w-full pl-10 pr-8 py-2.5 rounded-xl text-sm font-semibold text-slate-800 outline-none appearance-none cursor-pointer" 
                         id="categoria-select"
                         value={formData.categoria}
                         onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
@@ -817,7 +817,7 @@ const Expedidos = () => {
                         <span className="material-symbols-outlined text-lg">check_circle</span>
                       </div>
                       <select 
-                        className="w-full pl-10 pr-8 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none appearance-none cursor-pointer" 
+                        className="modal-glass-input w-full pl-10 pr-8 py-2.5 rounded-xl text-sm font-semibold text-slate-800 outline-none appearance-none cursor-pointer" 
                         id="estado-select"
                         value={formData.estado}
                         onChange={(e) => setFormData({ ...formData, estado: e.target.value })}
@@ -844,7 +844,7 @@ const Expedidos = () => {
                       <span className="material-symbols-outlined text-lg">calendar_today</span>
                     </div>
                     <input 
-                      className="w-full pl-10 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none" 
+                      className="modal-glass-input w-full pl-10 pr-3 py-2.5 rounded-xl text-sm font-medium text-slate-800 outline-none" 
                       id="fecha-input" 
                       type="date"
                       value={formData.fecha}
@@ -865,7 +865,7 @@ const Expedidos = () => {
                     </span>
                   </div>
                   <textarea 
-                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 focus:bg-white focus:border-[#0b2545] focus:ring-2 focus:ring-[#0b2545]/20 transition-all outline-none resize-none" 
+                    className="modal-glass-input w-full px-3.5 py-2.5 rounded-xl text-sm font-medium text-slate-800 placeholder-slate-400 outline-none resize-none" 
                     id="resumen-textarea" 
                     placeholder="Descripción adicional del documento remitido, antecedentes, códigos de seguimiento o referencias anexas..." 
                     rows="3"

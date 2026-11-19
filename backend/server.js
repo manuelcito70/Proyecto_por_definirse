@@ -10,18 +10,9 @@ const { iniciarCronAlertas } = require('./src/utils/mailer');
 
 const app = express();
 
-// CORS (Debe ejecutarse antes que cualquier middleware o limitador)
-const allowedOrigins = [
-  process.env.FRONTEND_URL,
-  'http://localhost:5173',
-  'http://localhost:3000'
-].filter(Boolean);
-
+// CORS (Permite acceso local, por IP de red y túneles compartidos)
 app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin || allowedOrigins.includes(origin)) callback(null, true);
-    else callback(new Error('No permitido por CORS'));
-  },
+  origin: true,
   credentials: true
 }));
 

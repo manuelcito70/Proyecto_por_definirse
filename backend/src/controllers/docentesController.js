@@ -350,6 +350,9 @@ const uploadArchivo = async (req, res) => {
       archivo_tamano: req.file.size || null
     }, { transaction: t });
 
+    // Actualizar fecha de modificación de la ficha del docente
+    await docente.update({ updatedAt: new Date() }, { transaction: t });
+
     await t.commit();
 
     const createdDoc = await Document.findByPk(docId, {
@@ -409,6 +412,7 @@ const deleteArchivo = async (req, res) => {
     }
 
     await doc.destroy();
+    await DocenteV4.update({ updatedAt: new Date() }, { where: { id_docente: req.params.id } });
     return res.json({ mensaje: 'Archivo eliminado' });
   } catch (err) {
     return res.status(500).json({ mensaje: 'Error al eliminar archivo' });

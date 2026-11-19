@@ -1,6 +1,6 @@
 import { fetchWithAuth, getToken } from './auth';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 // Helper para convertir objeto de query params a string
 const toQueryString = (params = {}) => {
@@ -84,7 +84,10 @@ export const updateRecibido = async (id, data) => {
     method: 'PUT',
     body: (data instanceof FormData ? data : JSON.stringify(data))
   });
-  if (!res.ok) throw new Error('Error al actualizar documento recibido');
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.mensaje || 'Error al actualizar documento recibido');
+  }
   return res.json();
 };
 

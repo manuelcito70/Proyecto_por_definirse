@@ -94,6 +94,7 @@ const Recibidos = () => {
   }, [previewDoc]);
 
   // Form State
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [formData, setFormData] = useState({
@@ -177,6 +178,7 @@ const Recibidos = () => {
         title: '¡Documento Registrado con Éxito!',
         message: `El documento enviado por "${formData.remitente}" ha sido indexado y custodiado en el archivo institucional.`
       });
+      setIsModalOpen(false);
 
       showToast(
         `Documento recibido #${String(newNro).padStart(2, '0')}/${gestion} registrado`,
@@ -319,10 +321,7 @@ const Recibidos = () => {
             <div className="h-10 w-px bg-surface-container hidden sm:block"></div>
             <button 
               className="btn-doc-fold" 
-              onClick={() => {
-                const el = document.getElementById('form-registro-section');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }} 
+              onClick={() => setIsModalOpen(true)} 
               type="button"
             >
               <span className="material-symbols-outlined text-base">add_circle</span>
@@ -505,10 +504,7 @@ const Recibidos = () => {
                       title={`No se encontraron documentos en ${gestion}`}
                       message={busqueda ? `No hay documentos que coincidan con la búsqueda "${busqueda}".` : "No existen registros de correspondencia externa para esta gestión."}
                       actionText="Registrar documento recibido"
-                      onAction={() => {
-                        const el = document.getElementById('form-registro-section');
-                        if (el) el.scrollIntoView({ behavior: 'smooth' });
-                      }}
+                      onAction={() => setIsModalOpen(true)}
                     />
                   </td>
                 </tr>
@@ -688,191 +684,239 @@ const Recibidos = () => {
         </div>
       </div>
 
-      {/* 3. Formulario Integrado: Registrar Documento Recibido */}
-      <div 
-        className="bg-surface-container-lowest rounded-2xl shadow-sm p-space-lg border border-surface-container flex flex-col gap-space-lg relative overflow-hidden" 
-        id="form-registro-section"
-      >
-        <div className="absolute inset-1 border border-[#c5a059]/20 rounded-xl pointer-events-none"></div>
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c1121f] via-[#c5a059] to-[#0b2545]"></div>
+      {/* MODAL: REGISTRAR DOCUMENTO RECIBIDO (CON EFECTO CRISTAL INSTITUCIONAL) */}
+      {isModalOpen && (
+        <div 
+          className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center p-3 sm:p-5 pt-16 sm:pt-20 pb-12 modal-glass-backdrop transition-all duration-300"
+          onClick={() => !submitting && setIsModalOpen(false)}
+        >
+          <div 
+            aria-labelledby="modal-recibido-title" 
+            aria-modal="true" 
+            className="relative w-full max-w-2xl modal-glass-card rounded-2xl overflow-hidden transform transition-all flex flex-col max-h-[calc(100vh-100px)] animate-in fade-in zoom-in-95 duration-200 mt-2 sm:mt-4"
+            onClick={(e) => e.stopPropagation()} 
+            role="dialog"
+          >
+            {/* Modal Header con Efecto Cristal Azul Institucional */}
+            <div className="modal-glass-header px-6 py-4 flex items-center justify-between text-white relative shrink-0">
+              <div className="flex items-center space-x-3 z-10">
+                <div className="w-10 h-10 rounded-xl modal-glass-badge flex items-center justify-center text-[#c5a059] shadow-inner">
+                  <span className="material-symbols-outlined text-xl">move_to_inbox</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="font-institutional-serif text-base font-bold tracking-wide text-white" id="modal-recibido-title">
+                      Registrar Documento Recibido
+                    </h2>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#c1121f] text-white border border-white/20 tracking-wider">
+                      GESTIÓN {gestion}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-white/70">Custodia Institucional y Respaldo Digital · FINI UAGRM</p>
+                </div>
+              </div>
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-space-sm pb-space-md bg-surface-container-low p-space-md rounded-xl border border-slate-200/60">
-          <div className="flex items-center gap-space-sm">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#091a32] to-[#15418c] text-white flex items-center justify-center font-bold shadow-sm ring-1 ring-[#c5a059]/40">
-              <span className="material-symbols-outlined">post_add</span>
+              {/* Close Button */}
+              <button 
+                aria-label="Cerrar modal" 
+                className="text-white/70 hover:text-white modal-glass-badge hover:bg-white/20 p-2 rounded-xl transition-all duration-150 cursor-pointer" 
+                onClick={() => !submitting && setIsModalOpen(false)}
+                type="button"
+              >
+                <span className="material-symbols-outlined text-base leading-none block">close</span>
+              </button>
             </div>
-            <div>
-              <h2 className="font-institutional-serif text-lg md:text-xl text-[#0b2545] font-bold">
-                Registrar documento recibido
-              </h2>
-              <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Llene los datos formales para anexar al archivo oficial de Sistemas · FINI UAGRM.
-              </p>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto flex-1 space-y-4">
+              {/* Correlative Card con Toque de Cristal */}
+              <div className="modal-glass-inner-card rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                <div className="flex items-center space-x-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#091a32] to-[#15418c] text-[#c5a059] flex items-center justify-center text-lg shadow-md shrink-0 font-bold font-mono border border-[#c5a059]/40">
+                    <span className="material-symbols-outlined text-xl">tag</span>
+                  </div>
+                  <div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
+                      Correlativo Oficial Asignado
+                    </span>
+                    <span className="text-xl font-label-code font-bold text-[#0b2545] tracking-tight">
+                      Recibido N.° {String(nextRecibidoNumber).padStart(2, '0')}{' '}
+                      <span className="text-[#c1121f]">/</span> {gestion}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="inline-flex items-center self-start sm:self-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50/80 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-2xs">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="material-symbols-outlined text-xs text-emerald-600">lock</span>
+                  <span>Secuencia Reservada</span>
+                </div>
+              </div>
+
+              {/* Formulario */}
+              <form id="form-registro-recibido" onSubmit={handleFormSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Origen / Remitente */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1" htmlFor="modal-origen-remitente">
+                      <span>Origen / Remitente</span>
+                      <span className="text-[#c1121f]">*</span>
+                    </label>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-lg">corporate_fare</span>
+                      <input 
+                        className="modal-glass-input w-full pl-10 pr-3 py-2.5 rounded-xl font-body-sm text-sm text-slate-800 placeholder-slate-400 outline-none" 
+                        id="modal-origen-remitente" 
+                        placeholder="Ej. Decanatura FINI, Dirección de Carrera Civil..." 
+                        value={formData.remitente}
+                        onChange={(e) => setFormData({ ...formData, remitente: e.target.value })}
+                        required 
+                        type="text"
+                      />
+                    </div>
+                  </div>
+
+                  {/* N.° de oficio original */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1" htmlFor="modal-oficio-original">
+                      <span>N.° de oficio original</span>
+                      <span className="text-[#c1121f]">*</span>
+                    </label>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-lg">numbers</span>
+                      <input 
+                        className="modal-glass-input w-full pl-10 pr-3 py-2.5 rounded-xl font-label-code text-sm text-slate-800 placeholder-slate-400 outline-none" 
+                        id="modal-oficio-original" 
+                        placeholder="Ej. OF-EXT-A/028, CITE-DIR-2026..." 
+                        value={formData.oficio_original}
+                        onChange={(e) => setFormData({ ...formData, oficio_original: e.target.value })}
+                        required 
+                        type="text"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Fecha de recepción */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1" htmlFor="modal-fecha-recepcion">
+                      <span>Fecha de recepción</span>
+                      <span className="text-[#c1121f]">*</span>
+                    </label>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-lg">calendar_month</span>
+                      <input 
+                        className="modal-glass-input w-full pl-10 pr-3 py-2.5 rounded-xl font-body-sm text-sm text-slate-800 outline-none" 
+                        id="modal-fecha-recepcion" 
+                        required 
+                        type="date" 
+                        value={formData.fecha}
+                        onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Categoría documental */}
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1" htmlFor="modal-categoria-recibido">
+                      <span>Categoría documental</span>
+                      <span className="text-[#c1121f]">*</span>
+                    </label>
+                    <div className="relative">
+                      <span className="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-lg">folder_open</span>
+                      <select 
+                        className="modal-glass-input w-full pl-10 pr-8 py-2.5 rounded-xl font-body-sm text-sm text-slate-800 outline-none appearance-none cursor-pointer" 
+                        id="modal-categoria-recibido" 
+                        required
+                        value={formData.categoria}
+                        onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
+                      >
+                        <option value="carta">Carta</option>
+                        <option value="solicitud">Solicitud</option>
+                        <option value="informe">Informe</option>
+                        <option value="memorandum">Memorándum</option>
+                        <option value="otro">Otro</option>
+                      </select>
+                      <span className="material-symbols-outlined absolute right-3 top-2.5 text-slate-400 pointer-events-none text-lg">expand_more</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tipo de atención */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1" htmlFor="modal-tipo-atencion">
+                    <span>Tipo de atención (Estado inicial)</span>
+                    <span className="text-[#c1121f]">*</span>
+                  </label>
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-lg">tune</span>
+                    <select 
+                      className="modal-glass-input w-full pl-10 pr-8 py-2.5 rounded-xl font-body-sm text-sm text-slate-800 outline-none appearance-none cursor-pointer" 
+                      id="modal-tipo-atencion" 
+                      required
+                      value={formData.tipo_atencion}
+                      onChange={(e) => setFormData({ ...formData, tipo_atencion: e.target.value })}
+                    >
+                      <option value="Requiere respuesta">Requiere respuesta (Estado: PENDIENTE — Notifica por correo)</option>
+                      <option value="Solo conocimiento">Solo conocimiento (Estado: COMPLETADO — Archivo institucional)</option>
+                    </select>
+                    <span className="material-symbols-outlined absolute right-3 top-2.5 text-slate-400 pointer-events-none text-lg">expand_more</span>
+                  </div>
+                </div>
+
+                {/* Asunto */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1" htmlFor="modal-asunto-referencia">
+                    <span>Asunto / Referencia documental</span>
+                    <span className="text-[#c1121f]">*</span>
+                  </label>
+                  <textarea 
+                    className="modal-glass-input w-full p-3 rounded-xl font-body-sm text-sm text-slate-800 placeholder-slate-400 outline-none resize-none" 
+                    id="modal-asunto-referencia" 
+                    placeholder="Sintetice el contenido del documento, solicitud o antecedente..." 
+                    required 
+                    rows="3"
+                    value={formData.asunto}
+                    onChange={(e) => setFormData({ ...formData, asunto: e.target.value })}
+                  ></textarea>
+                </div>
+
+                {/* File Dropzone */}
+                <div>
+                  <FileDropzone
+                    file={formData.archivo}
+                    onFileChange={(f) => setFormData({ ...formData, archivo: f })}
+                    label="Archivo escaneado (PDF digitalizado o Imagen)"
+                    hint="Formatos admitidos: PDF, JPG, PNG / Máx 20 MB"
+                  />
+                </div>
+              </form>
             </div>
-          </div>
-          <div className="flex items-center gap-space-sm bg-surface-container-lowest px-space-md py-2 rounded-lg shadow-2xs border border-surface-container">
-            <span className="font-caption text-caption uppercase tracking-wider text-on-surface-variant font-semibold">
-              Correlativo asignado:
-            </span>
-            <span className="font-label-code text-label-code font-bold text-[#c1121f] bg-red-50 border border-red-200 px-2 py-0.5 rounded">
-              {String(nextRecibidoNumber).padStart(2, '0')} / {gestion} (Automático)
-            </span>
+
+            {/* Modal Footer */}
+            <div className="modal-glass-inner-card px-6 py-4 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-slate-200/60 shrink-0">
+              <button 
+                className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-slate-600 hover:text-slate-800 hover:bg-slate-200/60 font-body-sm text-sm font-semibold transition-colors cursor-pointer" 
+                type="button"
+                onClick={() => !submitting && setIsModalOpen(false)}
+                disabled={submitting}
+              >
+                Cancelar
+              </button>
+              <button 
+                className="btn-doc-fold w-full sm:w-auto !py-2.5 !px-6"
+                type="submit"
+                form="form-registro-recibido"
+                disabled={submitting}
+              >
+                <span className="material-symbols-outlined text-lg">save</span>
+                <span>{submitting ? 'Registrando...' : 'Registrar y custodiar'}</span>
+              </button>
+            </div>
           </div>
         </div>
-
-        <form onSubmit={handleFormSubmit} className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-space-lg">
-          <div className="md:col-span-6 flex flex-col gap-1.5">
-            <label className="font-body-sm text-body-sm font-semibold text-[#0b2545] flex items-center gap-1" htmlFor="origen-remitente">
-              <span>Origen / Remitente</span>
-              <span className="text-[#c1121f]">*</span>
-            </label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-lg">corporate_fare</span>
-              <input 
-                className="w-full bg-surface-container-low text-on-surface placeholder:text-on-surface-variant font-body-md text-body-md pl-10 pr-3 py-2 rounded-lg focus:outline-none focus:bg-surface-container-lowest border border-slate-200 shadow-2xs" 
-                id="origen-remitente" 
-                placeholder="Ej. Decanatura FINI, Dirección de Carrera Civil..." 
-                value={formData.remitente}
-                onChange={(e) => setFormData({ ...formData, remitente: e.target.value })}
-                required 
-                type="text"
-              />
-            </div>
-          </div>
-
-          <div className="md:col-span-6 flex flex-col gap-1.5">
-            <label className="font-body-sm text-body-sm font-semibold text-[#0b2545] flex items-center gap-1" htmlFor="oficio-original">
-              <span>N.° de oficio original</span>
-              <span className="text-[#c1121f]">*</span>
-            </label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-lg">numbers</span>
-              <input 
-                className="w-full bg-surface-container-low text-on-surface placeholder:text-on-surface-variant font-label-code text-body-md pl-10 pr-3 py-2 rounded-lg focus:outline-none focus:bg-surface-container-lowest border border-slate-200 shadow-2xs" 
-                id="oficio-original" 
-                placeholder="Ej. OF-EXT-A/028, CITE-DIR-2026..." 
-                value={formData.oficio_original}
-                onChange={(e) => setFormData({ ...formData, oficio_original: e.target.value })}
-                required 
-                type="text"
-              />
-            </div>
-          </div>
-
-          <div className="md:col-span-6 flex flex-col gap-1.5">
-            <label className="font-body-sm text-body-sm font-semibold text-[#0b2545] flex items-center gap-1" htmlFor="fecha-recepcion">
-              <span>Fecha de recepción</span>
-              <span className="text-[#c1121f]">*</span>
-            </label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-lg">calendar_month</span>
-              <input 
-                className="w-full bg-surface-container-low text-on-surface font-body-md text-body-md pl-10 pr-3 py-2 rounded-lg focus:outline-none focus:bg-surface-container-lowest border border-slate-200 shadow-2xs" 
-                id="fecha-recepcion" 
-                required 
-                type="date" 
-                value={formData.fecha}
-                onChange={(e) => setFormData({ ...formData, fecha: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div className="md:col-span-6 flex flex-col gap-1.5">
-            <label className="font-body-sm text-body-sm font-semibold text-[#0b2545] flex items-center gap-1" htmlFor="categoria-recibido">
-              <span>Categoría documental</span>
-              <span className="text-[#c1121f]">*</span>
-            </label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-lg">folder_open</span>
-              <select 
-                className="w-full bg-surface-container-low text-on-surface font-body-md text-body-md pl-10 pr-3 py-2 rounded-lg focus:outline-none focus:bg-surface-container-lowest border border-slate-200 shadow-2xs appearance-none cursor-pointer" 
-                id="categoria-recibido" 
-                required
-                value={formData.categoria}
-                onChange={(e) => setFormData({ ...formData, categoria: e.target.value })}
-              >
-                <option value="carta">Carta</option>
-                <option value="solicitud">Solicitud</option>
-                <option value="informe">Informe</option>
-                <option value="memorandum">Memorándum</option>
-                <option value="otro">Otro</option>
-              </select>
-              <span className="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant pointer-events-none text-lg">expand_more</span>
-            </div>
-          </div>
-
-          <div className="md:col-span-6 flex flex-col gap-1.5">
-            <label className="font-body-sm text-body-sm font-semibold text-[#0b2545] flex items-center gap-1" htmlFor="tipo-atencion">
-              <span>Tipo de atención (Estado inicial)</span>
-              <span className="text-[#c1121f]">*</span>
-            </label>
-            <div className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant text-lg">tune</span>
-              <select 
-                className="w-full bg-surface-container-low text-on-surface font-body-md text-body-md pl-10 pr-3 py-2 rounded-lg focus:outline-none focus:bg-surface-container-lowest border border-slate-200 shadow-2xs appearance-none cursor-pointer" 
-                id="tipo-atencion" 
-                required
-                value={formData.tipo_atencion}
-                onChange={(e) => setFormData({ ...formData, tipo_atencion: e.target.value })}
-              >
-                <option value="Requiere respuesta">Requiere respuesta (Estado: PENDIENTE — Notifica por correo)</option>
-                <option value="Solo conocimiento">Solo conocimiento (Estado: COMPLETADO — Archivo institucional)</option>
-              </select>
-              <span className="material-symbols-outlined absolute right-3 top-2.5 text-on-surface-variant pointer-events-none text-lg">expand_more</span>
-            </div>
-          </div>
-
-          <div className="md:col-span-12 flex flex-col gap-1.5">
-            <label className="font-body-sm text-body-sm font-semibold text-[#0b2545] flex items-center gap-1" htmlFor="asunto-referencia">
-              <span>Asunto / Referencia documental</span>
-              <span className="text-[#c1121f]">*</span>
-            </label>
-            <textarea 
-              className="w-full bg-surface-container-low text-on-surface placeholder:text-on-surface-variant font-body-md text-body-md p-3 rounded-lg focus:outline-none focus:bg-surface-container-lowest border border-slate-200 shadow-2xs" 
-              id="asunto-referencia" 
-              placeholder="Sintetice el contenido del documento, solicitud o antecedente..." 
-              required 
-              rows="2"
-              value={formData.asunto}
-              onChange={(e) => setFormData({ ...formData, asunto: e.target.value })}
-            ></textarea>
-          </div>
-
-          <div className="md:col-span-12">
-            <FileDropzone
-              file={formData.archivo}
-              onFileChange={(f) => setFormData({ ...formData, archivo: f })}
-              label="Archivo escaneado (PDF digitalizado o Imagen)"
-              hint="Formatos admitidos: PDF, JPG, PNG / Máx 20 MB"
-            />
-          </div>
-
-          <div className="md:col-span-12 flex flex-col sm:flex-row items-center justify-end gap-space-sm pt-space-sm border-t border-slate-100">
-            <button 
-              className="w-full sm:w-auto px-space-lg py-2.5 rounded-lg bg-surface-container text-on-surface-variant hover:bg-surface-container-high font-body-sm text-body-sm font-medium transition-colors border border-slate-200 cursor-pointer" 
-              type="reset"
-              onClick={() => setFormData({
-                remitente: '',
-                oficio_original: '',
-                asunto: '',
-                fecha: new Date().toISOString().split('T')[0],
-                tipo_atencion: 'Requiere respuesta',
-                archivo: null
-              })}
-            >
-              Limpiar campos
-            </button>
-            <button 
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-space-xs px-space-xl py-2.5 rounded-lg bg-gradient-to-r from-[#c1121f] to-[#9e0c18] hover:from-[#8b0000] hover:to-[#c1121f] text-white shadow-md font-body-sm text-body-sm font-bold transition-all border border-white/20 cursor-pointer disabled:opacity-50" 
-              type="submit"
-              disabled={submitting}
-            >
-              <span className="material-symbols-outlined text-lg">save</span>
-              <span>{submitting ? 'Guardando...' : 'Guardar registro'}</span>
-            </button>
-          </div>
-        </form>
-      </div>
+      )}
 
       {/* 4. Modal Preview de Documento (Visor Interactivo para Imágenes y PDFs) */}
       {previewDoc && (

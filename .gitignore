@@ -44,3 +44,5 @@ test_no_verification.js
 
 # ===== RESPALDOS DEL SCRIPT db:actualizar =====
 backend/respaldos/
+
+*.zip

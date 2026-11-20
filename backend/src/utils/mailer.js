@@ -24,8 +24,8 @@ const isMailerConfigured = Boolean(EMAIL_HOST && EMAIL_USER && EMAIL_PASS);
 if (isMailerConfigured) {
   try {
     const isGmail = (EMAIL_HOST || '').includes('gmail') || (EMAIL_USER || '').includes('@gmail.com');
-    const port = parseInt(EMAIL_PORT, 10) || (isGmail ? 465 : 587);
-    const host = isGmail ? '64.233.186.109' : (EMAIL_HOST || 'smtp.gmail.com');
+    const port = parseInt(EMAIL_PORT, 10) || 465;
+    const host = EMAIL_HOST || 'smtp.gmail.com';
 
     transporter = nodemailer.createTransport({
       host,
@@ -36,8 +36,8 @@ if (isMailerConfigured) {
         pass: EMAIL_PASS
       },
       tls: {
-        servername: EMAIL_HOST || 'smtp.gmail.com',
-        rejectUnauthorized: true
+        servername: 'smtp.gmail.com',
+        rejectUnauthorized: false
       }
     });
   } catch (err) {

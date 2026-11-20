@@ -426,11 +426,34 @@ const remove = async (req, res) => {
       where: { id_docente: req.params.id, id_carrera }
     });
     if (!docente) return res.status(404).json({ mensaje: 'Docente no encontrado' });
+
+    // 1. Eliminar vínculos con materias asignadas
+    await DocenteMateria.destroy({ where: { id_docente: docente.id_docente } });
+
+    // 2. Eliminar documentos, adjuntos y archivos físicos del expediente
+    const docs = await Document.findAll({
+      where: { id_docente: docente.id_docente },
+      include: [{ model: DocumentAttachment, as: 'adjuntos' }]
+    });
+
+    for (const d of docs) {
+      if (d.adjuntos && d.adjuntos.length > 0) {
+        for (const adj of d.adjuntos) {
+          if (adj.archivo_path && fs.existsSync(adj.archivo_path)) {
+            try { fs.unlinkSync(adj.archivo_path); } catch (e) {}
+          }
+          await adj.destroy();
+        }
+      }
+      await d.destroy();
+    }
+
+    // 3. Eliminar registro del docente
     await docente.destroy();
-    return res.json({ mensaje: 'Docente eliminado correctamente' });
+    return res.json({ mensaje: 'Docente y expediente eliminados correctamente' });
   } catch (err) {
     console.error('Error delete docente:', err);
-    return res.status(500).json({ mensaje: 'Error al eliminar docente' });
+    return res.status(500).json({ mensaje: 'Error al eliminar docente', error: err.message });
   }
 };
 

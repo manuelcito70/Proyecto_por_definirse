@@ -283,12 +283,12 @@ const Expedidos = () => {
       </div>
 
       {/* Correlative Running Tracker Card */}
-      <div className="relative overflow-hidden bg-surface-container-lowest rounded-2xl p-space-lg shadow-sm border border-surface-container flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg">
+      <div className="relative overflow-hidden bg-surface-container-lowest rounded-2xl p-4 sm:p-space-lg shadow-sm border border-surface-container flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 sm:gap-space-lg">
         {/* Franjas geométricas y acento superior */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
         <div className="absolute -right-8 -top-12 w-48 h-48 bg-[#c1121f]/5 rounded-full blur-2xl pointer-events-none"></div>
 
-        <div className="flex items-center gap-space-lg min-w-0">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-space-lg w-full min-w-0">
           {/* Big Correlative Block */}
           <div className="flex flex-col items-center justify-center bg-surface-container-low px-space-lg py-space-sm rounded-xl min-w-[120px] border border-slate-200/60 shadow-2xs">
             <span className="font-caption text-caption uppercase tracking-wider text-on-surface-variant font-bold">
@@ -323,7 +323,7 @@ const Expedidos = () => {
         </div>
 
         {/* Historical Reference Box */}
-        <div className="w-full lg:w-auto flex flex-col justify-between bg-surface-container-low p-space-md rounded-xl max-w-xs border border-slate-200/70">
+        <div className="w-full lg:w-auto flex flex-col justify-between bg-surface-container-low p-3 sm:p-space-md rounded-xl max-w-full lg:max-w-xs border border-slate-200/70">
           <div className="flex items-center justify-between gap-space-xs text-[#0b2545] mb-1">
             <span className="font-institutional-serif text-xs uppercase tracking-wider font-bold">
               Cierre anual inmutable
@@ -375,7 +375,7 @@ const Expedidos = () => {
             </form>
 
             {/* Filter Controls */}
-            <div className="flex items-center gap-space-xs">
+            <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
               <div className="relative">
                 <select 
                   className="appearance-none bg-surface-container-low pl-3 pr-8 py-2.5 rounded-lg font-body-sm text-body-sm font-medium text-on-surface hover:bg-surface-container focus:outline-none focus:ring-2 focus:ring-[#0b2545]/20 cursor-pointer border border-slate-200/80"
@@ -424,7 +424,7 @@ const Expedidos = () => {
         </div>
 
         {/* Responsive Table Wrapper with Institutional Theme */}
-        <div className="overflow-x-auto w-full">
+        <div className="overflow-x-auto w-full max-w-full min-w-0">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-[#0b2545] text-white font-caption text-[11px] uppercase tracking-wider">

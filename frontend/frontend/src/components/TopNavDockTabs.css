@@ -8,6 +8,10 @@
   position: relative;
   z-index: 30;
   user-select: none;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .top-dock-container {
@@ -19,6 +23,10 @@
   overflow-y: visible;
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE 10+ */
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .top-dock-container::-webkit-scrollbar {
@@ -216,4 +224,26 @@
   width: 36px;
   background: #c1121f;
   box-shadow: 0 1px 8px rgba(193, 18, 31, 0.85);
+}
+
+
+/* ========================================================
+   OPTIMIZACIONES MÓVILES (RESPONSIVE TOUCH)
+   ======================================================== */
+@media (max-width: 768px) {
+  .top-dock-container {
+    padding: 6px 2px;
+    gap: 4px;
+  }
+  .dock-tab-item {
+    height: 34px;
+    padding: 0 10px;
+    font-size: 0.78rem;
+    gap: 5px;
+    border-radius: 10px;
+    transform: none !important;
+  }
+  .dock-tab-icon {
+    font-size: 16px !important;
+  }
 }

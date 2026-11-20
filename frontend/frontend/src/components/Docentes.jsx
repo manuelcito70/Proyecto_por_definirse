@@ -309,6 +309,19 @@ const Docentes = () => {
     }
   };
 
+  // Eliminación completa de Docente y su expediente
+  const handleDeleteDocente = async (docId, nombreDocente, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm(`¿Estás seguro de eliminar al docente "${nombreDocente}" y todo su legajo de expediente institucional? Esta acción no se puede deshacer.`)) return;
+    try {
+      await deleteDocente(docId);
+      if (selectedDocenteId === docId) setSelectedDocenteId(null);
+      await fetchDocentes();
+    } catch (err) {
+      alert('Error al eliminar docente: ' + err.message);
+    }
+  };
+
   // Descarga de expediente completo (.ZIP o lote)
   const handleDownloadExpedienteCompleto = () => {
     if (!selectedDocente) return;
@@ -345,7 +358,7 @@ const Docentes = () => {
           </div>
 
           {/* Selector de Materias extraídas de la tabla 'materia' */}
-          <div className="relative min-w-[240px] sm:min-w-[270px]">
+          <div className="relative w-full sm:w-auto sm:min-w-[240px]">
             <select
               value={selectedMateria}
               onChange={(e) => setSelectedMateria(e.target.value)}
@@ -508,8 +521,8 @@ const Docentes = () => {
                   </div>
 
                   {/* Fila Inferior: Los 2 Botones Interactivos y Acciones Rápidas */}
-                  <div className="flex items-center justify-between pt-1 border-t border-slate-100/80 gap-2">
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                  <div className="flex flex-wrap items-center justify-between pt-2 border-t border-slate-100/80 gap-2">
+                    <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                       {/* BOTÓN 1: Doc. General (X) */}
                       <button
                         onClick={() => {
@@ -588,6 +601,15 @@ const Docentes = () => {
                       >
                         <span className="material-symbols-outlined text-base">folder_shared</span>
                       </button>
+
+                      <button
+                        onClick={(e) => handleDeleteDocente(doc.id, doc.nombre, e)}
+                        className="p-2 rounded-lg text-slate-400 hover:text-[#C1121F] hover:bg-red-50 transition-colors cursor-pointer"
+                        title="Eliminar docente"
+                        type="button"
+                      >
+                        <span className="material-symbols-outlined text-base">delete</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -620,15 +642,27 @@ const Docentes = () => {
                   </p>
                 </div>
 
-                {/* Botón Cerrar Panel ✕ */}
-                <button
-                  onClick={() => setSelectedDocenteId(null)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer shrink-0"
-                  title="Cerrar expediente"
-                  type="button"
-                >
-                  <span className="material-symbols-outlined text-xl">close</span>
-                </button>
+                {/* Acciones del Panel */}
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={(e) => handleDeleteDocente(selectedDocente.id, selectedDocente.nombre, e)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-[#C1121F] hover:bg-red-50 transition-colors cursor-pointer"
+                    title="Eliminar docente y legajo"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-lg">delete</span>
+                  </button>
+
+                  {/* Botón Cerrar Panel ✕ */}
+                  <button
+                    onClick={() => setSelectedDocenteId(null)}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+                    title="Cerrar expediente"
+                    type="button"
+                  >
+                    <span className="material-symbols-outlined text-xl">close</span>
+                  </button>
+                </div>
               </div>
 
               {/* Tabs de Cambio Rápido entre "Doc. General" y "Semestral" */}

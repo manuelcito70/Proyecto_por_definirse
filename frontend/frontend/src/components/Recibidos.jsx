@@ -477,8 +477,8 @@ const Recibidos = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto w-full">
-          <table className="w-full text-left" id="tabla-recibidos">
+        <div className="overflow-x-auto w-full max-w-full min-w-0">
+          <table className="w-full min-w-[700px] text-left" id="tabla-recibidos">
             <thead className="bg-surface-container-low text-on-surface-variant font-caption text-caption uppercase tracking-wider border-b border-surface-container">
               <tr>
                 <th className="py-3.5 px-space-lg font-bold text-[#0b2545]">N.° Interno</th>

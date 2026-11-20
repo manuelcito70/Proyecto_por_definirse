@@ -797,6 +797,11 @@ const Docentes = () => {
                         ? 'bg-purple-100 text-purple-800 border-purple-200'
                         : 'bg-blue-100 text-blue-800 border-blue-200';
 
+                      if (docItem.archivo_existe === false) {
+                        badgeText = 'NO EN DISCO';
+                        badgeColor = 'bg-amber-100 text-amber-800 border-amber-300';
+                      }
+
                       return (
                         <div
                           key={docItem.id}
@@ -825,22 +830,35 @@ const Docentes = () => {
 
                           {/* Acciones del Archivo: Ver, Descargar, Eliminar */}
                           <div className="flex items-center gap-1 shrink-0">
-                            <button
-                              onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${docItem.id}/download`, docItem.nombre_original)}
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-[#0B2545] hover:bg-white transition-colors cursor-pointer"
-                              title="Previsualizar archivo"
-                              type="button"
-                            >
-                              <span className="material-symbols-outlined text-base">visibility</span>
-                            </button>
-                            <button
-                              onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${docItem.id}/download`, docItem.nombre_original, true)}
-                              className="p-1.5 rounded-lg text-slate-500 hover:text-[#C1121F] hover:bg-white transition-colors cursor-pointer"
-                              title="Descargar archivo"
-                              type="button"
-                            >
-                              <span className="material-symbols-outlined text-base">download</span>
-                            </button>
+                            {docItem.archivo_existe === false ? (
+                              <button
+                                onClick={() => alert(`El archivo "${docItem.nombre_original}" no existe en el disco del servidor (posiblemente pertenecía a una versión o ruta anterior de prueba).\n\nPuedes eliminar este registro del expediente con el botón de basurero 🗑️ y volver a subir el documento actualizado.`)}
+                                className="p-1.5 rounded-lg text-amber-600 hover:bg-amber-100/60 transition-colors cursor-pointer"
+                                title="Archivo físico no encontrado en disco. Clic para más info."
+                                type="button"
+                              >
+                                <span className="material-symbols-outlined text-base">warning</span>
+                              </button>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${docItem.id}/download`, docItem.nombre_original)}
+                                  className="p-1.5 rounded-lg text-slate-500 hover:text-[#0B2545] hover:bg-white transition-colors cursor-pointer"
+                                  title="Previsualizar archivo"
+                                  type="button"
+                                >
+                                  <span className="material-symbols-outlined text-base">visibility</span>
+                                </button>
+                                <button
+                                  onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${docItem.id}/download`, docItem.nombre_original, true)}
+                                  className="p-1.5 rounded-lg text-slate-500 hover:text-[#C1121F] hover:bg-white transition-colors cursor-pointer"
+                                  title="Descargar archivo"
+                                  type="button"
+                                >
+                                  <span className="material-symbols-outlined text-base">download</span>
+                                </button>
+                              </>
+                            )}
                             <button
                               onClick={() => handleDeleteArchivo(docItem.id, docItem.nombre_original)}
                               className="p-1.5 rounded-lg text-slate-300 hover:text-[#C1121F] hover:bg-white transition-colors cursor-pointer"
@@ -913,13 +931,17 @@ const Docentes = () => {
                                   : (docItem.tipo_nombre || 'Documento Semestral')}
                               </span>
                               <span className={`font-label-badge text-[9px] px-1.5 py-0.2 rounded font-bold border ${
-                                docItem.tipo === 'lista_asistencia'
+                                docItem.archivo_existe === false
+                                  ? 'bg-amber-100 text-amber-800 border-amber-300'
+                                  : docItem.tipo === 'lista_asistencia'
                                   ? 'bg-amber-100 text-amber-800 border-amber-200'
                                   : docItem.tipo === 'otro'
                                   ? 'bg-purple-100 text-purple-800 border-purple-200'
                                   : 'bg-blue-100 text-blue-800 border-blue-200'
                               }`}>
-                                {docItem.tipo === 'lista_asistencia' 
+                                {docItem.archivo_existe === false
+                                  ? 'NO EN DISCO'
+                                  : docItem.tipo === 'lista_asistencia' 
                                   ? 'CUSTODIA' 
                                   : docItem.tipo === 'otro'
                                   ? 'RESPALDO'
@@ -933,22 +955,35 @@ const Docentes = () => {
                         </div>
 
                         <div className="flex items-center gap-1 shrink-0">
-                          <button
-                            onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${docItem.id}/download`, docItem.nombre_original)}
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-[#0B2545] hover:bg-white transition-colors cursor-pointer"
-                            title="Previsualizar informe"
-                            type="button"
-                          >
-                            <span className="material-symbols-outlined text-base">visibility</span>
-                          </button>
-                          <button
-                            onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${docItem.id}/download`, docItem.nombre_original, true)}
-                            className="p-1.5 rounded-lg text-slate-500 hover:text-[#C1121F] hover:bg-white transition-colors cursor-pointer"
-                            title="Descargar archivo"
-                            type="button"
-                          >
-                            <span className="material-symbols-outlined text-base">download</span>
-                          </button>
+                          {docItem.archivo_existe === false ? (
+                            <button
+                              onClick={() => alert(`El archivo "${docItem.nombre_original}" no existe en el disco del servidor (posiblemente pertenecía a una versión o ruta anterior de prueba).\n\nPuedes eliminar este registro del expediente con el botón de basurero 🗑️ y volver a subir el documento actualizado.`)}
+                              className="p-1.5 rounded-lg text-amber-600 hover:bg-amber-100/60 transition-colors cursor-pointer"
+                              title="Archivo físico no encontrado en disco. Clic para más info."
+                              type="button"
+                            >
+                              <span className="material-symbols-outlined text-base">warning</span>
+                            </button>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${docItem.id}/download`, docItem.nombre_original)}
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-[#0B2545] hover:bg-white transition-colors cursor-pointer"
+                                title="Previsualizar informe"
+                                type="button"
+                              >
+                                <span className="material-symbols-outlined text-base">visibility</span>
+                              </button>
+                              <button
+                                onClick={() => downloadFile(`/docentes/${selectedDocente.id}/archivos/${docItem.id}/download`, docItem.nombre_original, true)}
+                                className="p-1.5 rounded-lg text-slate-500 hover:text-[#C1121F] hover:bg-white transition-colors cursor-pointer"
+                                title="Descargar archivo"
+                                type="button"
+                              >
+                                <span className="material-symbols-outlined text-base">download</span>
+                              </button>
+                            </>
+                          )}
                           <button
                             onClick={() => handleDeleteArchivo(docItem.id, docItem.nombre_original)}
                             className="p-1.5 rounded-lg text-slate-300 hover:text-[#C1121F] hover:bg-white transition-colors cursor-pointer"

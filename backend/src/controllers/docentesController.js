@@ -19,7 +19,8 @@ const {
   getDocumentTypeId,
   DOCENTE_TIPO_LEGACY_TO_V4,
   formatDocente,
-  formatDocenteArchivo
+  formatDocenteArchivo,
+  resolverArchivoDocente
 } = require('../utils/compatibilityHelpers');
 
 // ── Docentes ──
@@ -384,10 +385,18 @@ const downloadArchivo = async (req, res) => {
     }
 
     const attachment = doc.adjuntos[0];
-    const absPath = path.resolve(attachment.archivo_path);
-    if (!fs.existsSync(absPath)) return res.status(404).json({ mensaje: 'Archivo no existe en disco' });
-    return res.download(absPath, attachment.nombre_archivo || 'documento.pdf');
+    const absPath = resolverArchivoDocente(attachment.archivo_path);
+    if (!absPath) {
+      return res.status(404).json({ mensaje: 'El archivo físico no se encuentra en el servidor. Puede haber sido eliminado o trasladado.' });
+    }
+    return res.download(absPath, attachment.nombre_archivo || 'documento.pdf', (err) => {
+      if (err && !res.headersSent) {
+        console.error('Error enviando archivo en downloadArchivo:', err);
+        return res.status(500).json({ mensaje: 'Error al enviar archivo' });
+      }
+    });
   } catch (err) {
+    console.error('Error downloadArchivo:', err);
     return res.status(500).json({ mensaje: 'Error al descargar' });
   }
 };

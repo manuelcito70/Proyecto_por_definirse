@@ -1,3 +1,5 @@
+const path = require('path');
+const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { Op } = require('sequelize');
 const {
@@ -198,10 +200,35 @@ function formatDocente(doc) {
   };
 }
 
+// Resolver ruta física de archivo con soporte para rutas relativas y cambios de directorio
+function resolverArchivoDocente(archivoPath) {
+  if (!archivoPath || typeof archivoPath !== 'string') return null;
+  const abs = path.resolve(archivoPath);
+  if (fs.existsSync(abs)) return abs;
+
+  // Fallback 1: Buscar por nombre de archivo en uploads/docentes
+  const filename = path.basename(archivoPath);
+  const fallbackDocentes = path.resolve(__dirname, '../../uploads/docentes', filename);
+  if (fs.existsSync(fallbackDocentes)) return fallbackDocentes;
+
+  // Fallback 2: Buscar en uploads raíz u otras carpetas
+  const fallbackUploads = path.resolve(__dirname, '../../uploads', filename);
+  if (fs.existsSync(fallbackUploads)) return fallbackUploads;
+
+  const fallbackExpedidos = path.resolve(__dirname, '../../uploads/expedidos', filename);
+  if (fs.existsSync(fallbackExpedidos)) return fallbackExpedidos;
+
+  const fallbackRecibidos = path.resolve(__dirname, '../../uploads/recibidos', filename);
+  if (fs.existsSync(fallbackRecibidos)) return fallbackRecibidos;
+
+  return null;
+}
+
 // Formateador de Archivos Docentes (Documento V4 -> JSON Contrato de API)
 function formatDocenteArchivo(doc) {
   const adjunto = doc.adjuntos && doc.adjuntos.length > 0 ? doc.adjuntos[0] : null;
   const tipoV4 = doc.tipo_documento ? doc.tipo_documento.nombre : 'Otro';
+  const resolvedPath = adjunto ? resolverArchivoDocente(adjunto.archivo_path) : null;
   return {
     id: doc.id_documento,
     id_docente: doc.id_docente,
@@ -210,6 +237,7 @@ function formatDocenteArchivo(doc) {
     gestion: doc.gestion ? doc.gestion.anio : (doc.fecha ? new Date(doc.fecha).getFullYear() : null),
     semestre: doc.semestre || null,
     archivo_path: adjunto ? adjunto.archivo_path : null,
+    archivo_existe: Boolean(resolvedPath),
     nombre_original: adjunto ? adjunto.nombre_archivo : 'documento.pdf',
     tamano: adjunto ? adjunto.archivo_tamano : null,
     mimetype: adjunto ? adjunto.archivo_tipo : null,
@@ -229,5 +257,6 @@ module.exports = {
   formatActa,
   formatAuxiliar,
   formatDocente,
-  formatDocenteArchivo
+  formatDocenteArchivo,
+  resolverArchivoDocente
 };

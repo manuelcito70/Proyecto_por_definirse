@@ -291,8 +291,14 @@ const download = async (req, res) => {
         return res.status(404).json({ mensaje: 'Archivo no existe en disco' });
       }
     }
-    return res.download(absPath, attachment.nombre_archivo || 'documento.pdf');
+    return res.download(absPath, attachment.nombre_archivo || 'documento.pdf', (err) => {
+      if (err && !res.headersSent) {
+        console.error('Error enviando archivo en recibidos download:', err);
+        return res.status(500).json({ mensaje: 'Error al enviar archivo' });
+      }
+    });
   } catch (err) {
+    console.error('Error recibidos download:', err);
     return res.status(500).json({ mensaje: 'Error al descargar' });
   }
 };

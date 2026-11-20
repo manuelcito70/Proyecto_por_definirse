@@ -240,10 +240,23 @@ const download = async (req, res) => {
     }
 
     const attachment = doc.adjuntos[0];
-    const absPath = path.resolve(attachment.archivo_path);
-    if (!fs.existsSync(absPath)) return res.status(404).json({ mensaje: 'Archivo no existe' });
-    return res.download(absPath, attachment.nombre_archivo || 'acta.pdf');
+    let absPath = path.resolve(attachment.archivo_path);
+    if (!fs.existsSync(absPath)) {
+      const fallback = path.resolve(__dirname, '../../uploads/actas', path.basename(attachment.archivo_path));
+      if (fs.existsSync(fallback)) {
+        absPath = fallback;
+      } else {
+        return res.status(404).json({ mensaje: 'Archivo no existe en disco' });
+      }
+    }
+    return res.download(absPath, attachment.nombre_archivo || 'acta.pdf', (err) => {
+      if (err && !res.headersSent) {
+        console.error('Error enviando archivo en actas download:', err);
+        return res.status(500).json({ mensaje: 'Error al enviar archivo' });
+      }
+    });
   } catch (err) {
+    console.error('Error actas download:', err);
     return res.status(500).json({ mensaje: 'Error al descargar' });
   }
 };

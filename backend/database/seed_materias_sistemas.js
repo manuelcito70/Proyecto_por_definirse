@@ -150,3 +150,4 @@ async function seedMaterias() {
 }
 
 seedMaterias();
+

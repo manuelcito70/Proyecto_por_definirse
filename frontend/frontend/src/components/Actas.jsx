@@ -5,6 +5,7 @@ import EmptyState from './EmptyState';
 import LoadingState from './LoadingState';
 import SuccessModal from './SuccessModal';
 import { imprimirDocumentoOficial, FIRMAS, esc } from '../utils/documentoOficial';
+import { getUserCarrera } from '../utils/carreraHelper';
 import FileDropzone from './FileDropzone';
 
 const MODALIDADES = [
@@ -267,7 +268,7 @@ const Actas = () => {
       cite: `CERT. No. ______/${anio}`,
       titulo: 'CERTIFICACIÓN',
       cuerpo: `
-        <p>La suscrita Directora de la Carrera de Ingeniería en Sistemas de la Facultad Integral de Ichilo, de la Universidad Autónoma "Gabriel René Moreno", a solicitud de parte interesada y de acuerdo a los antecedentes que cursan en el archivo de esta Dirección:</p>
+        <p>La suscrita Directora de la Carrera de ${esc(getUserCarrera())} de la Facultad Integral de Ichilo, de la Universidad Autónoma "Gabriel René Moreno", a solicitud de parte interesada y de acuerdo a los antecedentes que cursan en el archivo de esta Dirección:</p>
         <p class="destacado">CERTIFICA:</p>
         <p class="sin-sangria">Que <strong>${esc(acta.nombre_estudiante)}</strong> se encuentra registrado(a) como graduado(a) de la Carrera, con los siguientes datos:</p>
         <table class="datos">

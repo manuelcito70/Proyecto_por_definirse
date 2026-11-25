@@ -12,6 +12,7 @@ import {
 import EmptyState from './EmptyState';
 import LoadingState from './LoadingState';
 import SuccessModal from './SuccessModal';
+import { getUserCarrera } from '../utils/carreraHelper';
 import {
   imprimirDocumentoOficial,
   abrirVentanaImpresion,
@@ -312,7 +313,7 @@ const Auxiliares = () => {
       cite: `CONST. No. ______/${anio}`,
       titulo: 'CONSTANCIA',
       cuerpo: `
-        <p>La suscrita Directora de la Carrera de Ingeniería en Sistemas de la Facultad Integral de Ichilo, de la Universidad Autónoma "Gabriel René Moreno", a solicitud del interesado(a):</p>
+        <p>La suscrita Directora de la Carrera de ${esc(getUserCarrera())} de la Facultad Integral de Ichilo, de la Universidad Autónoma "Gabriel René Moreno", a solicitud del interesado(a):</p>
         <p class="destacado">HACE CONSTAR:</p>
         <p class="sin-sangria">Que el(la) universitario(a) <strong>${esc(aux.nombre.toUpperCase())}</strong>, con Registro Universitario <strong>${esc(aux.nro_registro || 'S/N')}</strong>, ejerció funciones de <strong>AUXILIAR DE DOCENCIA</strong> en la materia <strong>${esc(materiaConCodigo(aux))}</strong>, durante el Semestre ${semestreRomano(aux.semestre)} de la Gestión ${esc(aux.gestion)}, designado(a) ${condicion}.</p>
         ${resumenProceso(avance)}

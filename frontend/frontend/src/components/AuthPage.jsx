@@ -2,11 +2,38 @@ import React, { useState, useEffect } from 'react';
 import { login } from '../services/auth';
 import './AuthPage.css';
 
+const FALLBACK_CARRERAS = [
+  'Administración de Empresas',
+  'Ciencias de la Educación',
+  'Contaduría Pública',
+  'Enfermería',
+  'Ingeniería Agropecuaria',
+  'Ingeniería Comercial',
+  'Ingeniería de Sistemas',
+  'Ingeniería en Redes y Telecomunicaciones',
+  'Ingeniería Financiera',
+  'Ingeniería Industrial',
+  'Ingeniería Informática',
+  'Medicina Veterinaria y Zootecnia'
+];
+
 function AuthPage({ onLoginSuccess }) {
   const [isActive, setIsActive] = useState(false); // false = Sign In, true = Sign Up
   const [isLoading, setIsLoading] = useState(false);
   const [loginMessage, setLoginMessage] = useState({ text: '', type: '' });
   const [registerMessage, setRegisterMessage] = useState({ text: '', type: '' });
+  const [carreras, setCarreras] = useState(FALLBACK_CARRERAS);
+
+  useEffect(() => {
+    fetch('/api/carreras')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (Array.isArray(data) && data.length > 0) {
+          setCarreras(data.map((c) => c.nombre));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // Auto-limpiar mensajes despues de 6 segundos
   useEffect(() => {
@@ -32,7 +59,7 @@ function AuthPage({ onLoginSuccess }) {
     nombre: '',
     email: '',
     password: '',
-    cargo: 'Directora',
+    cargo: '',
     carrera: ''
   });
 
@@ -105,7 +132,7 @@ function AuthPage({ onLoginSuccess }) {
       if (!response.ok) throw new Error(data.mensaje || 'Error al registrar usuario');
 
       // Limpiar formulario y mostrar mensaje de verificacion
-      setRegisterData({ nombre: '', email: '', password: '', cargo: 'Directora', carrera: '' });
+      setRegisterData({ nombre: '', email: '', password: '', cargo: '', carrera: '' });
       setRegisterMessage({ text: data.mensaje || 'Revisa tu correo electronico para confirmar tu cuenta.', type: 'success' });
 
       // Pasar al login despues de 3 segundos
@@ -128,7 +155,7 @@ function AuthPage({ onLoginSuccess }) {
         
         {/* FORMULARIO DE REGISTRO (Sign Up) */}
         <div className="form-container sign-up">
-          <form className="auth-form" onSubmit={handleRegisterSubmit}>
+          <form className="auth-form" onSubmit={handleRegisterSubmit} autoComplete="off">
             <div className="form-brand">
               <img src="/logo-ichilo.png?v=2" alt="Logo FINI" className="brand-logo" />
               <h2>Crear Cuenta</h2>
@@ -150,6 +177,7 @@ function AuthPage({ onLoginSuccess }) {
                   placeholder="Ej. Juan Perez"
                   value={registerData.nombre}
                   onChange={handleRegisterChange}
+                  autoComplete="off"
                   required
                 />
               </div>
@@ -159,9 +187,10 @@ function AuthPage({ onLoginSuccess }) {
                 <input
                   type="text"
                   name="cargo"
-                  placeholder="Opcional, por defecto: Directora"
+                  placeholder="Ej: Directora, Secretaria"
                   value={registerData.cargo}
                   onChange={handleRegisterChange}
+                  autoComplete="off"
                 />
               </div>
 
@@ -170,10 +199,18 @@ function AuthPage({ onLoginSuccess }) {
                 <input
                   type="text"
                   name="carrera"
-                  placeholder="Ej: Ingenieria en Sistemas"
+                  list="carreras-list"
+                  placeholder="Ej: Ingeniería en..."
                   value={registerData.carrera}
                   onChange={handleRegisterChange}
+                  autoComplete="off"
+                  required
                 />
+                <datalist id="carreras-list">
+                  {carreras.map((nombre) => (
+                    <option key={nombre} value={nombre} />
+                  ))}
+                </datalist>
               </div>
 
               <div className="input-group">
@@ -184,6 +221,9 @@ function AuthPage({ onLoginSuccess }) {
                   placeholder="Ej: nombre@gmail.com"
                   value={registerData.email}
                   onChange={handleRegisterChange}
+                  autoComplete="off"
+                  readOnly
+                  onFocus={(e) => e.target.removeAttribute('readonly')}
                   required
                 />
               </div>
@@ -193,9 +233,12 @@ function AuthPage({ onLoginSuccess }) {
                 <input
                   type="password"
                   name="password"
-                  placeholder="Minimo 6 caracteres"
+                  placeholder="Ej: Minimo 6 caracteres"
                   value={registerData.password}
                   onChange={handleRegisterChange}
+                  autoComplete="new-password"
+                  readOnly
+                  onFocus={(e) => e.target.removeAttribute('readonly')}
                   minLength="6"
                   required
                 />
@@ -256,7 +299,7 @@ function AuthPage({ onLoginSuccess }) {
                 <input
                   type="password"
                   name="password"
-                  placeholder="Tu contrasena"
+                  placeholder="Ej: Tu contrasena"
                   value={loginData.password}
                   onChange={handleLoginChange}
                   required

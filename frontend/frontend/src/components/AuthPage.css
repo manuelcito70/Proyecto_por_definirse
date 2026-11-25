@@ -200,7 +200,8 @@
 
 .auth-form input[type="text"],
 .auth-form input[type="email"],
-.auth-form input[type="password"] {
+.auth-form input[type="password"],
+.auth-form select {
   width: 100%;
   background: #f8fafc;
   border: 1.5px solid #e2e8f0;
@@ -213,7 +214,8 @@
   transition: all 0.2s ease;
 }
 
-.auth-form input:focus {
+.auth-form input:focus,
+.auth-form select:focus {
   background: #ffffff;
   border-color: #1d4ed8;
   box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);

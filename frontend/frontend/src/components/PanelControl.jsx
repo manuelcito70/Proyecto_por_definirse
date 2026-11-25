@@ -12,6 +12,7 @@ import {
 } from '../services/api';
 import EmptyState from './EmptyState';
 import SuccessModal from './SuccessModal';
+import { getUserCarrera } from '../utils/carreraHelper';
 
 const PanelControl = () => {
   const { gestion } = useGestion();
@@ -199,7 +200,7 @@ const PanelControl = () => {
                   Panel de Control y Archivo Documental
                 </h1>
                 <p className="font-body-md text-body-md text-on-surface-variant mt-0.5">
-                  Gestión {gestion} · Dirección de Carrera de Ingeniería de Sistemas — <span className="font-semibold text-[#0b2545]">Facultad Integral del Ichilo</span>
+                  Gestión {gestion} · Dirección de Carrera de {getUserCarrera()} — <span className="font-semibold text-[#0b2545]">Facultad Integral del Ichilo</span>
                 </p>
               </div>
             </div>

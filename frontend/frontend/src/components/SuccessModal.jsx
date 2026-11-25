@@ -1,5 +1,6 @@
 import React from 'react';
 import './SuccessModal.css';
+import { getCarreraCorta } from '../utils/carreraHelper';
 
 /**
  * SuccessModal - Modal de confirmación institucional con animación interactiva Typewriter.
@@ -92,7 +93,7 @@ export default function SuccessModal({
         {/* Institutional Footer Seal */}
         <div className="px-6 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-center gap-1.5 text-slate-500 text-[11px] font-label-code">
           <span className="material-symbols-outlined text-xs text-[#c5a059]">verified_user</span>
-          <span>DIRECCIÓN DE CARRERA · SISTEMAS FINI UAGRM</span>
+          <span>DIRECCIÓN DE CARRERA · {getCarreraCorta()} FINI UAGRM</span>
         </div>
       </div>
     </div>

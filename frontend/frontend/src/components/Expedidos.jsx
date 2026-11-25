@@ -12,6 +12,7 @@ import EmptyState from './EmptyState';
 import LoadingState from './LoadingState';
 import SuccessModal from './SuccessModal';
 import FileDropzone from './FileDropzone';
+import { getUserCarrera } from '../utils/carreraHelper';
 
 const Expedidos = () => {
   const { gestion } = useGestion();
@@ -670,7 +671,7 @@ const Expedidos = () => {
                       GESTIÓN {gestion}
                     </span>
                   </div>
-                  <p className="text-[11px] text-white/70">Dirección de Ingeniería de Sistemas — FINI UAGRM</p>
+                  <p className="text-[11px] text-white/70">Dirección de {getUserCarrera()} — FINI UAGRM</p>
                 </div>
               </div>
 

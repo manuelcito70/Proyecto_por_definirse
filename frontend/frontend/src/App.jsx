@@ -34,6 +34,14 @@ function App() {
     }
   }, []);
 
+  useEffect(() => {
+    if (user?.carrera) {
+      document.title = `Dirección de Carrera - ${user.carrera} FINI UAGRM`;
+    } else {
+      document.title = 'SIGAD - Dirección de Carrera | FINI UAGRM';
+    }
+  }, [user]);
+
   const handleLoginSuccess = (userData) => {
     setShowIntro(true);
     setUser(userData);

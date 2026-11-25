@@ -23,6 +23,17 @@
   opacity: 0.35;
   z-index: 0;
   pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+/* ===== DARK MODE ===== */
+.dark .app-container {
+  background: #030a16;
+}
+
+.dark .app-container::before {
+  background: url('/bg-fini-noche.jpg') center center / cover no-repeat;
+  opacity: 0.30;
 }
 
 .app-content {
@@ -117,6 +128,203 @@
   color: rgba(255,255,255,0.4);
   margin: 0;
   text-transform: capitalize;
+}
+
+/* ===== DARK MODE – comprehensive overrides ===== */
+
+/* Body & base background */
+.dark body,
+.dark .bg-background,
+.dark .bg-surface,
+.dark .bg-surface-bright {
+  background-color: #0c1527 !important;
+  color: #e2e8f0 !important;
+}
+
+/* Guilloche pattern (subtle dots) */
+.dark .guilloche-bg {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 0) !important;
+}
+
+/* Grid overlay in Layout */
+.dark .fixed.inset-0.pointer-events-none.z-0 {
+  opacity: 0.15;
+}
+
+/* Surface containers */
+.dark .bg-surface-container-lowest {
+  background-color: #111c30 !important;
+}
+.dark .bg-surface-container-low {
+  background-color: #0f1a2e !important;
+}
+.dark .bg-surface-container {
+  background-color: #131f35 !important;
+}
+.dark .bg-surface-container-high {
+  background-color: #162340 !important;
+}
+.dark .bg-surface-container-highest {
+  background-color: #1a2847 !important;
+}
+.dark .bg-\[\#f8fafc\] {
+  background-color: #0c1527 !important;
+}
+
+/* Text colors */
+.dark .text-on-surface {
+  color: #e2e8f0 !important;
+}
+.dark .text-on-surface-variant {
+  color: #94a3b8 !important;
+}
+.dark .text-\[\#0b1c30\],
+.dark .text-\[\#1a1a2e\] {
+  color: #e2e8f0 !important;
+}
+
+/* Borders */
+.dark .border-surface-container {
+  border-color: #1e293b !important;
+}
+.dark .border-outline-variant {
+  border-color: #334155 !important;
+}
+
+/* Cards and panels */
+.dark .bg-white {
+  background-color: #111c30 !important;
+  color: #e2e8f0 !important;
+}
+.dark .bg-white\/95 {
+  background-color: rgba(17, 28, 48, 0.95) !important;
+}
+.dark .bg-white\/90 {
+  background-color: rgba(17, 28, 48, 0.90) !important;
+}
+.dark .bg-white\/80 {
+  background-color: rgba(17, 28, 48, 0.80) !important;
+}
+.dark .bg-white\/50 {
+  background-color: rgba(17, 28, 48, 0.50) !important;
+}
+
+/* Hover states for white backgrounds */
+.dark .hover\:bg-white\/80:hover {
+  background-color: rgba(17, 28, 48, 0.80) !important;
+}
+
+/* Shadows for dark mode (softer, darker) */
+.dark .shadow-sm,
+.dark .shadow,
+.dark .shadow-md,
+.dark .shadow-lg,
+.dark .shadow-xl {
+  --tw-shadow-color: rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Table styles */
+.dark table th {
+  background-color: #0f1a2e !important;
+  color: #94a3b8 !important;
+  border-color: #1e293b !important;
+}
+.dark table td {
+  color: #cbd5e1 !important;
+  border-color: #1e293b !important;
+}
+.dark table tr:hover td {
+  background-color: rgba(30, 41, 59, 0.5) !important;
+}
+.dark table tbody tr {
+  background-color: transparent !important;
+}
+.dark table tbody tr:nth-child(even) {
+  background-color: rgba(15, 26, 46, 0.5) !important;
+}
+
+/* Input fields */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark select,
+.dark textarea {
+  background-color: #0f1a2e !important;
+  color: #e2e8f0 !important;
+  border-color: #334155 !important;
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Badges & pills */
+.dark .bg-blue-50 { background-color: rgba(29, 78, 216, 0.15) !important; }
+.dark .bg-green-50 { background-color: rgba(22, 163, 74, 0.15) !important; }
+.dark .bg-red-50 { background-color: rgba(220, 38, 38, 0.15) !important; }
+.dark .bg-yellow-50 { background-color: rgba(234, 179, 8, 0.15) !important; }
+.dark .bg-orange-50 { background-color: rgba(249, 115, 22, 0.15) !important; }
+.dark .bg-gray-50 { background-color: rgba(100, 116, 139, 0.15) !important; }
+.dark .bg-indigo-50 { background-color: rgba(99, 102, 241, 0.15) !important; }
+.dark .bg-purple-50 { background-color: rgba(168, 85, 247, 0.15) !important; }
+.dark .bg-slate-50 { background-color: rgba(100, 116, 139, 0.15) !important; }
+.dark .bg-slate-100 { background-color: rgba(100, 116, 139, 0.2) !important; }
+
+/* Gray backgrounds */
+.dark .bg-gray-100 { background-color: #131f35 !important; }
+.dark .bg-gray-200 { background-color: #162340 !important; }
+.dark .bg-slate-200 { background-color: #162340 !important; }
+
+/* Modal overlays */
+.dark .bg-black\/50 {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Scroll bars */
+.dark ::-webkit-scrollbar-track {
+  background: #0c1527;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+/* Stat cards with colored backgrounds */
+.dark .bg-gradient-to-br.from-blue-50,
+.dark .bg-gradient-to-r.from-blue-50,
+.dark .bg-gradient-to-br.from-indigo-50 {
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.12), rgba(99, 102, 241, 0.08)) !important;
+}
+.dark .bg-gradient-to-br.from-green-50 {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.12), rgba(16, 185, 129, 0.08)) !important;
+}
+.dark .bg-gradient-to-br.from-red-50 {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.12), rgba(248, 113, 113, 0.08)) !important;
+}
+.dark .bg-gradient-to-br.from-yellow-50,
+.dark .bg-gradient-to-br.from-amber-50 {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.12), rgba(245, 158, 11, 0.08)) !important;
+}
+
+/* Links and anchors */
+.dark a:not(.nav-link):not([class*="text-white"]):not([class*="text-\["]) {
+  color: #93c5fd;
+}
+
+/* Rounded containers often used for stat cards */
+.dark .rounded-xl,
+.dark .rounded-2xl,
+.dark .rounded-lg {
+  border-color: #1e293b;
+}
+
+/* Sub-nav bar specific */
+.dark .bg-surface-container-lowest.border-b {
+  background-color: #0a1525 !important;
+  border-color: #1e293b !important;
+}
+
+/* Select option text (dropdown menus) */
+.dark select option {
+  background-color: #111c30 !important;
+  color: #e2e8f0 !important;
 }
 
 /* ===== RESPONSIVE ===== */

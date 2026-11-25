@@ -1,5 +1,6 @@
 // Plantilla común para los documentos imprimibles de la Dirección de Carrera,
 // con el formato de los oficios institucionales (membrete, CITE, A/DE, firmas y pie).
+import { getUserCarrera, getCarreraCorta } from './carreraHelper';
 
 // Datos institucionales: cambiar aquí si cambian las autoridades o el contacto.
 export const INSTITUCION = {
@@ -126,10 +127,13 @@ export function imprimirDocumentoOficial(doc, ventanaPrevia = null) {
       <div class="cargo">${esc(doc.destinatario.cargo)}</div>
     </div>` : '';
 
+  const carreraActual = getUserCarrera();
+  const carreraCorta = getCarreraCorta(carreraActual);
+
   const bloqueDe = doc.conRemitente ? `
     <div class="bloque">
       <div><span class="etiqueta">DE:</span>${esc(FIRMAS.directora.nombre.replace('Ing. ', ''))}</div>
-      <div class="cargo">DIRECTORA DE CARRERA "ING. EN SISTEMAS" F.IN.I. – U.A.G.R.M.</div>
+      <div class="cargo">DIRECTORA DE CARRERA "${esc(carreraCorta)}" F.IN.I. – U.A.G.R.M.</div>
     </div>` : '';
 
   const bloqueRef = doc.referencia ? `
@@ -201,13 +205,13 @@ export function imprimirDocumentoOficial(doc, ventanaPrevia = null) {
     <div class="textos">
       <div class="u">${esc(INSTITUCION.universidad)}</div>
       <div class="f">${esc(INSTITUCION.facultad)}</div>
-      <div class="c">${esc(INSTITUCION.carrera)}</div>
+      <div class="c">${esc(carreraActual)}</div>
     </div>
-    <img class="logo-carrera" src="${base}/logo-sistemas.svg" alt="Logo Ingeniería en Sistemas" />
+    <img class="logo-carrera" src="${base}/logo-sistemas.svg" alt="Logo ${esc(carreraActual)}" />
   </header>
 
   <div class="lugar">${esc(lugarYFecha())}</div>
-  <div class="cite">${esc(INSTITUCION.cite)} ${esc(doc.cite)}</div>
+  <div class="cite">DIR.CARR: ${esc(carreraCorta)} F.IN.I. ${esc(doc.cite)}</div>
 
   ${bloqueA}
   ${bloqueDe}

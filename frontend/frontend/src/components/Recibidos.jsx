@@ -13,6 +13,7 @@ import LoadingState from './LoadingState';
 import SuccessModal from './SuccessModal';
 import FileDropzone from './FileDropzone';
 import LordIcon from './LordIcon';
+import { getCarreraCorta, getCarreraCodigo } from '../utils/carreraHelper';
 
 const Recibidos = () => {
   const { gestion } = useGestion();
@@ -182,7 +183,7 @@ const Recibidos = () => {
 
       showToast(
         `Documento recibido #${String(newNro).padStart(2, '0')}/${gestion} registrado`,
-        'Guardado con respaldo digital indexado en Sistemas.'
+        'Guardado con respaldo digital indexado en el sistema.'
       );
       await fetchData();
     } catch (err) {
@@ -299,7 +300,7 @@ const Recibidos = () => {
                 <h1 className="font-institutional-serif text-[26px] md:text-[32px] text-[#0b2545] font-bold tracking-tight leading-tight flex items-center gap-space-sm flex-wrap">
                   <span>Documentos Recibidos</span>
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-[#0b2545]/10 text-[#0b2545] font-label-badge text-caption border border-[#0b2545]/20">
-                    SISTEMAS
+                    {getCarreraCorta()}
                   </span>
                 </h1>
                 <p className="font-body-md text-body-md text-on-surface-variant mt-0.5">
@@ -386,7 +387,7 @@ const Recibidos = () => {
             <div className="bg-surface-container-low px-space-md py-2 rounded-lg flex items-center justify-between text-on-surface-variant font-caption text-caption font-medium border border-slate-200/60">
               <span>Vigencia: Gestión {gestion}</span>
               <span className="font-label-code text-label-code text-[#0b2545] bg-white px-2 py-0.5 rounded border border-slate-200 font-bold">
-                R-SYS-{String(gestion).slice(-2)}
+                R-{getCarreraCodigo()}-{String(gestion).slice(-2)}
               </span>
             </div>
           </div>

@@ -117,7 +117,10 @@ const register = async (req, res) => {
     // Resolver carrera
     let resolvedCarreraId = id_carrera;
     if (!resolvedCarreraId && carrera) {
-      const carreraRecord = await Carrera.findOne({ where: { nombre: { [Op.iLike]: `%${carrera}%` } } });
+      let carreraRecord = await Carrera.findOne({ where: { nombre: { [Op.iLike]: `%${carrera.trim()}%` } } });
+      if (!carreraRecord && carrera.toLowerCase().includes('sistemas')) {
+        carreraRecord = await Carrera.findOne({ where: { nombre: { [Op.iLike]: '%Sistemas%' } } });
+      }
       if (carreraRecord) resolvedCarreraId = carreraRecord.id_carrera;
     }
     if (!resolvedCarreraId) {
@@ -284,4 +287,21 @@ const resendVerification = async (req, res) => {
   }
 };
 
-module.exports = { login, register, verifyEmail, resendVerification };
+// ============================================================
+// LISTAR CARRERAS ACTIVAS
+// ============================================================
+const getCarreras = async (req, res) => {
+  try {
+    const carreras = await Carrera.findAll({
+      where: { activo: true },
+      attributes: ['id_carrera', 'nombre'],
+      order: [['nombre', 'ASC']]
+    });
+    return res.json(carreras);
+  } catch (err) {
+    console.error('Get carreras error:', err);
+    return res.status(500).json({ mensaje: 'Error al obtener carreras' });
+  }
+};
+
+module.exports = { login, register, verifyEmail, resendVerification, getCarreras };

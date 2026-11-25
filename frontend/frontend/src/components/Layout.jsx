@@ -4,10 +4,17 @@ import { useGestion } from '../context/GestionContext';
 import { getRecibidos } from '../services/api';
 import TopNavDockTabs from './TopNavDockTabs';
 import NotificationBell from './NotificationBell';
+import ThemeToggle from './ThemeToggle';
 
 const Layout = ({ user, onLogout, children }) => {
   const { gestion, setGestion, currentSystemYear } = useGestion();
   const [pendientesCount, setPendientesCount] = useState(0);
+  const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark');
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
 
   useEffect(() => {
     const fetchPendientes = () => {
@@ -80,7 +87,7 @@ const Layout = ({ user, onLogout, children }) => {
                 </span>
               </div>
               <span className="font-caption text-[9px] sm:text-[11px] tracking-wider uppercase text-[#c5a059] font-semibold mt-0.5 truncate flex items-center gap-1">
-                <span>INGENIERÍA DE SISTEMAS</span>
+                <span>{(user?.carrera || 'Ingeniería de Sistemas').toUpperCase()}</span>
                 <span className="text-white/40">•</span>
                 <span className="text-white/80">FINI — UAGRM</span>
               </span>
@@ -114,6 +121,8 @@ const Layout = ({ user, onLogout, children }) => {
 
             {/* Perfil Oficial */}
             <div className="flex items-center gap-1.5 sm:gap-space-md pl-1.5 sm:pl-space-md border-l border-white/10">
+              {/* Toggle día/noche */}
+              <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} />
               {/* Campana de notificaciones: oficios pendientes y alertas */}
               <NotificationBell />
               <div className="hidden lg:flex flex-col text-right">
@@ -121,7 +130,7 @@ const Layout = ({ user, onLogout, children }) => {
                   {user?.nombre || 'Dirección de Carrera'}
                 </span>
                 <span className="font-caption text-caption text-white/60">
-                  {user?.username ? `${user.username}@uagrm.edu.bo` : 'admin@uagrm.edu.bo'}
+                  {user?.email || (user?.username ? `${user.username}@uagrm.edu.bo` : 'admin@uagrm.edu.bo')}
                 </span>
               </div>
               <div className="relative">
@@ -219,7 +228,7 @@ const Layout = ({ user, onLogout, children }) => {
             <span><strong className="text-white font-semibold">UAGRM — Facultad Integral del Ichilo</strong> · SIGAD</span>
           </div>
           <div className="flex items-center gap-2 font-medium text-[11px] justify-center md:justify-end">
-            <span className="text-[#c5a059]">Carrera de Ingeniería de Sistemas</span>
+            <span className="text-[#c5a059]">Carrera de {user?.carrera || 'Ingeniería de Sistemas'}</span>
             <span className="text-white/40">•</span>
             <span>Yapacaní - Santa Cruz, Bolivia</span>
           </div>

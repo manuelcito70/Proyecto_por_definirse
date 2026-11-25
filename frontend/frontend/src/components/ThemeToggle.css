@@ -1,0 +1,53 @@
+/* ===== THEME TOGGLE (Day/Night Switch) ===== */
+.theme-toggle-label {
+  font-size: 17px;
+  position: relative;
+  display: inline-block;
+  width: 4em;
+  cursor: pointer;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+.theme-toggle-input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.theme-toggle-label svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.tt-container,
+.tt-patches,
+.tt-stars,
+.tt-button,
+.tt-sun,
+.tt-moon,
+.tt-cloud {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.theme-toggle-input:checked + svg .tt-container {
+  fill: #2b4360;
+}
+
+.theme-toggle-input:checked + svg .tt-button {
+  transform: translate(28px, 2.333px);
+}
+
+.tt-sun { opacity: 1; }
+.theme-toggle-input:checked + svg .tt-sun { opacity: 0; }
+
+.tt-moon { opacity: 0; }
+.theme-toggle-input:checked + svg .tt-moon { opacity: 1; }
+
+.tt-cloud { opacity: 1; }
+.theme-toggle-input:checked + svg .tt-cloud { opacity: 0; }
+
+.tt-stars { opacity: 0; }
+.theme-toggle-input:checked + svg .tt-stars { opacity: 1; }

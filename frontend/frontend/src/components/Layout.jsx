@@ -34,7 +34,7 @@ const Layout = ({ user, onLogout, children }) => {
         <div
           className="fixed inset-0 pointer-events-none z-0 transition-opacity duration-500"
           style={{
-            backgroundImage: "linear-gradient(to bottom, rgba(3, 10, 22, 0.55), rgba(6, 15, 32, 0.72)), url('/bg-fini-noche.jpg')",
+            backgroundImage: "linear-gradient(to bottom, rgba(4, 11, 24, 0.35), rgba(6, 15, 32, 0.50)), url('/bg-fini-noche.jpg')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'

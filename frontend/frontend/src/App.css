@@ -146,22 +146,29 @@
   background-image: radial-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 0) !important;
 }
 
-/* Surface containers (semi-translúcidos para que se luzca la foto nocturna de fondo) */
+/* Surface containers (Efecto Crystal Glassmorphism transparente para lucir el fondo nocturno) */
 .dark .bg-surface-container-lowest {
-  background-color: rgba(13, 25, 48, 0.84) !important;
-  backdrop-filter: blur(8px);
+  background-color: rgba(10, 20, 42, 0.48) !important;
+  backdrop-filter: blur(12px) saturate(135%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(135%) !important;
+  border-color: rgba(148, 163, 184, 0.22) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
 }
 .dark .bg-surface-container-low {
-  background-color: rgba(15, 28, 54, 0.80) !important;
+  background-color: rgba(12, 24, 48, 0.42) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
 }
 .dark .bg-surface-container {
-  background-color: rgba(19, 34, 62, 0.85) !important;
+  background-color: rgba(15, 30, 58, 0.50) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
 }
 .dark .bg-surface-container-high {
-  background-color: rgba(22, 38, 70, 0.9) !important;
+  background-color: rgba(18, 35, 68, 0.58) !important;
 }
 .dark .bg-surface-container-highest {
-  background-color: rgba(26, 44, 80, 0.92) !important;
+  background-color: rgba(22, 42, 80, 0.65) !important;
 }
 .dark .bg-\[\#f8fafc\] {
   background-color: transparent !important;
@@ -207,22 +214,33 @@
   border-color: #334155 !important;
 }
 
-/* Cards and panels */
+/* Cards and panels (efecto crystal transparente) */
 .dark .bg-white {
-  background-color: #111c30 !important;
+  background-color: rgba(10, 20, 42, 0.52) !important;
+  backdrop-filter: blur(12px) saturate(135%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(135%) !important;
   color: #e2e8f0 !important;
+  border-color: rgba(148, 163, 184, 0.22) !important;
 }
 .dark .bg-white\/95 {
-  background-color: rgba(17, 28, 48, 0.95) !important;
+  background-color: rgba(10, 20, 42, 0.72) !important;
+  backdrop-filter: blur(14px) !important;
 }
 .dark .bg-white\/90 {
-  background-color: rgba(17, 28, 48, 0.90) !important;
+  background-color: rgba(10, 20, 42, 0.65) !important;
+  backdrop-filter: blur(12px) !important;
 }
 .dark .bg-white\/80 {
-  background-color: rgba(17, 28, 48, 0.80) !important;
+  background-color: rgba(10, 20, 42, 0.55) !important;
+  backdrop-filter: blur(10px) !important;
+}
+.dark .bg-white\/60 {
+  background-color: rgba(12, 24, 48, 0.36) !important;
+  backdrop-filter: blur(10px) !important;
 }
 .dark .bg-white\/50 {
-  background-color: rgba(17, 28, 48, 0.50) !important;
+  background-color: rgba(12, 24, 48, 0.32) !important;
+  backdrop-filter: blur(8px) !important;
 }
 
 /* Hover states for white backgrounds */
@@ -239,33 +257,34 @@
   --tw-shadow-color: rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Table styles */
+/* Table styles (crystal transparente) */
 .dark table th {
-  background-color: #0f1a2e !important;
-  color: #94a3b8 !important;
-  border-color: #1e293b !important;
+  background-color: rgba(10, 20, 42, 0.45) !important;
+  color: #cbd5e1 !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
 }
 .dark table td {
-  color: #cbd5e1 !important;
-  border-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(148, 163, 184, 0.15) !important;
 }
 .dark table tr:hover td {
-  background-color: rgba(30, 41, 59, 0.5) !important;
+  background-color: rgba(255, 255, 255, 0.06) !important;
 }
 .dark table tbody tr {
   background-color: transparent !important;
 }
 .dark table tbody tr:nth-child(even) {
-  background-color: rgba(15, 26, 46, 0.5) !important;
+  background-color: rgba(255, 255, 255, 0.025) !important;
 }
 
 /* Input fields */
 .dark input:not([type="checkbox"]):not([type="radio"]),
 .dark select,
 .dark textarea {
-  background-color: #0f1a2e !important;
-  color: #e2e8f0 !important;
-  border-color: #334155 !important;
+  background-color: rgba(10, 20, 42, 0.55) !important;
+  color: #f1f5f9 !important;
+  border-color: rgba(148, 163, 184, 0.28) !important;
+  backdrop-filter: blur(8px) !important;
 }
 .dark input::placeholder,
 .dark textarea::placeholder {
@@ -331,10 +350,12 @@
   border-color: #1e293b;
 }
 
-/* Sub-nav bar specific */
+/* Sub-nav bar specific (crystal oscuro) */
 .dark .bg-surface-container-lowest.border-b {
-  background-color: #0a1525 !important;
-  border-color: #1e293b !important;
+  background-color: rgba(7, 22, 43, 0.55) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
 }
 
 /* Select option text (dropdown menus) */

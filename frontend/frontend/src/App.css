@@ -234,6 +234,10 @@
   background-color: rgba(10, 20, 42, 0.55) !important;
   backdrop-filter: blur(10px) !important;
 }
+.dark .bg-white\/70 {
+  background-color: rgba(12, 24, 48, 0.42) !important;
+  backdrop-filter: blur(10px) !important;
+}
 .dark .bg-white\/60 {
   background-color: rgba(12, 24, 48, 0.36) !important;
   backdrop-filter: blur(10px) !important;
@@ -241,6 +245,9 @@
 .dark .bg-white\/50 {
   background-color: rgba(12, 24, 48, 0.32) !important;
   backdrop-filter: blur(8px) !important;
+}
+.dark .focus\:bg-white:focus {
+  background-color: rgba(20, 38, 72, 0.85) !important;
 }
 
 /* Hover states for white backgrounds */
@@ -338,10 +345,49 @@
 .dark .bg-gray-50 { background-color: rgba(100, 116, 139, 0.16) !important; }
 .dark .bg-indigo-50 { background-color: rgba(99, 102, 241, 0.16) !important; }
 .dark .bg-purple-50 { background-color: rgba(168, 85, 247, 0.16) !important; }
-.dark .bg-slate-50 { background-color: rgba(148, 163, 184, 0.12) !important; }
-.dark .bg-slate-100 {
-  background-color: rgba(148, 163, 184, 0.14) !important;
+.dark .bg-slate-50,
+.dark .bg-slate-50\/60,
+.dark .bg-slate-50\/90 {
+  background-color: rgba(15, 28, 54, 0.55) !important;
+  border-color: rgba(148, 163, 184, 0.22) !important;
+}
+.dark .bg-slate-100,
+.dark .bg-slate-100\/80,
+.dark .bg-slate-100\/90 {
+  background-color: rgba(20, 35, 66, 0.55) !important;
   border-color: rgba(148, 163, 184, 0.25) !important;
+}
+
+/* Modales Crystal Glassmorphism en modo noche */
+.dark .modal-glass-card {
+  background: rgba(10, 20, 42, 0.78) !important;
+  backdrop-filter: blur(24px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(160%) !important;
+  border: 1px solid rgba(148, 163, 184, 0.28) !important;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(197, 160, 89, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.08) !important;
+  color: #f1f5f9 !important;
+}
+.dark .modal-glass-inner-card {
+  background: rgba(15, 28, 54, 0.55) !important;
+  border: 1px solid rgba(148, 163, 184, 0.22) !important;
+}
+.dark .modal-glass-input {
+  background: rgba(15, 28, 54, 0.65) !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+  color: #f1f5f9 !important;
+}
+.dark .modal-glass-input:focus {
+  background: rgba(20, 38, 72, 0.85) !important;
+  border-color: #c5a059 !important;
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.2) !important;
+}
+.dark .modal-glass-card label {
+  color: #cbd5e1 !important;
+}
+.dark select optgroup,
+.dark select option {
+  background-color: #0f1c36 !important;
+  color: #f1f5f9 !important;
 }
 
 .dark .border-slate-100,

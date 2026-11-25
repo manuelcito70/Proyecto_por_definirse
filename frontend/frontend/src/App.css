@@ -291,17 +291,66 @@
   color: #64748b !important;
 }
 
+/* Cajas con gradiente blanco (e.g., from-surface-container-low to-white) */
+.dark .bg-gradient-to-r.to-white,
+.dark .bg-gradient-to-br.to-white,
+.dark .bg-gradient-to-b.from-surface-container-low\/70,
+.dark .bg-surface-container-low\/60,
+.dark .bg-surface-container-low\/70,
+.dark .bg-surface-container-low\/40 {
+  background-image: none !important;
+  background-color: rgba(12, 24, 48, 0.48) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-color: rgba(148, 163, 184, 0.22) !important;
+}
+
 /* Badges & pills */
-.dark .bg-blue-50 { background-color: rgba(29, 78, 216, 0.15) !important; }
-.dark .bg-green-50 { background-color: rgba(22, 163, 74, 0.15) !important; }
-.dark .bg-red-50 { background-color: rgba(220, 38, 38, 0.15) !important; }
-.dark .bg-yellow-50 { background-color: rgba(234, 179, 8, 0.15) !important; }
-.dark .bg-orange-50 { background-color: rgba(249, 115, 22, 0.15) !important; }
-.dark .bg-gray-50 { background-color: rgba(100, 116, 139, 0.15) !important; }
-.dark .bg-indigo-50 { background-color: rgba(99, 102, 241, 0.15) !important; }
-.dark .bg-purple-50 { background-color: rgba(168, 85, 247, 0.15) !important; }
-.dark .bg-slate-50 { background-color: rgba(100, 116, 139, 0.15) !important; }
-.dark .bg-slate-100 { background-color: rgba(100, 116, 139, 0.2) !important; }
+.dark .bg-blue-50, .dark .bg-blue-100 {
+  background-color: rgba(59, 130, 246, 0.18) !important;
+  border-color: rgba(96, 165, 250, 0.35) !important;
+}
+.dark .text-blue-800, .dark .text-blue-700 { color: #93c5fd !important; }
+
+.dark .bg-emerald-50, .dark .bg-emerald-100,
+.dark .bg-green-50, .dark .bg-green-100 {
+  background-color: rgba(16, 185, 129, 0.16) !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}
+.dark .text-emerald-800, .dark .text-emerald-700,
+.dark .text-green-800, .dark .text-green-700 { color: #6ee7b7 !important; }
+
+.dark .bg-red-50, .dark .bg-rose-50 {
+  background-color: rgba(225, 29, 72, 0.18) !important;
+  border-color: rgba(251, 113, 133, 0.35) !important;
+}
+.dark .text-red-700, .dark .text-red-800 { color: #fda4af !important; }
+
+.dark .bg-amber-50, .dark .bg-amber-100,
+.dark .bg-yellow-50 {
+  background-image: none !important;
+  background-color: rgba(245, 158, 11, 0.16) !important;
+  border-color: rgba(251, 191, 36, 0.35) !important;
+}
+.dark .text-amber-800, .dark .text-amber-700 { color: #fcd34d !important; }
+
+.dark .bg-orange-50 { background-color: rgba(249, 115, 22, 0.16) !important; }
+.dark .bg-gray-50 { background-color: rgba(100, 116, 139, 0.16) !important; }
+.dark .bg-indigo-50 { background-color: rgba(99, 102, 241, 0.16) !important; }
+.dark .bg-purple-50 { background-color: rgba(168, 85, 247, 0.16) !important; }
+.dark .bg-slate-50 { background-color: rgba(148, 163, 184, 0.12) !important; }
+.dark .bg-slate-100 {
+  background-color: rgba(148, 163, 184, 0.14) !important;
+  border-color: rgba(148, 163, 184, 0.25) !important;
+}
+
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-300,
+.dark .border-slate-200\/80,
+.dark .border-slate-200\/60 {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
 
 /* Gray backgrounds */
 .dark .bg-gray-100 { background-color: #131f35 !important; }

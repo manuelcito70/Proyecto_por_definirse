@@ -1,10 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { login } from '../services/auth';
 import './AuthPage.css';
 
 function AuthPage({ onLoginSuccess }) {
   const [isActive, setIsActive] = useState(false); // false = Sign In, true = Sign Up
   const [isLoading, setIsLoading] = useState(false);
+  const [loginMessage, setLoginMessage] = useState({ text: '', type: '' });
+  const [registerMessage, setRegisterMessage] = useState({ text: '', type: '' });
+
+  // Auto-limpiar mensajes despues de 6 segundos
+  useEffect(() => {
+    if (loginMessage.text) {
+      const timer = setTimeout(() => setLoginMessage({ text: '', type: '' }), 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [loginMessage]);
+
+  useEffect(() => {
+    if (registerMessage.text) {
+      const timer = setTimeout(() => setRegisterMessage({ text: '', type: '' }), 6000);
+      return () => clearTimeout(timer);
+    }
+  }, [registerMessage]);
 
   const [loginData, setLoginData] = useState({
     email: '',
@@ -13,9 +30,10 @@ function AuthPage({ onLoginSuccess }) {
 
   const [registerData, setRegisterData] = useState({
     nombre: '',
-    username: '',
+    email: '',
     password: '',
-    cargo: 'Directora'
+    cargo: 'Directora',
+    carrera: ''
   });
 
   const handleLoginChange = (e) => {
@@ -34,8 +52,10 @@ function AuthPage({ onLoginSuccess }) {
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
+    setLoginMessage({ text: '', type: '' });
+
     if (!loginData.email || !loginData.password) {
-      alert('Por favor completa todos los campos');
+      setLoginMessage({ text: 'Por favor completa todos los campos', type: 'error' });
       return;
     }
 
@@ -45,7 +65,7 @@ function AuthPage({ onLoginSuccess }) {
       onLoginSuccess(data.user);
     } catch (error) {
       console.error(error);
-      alert(error.message || 'Error al iniciar sesión');
+      setLoginMessage({ text: error.message || 'Error al iniciar sesion', type: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -53,8 +73,15 @@ function AuthPage({ onLoginSuccess }) {
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    if (!registerData.username || !registerData.password || !registerData.nombre) {
-      alert('Por favor completa todos los campos requeridos');
+    setRegisterMessage({ text: '', type: '' });
+
+    if (!registerData.email || !registerData.password || !registerData.nombre) {
+      setRegisterMessage({ text: 'Por favor completa todos los campos requeridos', type: 'error' });
+      return;
+    }
+
+    if (registerData.password.length < 6) {
+      setRegisterMessage({ text: 'La contrasena debe tener al menos 6 caracteres', type: 'error' });
       return;
     }
 
@@ -62,10 +89,11 @@ function AuthPage({ onLoginSuccess }) {
 
     try {
       const payload = {
-        username: registerData.username,
+        email: registerData.email.trim(),
         password: registerData.password,
-        nombre: registerData.nombre,
-        cargo: registerData.cargo
+        nombre: registerData.nombre.trim(),
+        cargo: registerData.cargo,
+        carrera: registerData.carrera || undefined
       };
 
       const response = await fetch('/api/register', {
@@ -75,11 +103,20 @@ function AuthPage({ onLoginSuccess }) {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.mensaje || 'Error al registrar usuario');
-      alert(data.mensaje || 'Cuenta creada exitosamente. Ya puedes iniciar sesión.');
-      setIsActive(false); // Cambiar a inicio de sesión
+
+      // Limpiar formulario y mostrar mensaje de verificacion
+      setRegisterData({ nombre: '', email: '', password: '', cargo: 'Directora', carrera: '' });
+      setRegisterMessage({ text: data.mensaje || 'Revisa tu correo electronico para confirmar tu cuenta.', type: 'success' });
+
+      // Pasar al login despues de 3 segundos
+      setTimeout(() => {
+        setLoginData({ email: payload.email, password: '' });
+        setLoginMessage({ text: 'Revisa tu bandeja de entrada y confirma tu correo antes de iniciar sesion.', type: 'success' });
+        setIsActive(false);
+      }, 3000);
     } catch (error) {
       console.error(error);
-      alert(error.message || 'Error al registrar usuario');
+      setRegisterMessage({ text: error.message || 'Error al registrar usuario', type: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -95,8 +132,14 @@ function AuthPage({ onLoginSuccess }) {
             <div className="form-brand">
               <img src="/logo-ichilo.png?v=2" alt="Logo FINI" className="brand-logo" />
               <h2>Crear Cuenta</h2>
-              <p className="brand-subtitle">SIGAD - Dirección de Carrera</p>
+              <p className="brand-subtitle">SIGAD - Direccion de Carrera</p>
             </div>
+
+            {registerMessage.text && (
+              <div className={`auth-message ${registerMessage.type}`}>
+                {registerMessage.type === 'error' ? '\u26A0\uFE0F' : '\u2709\uFE0F'} {registerMessage.text}
+              </div>
+            )}
 
             <div className="form-scrollable">
               <div className="input-group">
@@ -104,7 +147,7 @@ function AuthPage({ onLoginSuccess }) {
                 <input
                   type="text"
                   name="nombre"
-                  placeholder="Ej. Juan Pérez"
+                  placeholder="Ej. Juan Perez"
                   value={registerData.nombre}
                   onChange={handleRegisterChange}
                   required
@@ -112,19 +155,7 @@ function AuthPage({ onLoginSuccess }) {
               </div>
 
               <div className="input-group">
-                <label>Usuario</label>
-                <input
-                  type="text"
-                  name="username"
-                  placeholder="Ej: directora"
-                  value={registerData.username}
-                  onChange={handleRegisterChange}
-                  required
-                />
-              </div>
-
-              <div className="input-group">
-                <label>Cargo / Función</label>
+                <label>Cargo / Funcion</label>
                 <input
                   type="text"
                   name="cargo"
@@ -135,11 +166,34 @@ function AuthPage({ onLoginSuccess }) {
               </div>
 
               <div className="input-group">
-                <label>Contraseña</label>
+                <label>Direccion de Carrera</label>
+                <input
+                  type="text"
+                  name="carrera"
+                  placeholder="Ej: Ingenieria en Sistemas"
+                  value={registerData.carrera}
+                  onChange={handleRegisterChange}
+                />
+              </div>
+
+              <div className="input-group">
+                <label>Correo Electronico</label>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Ej: nombre@gmail.com"
+                  value={registerData.email}
+                  onChange={handleRegisterChange}
+                  required
+                />
+              </div>
+
+              <div className="input-group">
+                <label>Contrasena</label>
                 <input
                   type="password"
                   name="password"
-                  placeholder="••••••••"
+                  placeholder="Minimo 6 caracteres"
                   value={registerData.password}
                   onChange={handleRegisterChange}
                   minLength="6"
@@ -153,36 +207,38 @@ function AuthPage({ onLoginSuccess }) {
             </button>
 
             <div className="mobile-toggle">
-              <span>¿Ya tienes cuenta?</span>
-              <button type="button" onClick={() => setIsActive(false)}>Iniciar Sesión</button>
+              <span>Ya tienes cuenta?</span>
+              <button type="button" onClick={() => setIsActive(false)}>Iniciar Sesion</button>
             </div>
           </form>
         </div>
 
-        {/* FORMULARIO DE INICIO DE SESIÓN (Sign In) */}
+        {/* FORMULARIO DE INICIO DE SESION (Sign In) */}
         <div className="form-container sign-in">
           <form className="auth-form" onSubmit={handleLoginSubmit}>
             <div className="form-brand">
               <img src="/logo-ichilo.png?v=2" alt="Logo FINI" className="brand-logo" />
               <h2>SIGAD FINI</h2>
-              <p className="brand-subtitle">Dirección de Carrera - UAGRM</p>
+              <p className="brand-subtitle">Direccion de Carrera - UAGRM</p>
             </div>
 
-            <div style={{ background: '#f0fdf4', padding: '10px', borderRadius: '6px', fontSize: '0.8rem', color: '#166534', border: '1px solid #bbf7d0', textAlign: 'center', marginBottom: '14px' }}>
-              🔑 Acceso de Prueba: Correo <strong>directora@uagrm.edu.bo</strong> · Contraseña <strong>1234</strong>
-            </div>
+            {loginMessage.text && (
+              <div className={`auth-message ${loginMessage.type}`}>
+                {loginMessage.type === 'error' ? '\u26A0\uFE0F' : '\u2709\uFE0F'} {loginMessage.text}
+              </div>
+            )}
 
             <div className="input-group">
-              <label>Correo Electrónico</label>
+              <label>Correo Electronico</label>
               <div className="input-with-icon">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                   <polyline points="22,6 12,13 2,6" />
                 </svg>
                 <input
-                  type="text"
+                  type="email"
                   name="email"
-                  placeholder="Ej: directora@uagrm.edu.bo"
+                  placeholder="Ej: nombre@gmail.com"
                   value={loginData.email}
                   onChange={handleLoginChange}
                   required
@@ -191,7 +247,7 @@ function AuthPage({ onLoginSuccess }) {
             </div>
 
             <div className="input-group">
-              <label>Contraseña</label>
+              <label>Contrasena</label>
               <div className="input-with-icon">
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -200,7 +256,7 @@ function AuthPage({ onLoginSuccess }) {
                 <input
                   type="password"
                   name="password"
-                  placeholder="••••••••"
+                  placeholder="Tu contrasena"
                   value={loginData.password}
                   onChange={handleLoginChange}
                   required
@@ -209,23 +265,23 @@ function AuthPage({ onLoginSuccess }) {
             </div>
 
             <div className="forgot-password">
-              <a href="#forgot" onClick={(e) => { e.preventDefault(); alert('Por favor contacta al administrador del sistema para restablecer tu clave.'); }}>
-                ¿Olvidaste tu contraseña?
+              <a href="#forgot" onClick={(e) => { e.preventDefault(); setLoginMessage({ text: 'Por favor contacta al administrador del sistema para restablecer tu clave.', type: 'error' }); }}>
+                Olvidaste tu contrasena?
               </a>
             </div>
 
             <button type="submit" className="submit-btn" disabled={isLoading}>
-              {isLoading ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
+              {isLoading ? 'Iniciando Sesion...' : 'Iniciar Sesion'}
             </button>
 
             <div className="mobile-toggle">
-              <span>¿No tienes una cuenta?</span>
+              <span>No tienes una cuenta?</span>
               <button type="button" onClick={() => setIsActive(true)}>Registrarse</button>
             </div>
           </form>
         </div>
 
-        {/* CONTENEDOR DESLIZANTE DE TRANSICIÓN */}
+        {/* CONTENEDOR DESLIZANTE DE TRANSICION */}
         <div className="toggle-container">
           <div className="toggle">
             
@@ -234,12 +290,12 @@ function AuthPage({ onLoginSuccess }) {
               <div className="toggle-icon-badge">
                 <img src="/logo-uagrm.png" alt="UAGRM Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
-              <h1>¡Bienvenido de Nuevo!</h1>
+              <h1>Bienvenido de Nuevo!</h1>
               <p>
-                Si ya posees un usuario registrado en el Sistema de Gestión Documental FINI, ingresa tus credenciales para continuar.
+                Si ya posees una cuenta registrada en el Sistema de Gestion Documental FINI, ingresa tus credenciales para continuar.
               </p>
               <button className="toggle-action-btn" id="login" onClick={() => setIsActive(false)}>
-                Iniciar Sesión
+                Iniciar Sesion
               </button>
             </div>
 
@@ -248,9 +304,9 @@ function AuthPage({ onLoginSuccess }) {
               <div className="toggle-icon-badge">
                 <img src="/logo-uagrm.png" alt="UAGRM Logo" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
               </div>
-              <h1>¡Hola, Bienvenido!</h1>
+              <h1>Hola, Bienvenido!</h1>
               <p>
-                Regístrate con tus datos para acceder a SIGAD - Dirección de Carrera de la Facultad Integral de Ichilo.
+                Registrate con tus datos para acceder a SIGAD - Direccion de Carrera de la Facultad Integral de Ichilo.
               </p>
               <button className="toggle-action-btn" id="register" onClick={() => setIsActive(true)}>
                 Registrarse
@@ -262,9 +318,9 @@ function AuthPage({ onLoginSuccess }) {
 
       </div>
 
-      {/* Pie de Página Institucional */}
+      {/* Pie de Pagina Institucional */}
       <footer className="auth-footer-bottom">
-        <p>© 2026 Universidad Autónoma Gabriel René Moreno — Facultad Integral de Ichilo</p>
+        <p>&copy; 2026 Universidad Autonoma Gabriel Rene Moreno &mdash; Facultad Integral de Ichilo</p>
       </footer>
     </div>
   );

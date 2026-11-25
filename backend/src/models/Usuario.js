@@ -37,6 +37,15 @@ const Usuario = sequelize.define('Usuario', {
     allowNull: false,
     defaultValue: true
   },
+  is_verified: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  },
+  verification_token: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
   ultimo_acceso: {
     type: DataTypes.DATE
   }

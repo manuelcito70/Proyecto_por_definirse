@@ -28,14 +28,28 @@ const Layout = ({ user, onLogout, children }) => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#f8fafc] relative w-full max-w-full overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-[#f8fafc] dark:bg-transparent relative w-full max-w-full overflow-x-hidden">
+      {/* IMAGEN DE FONDO EN MODO NOCHE */}
+      {isDark && (
+        <div
+          className="fixed inset-0 pointer-events-none z-0 transition-opacity duration-500"
+          style={{
+            backgroundImage: "linear-gradient(to bottom, rgba(3, 10, 22, 0.55), rgba(6, 15, 32, 0.72)), url('/bg-fini-noche.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
+          aria-hidden="true"
+        />
+      )}
+
       {/* SUTIL RETÍCULA DE INGENIERÍA CON MÁSCARA RADIAL (TECH GRID SPOTLIGHT) */}
       <div 
         className="fixed inset-0 pointer-events-none z-0" 
         style={{
           backgroundImage: `
-            linear-gradient(to right, rgba(203, 213, 225, 0.55) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(203, 213, 225, 0.55) 1px, transparent 1px)
+            linear-gradient(to right, rgba(203, 213, 225, ${isDark ? '0.12' : '0.55'}) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(203, 213, 225, ${isDark ? '0.12' : '0.55'}) 1px, transparent 1px)
           `,
           backgroundSize: '24px 28px',
           maskImage: 'radial-gradient(ellipse 80% 65% at 50% 0%, #000 55%, transparent 100%)',

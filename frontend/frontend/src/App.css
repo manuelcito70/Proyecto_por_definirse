@@ -137,7 +137,7 @@
 .dark .bg-background,
 .dark .bg-surface,
 .dark .bg-surface-bright {
-  background-color: #0c1527 !important;
+  background-color: #060e1e !important;
   color: #e2e8f0 !important;
 }
 
@@ -146,41 +146,57 @@
   background-image: radial-gradient(rgba(148, 163, 184, 0.06) 1px, transparent 0) !important;
 }
 
-/* Grid overlay in Layout */
-.dark .fixed.inset-0.pointer-events-none.z-0 {
-  opacity: 0.15;
-}
-
-/* Surface containers */
+/* Surface containers (semi-translúcidos para que se luzca la foto nocturna de fondo) */
 .dark .bg-surface-container-lowest {
-  background-color: #111c30 !important;
+  background-color: rgba(13, 25, 48, 0.84) !important;
+  backdrop-filter: blur(8px);
 }
 .dark .bg-surface-container-low {
-  background-color: #0f1a2e !important;
+  background-color: rgba(15, 28, 54, 0.80) !important;
 }
 .dark .bg-surface-container {
-  background-color: #131f35 !important;
+  background-color: rgba(19, 34, 62, 0.85) !important;
 }
 .dark .bg-surface-container-high {
-  background-color: #162340 !important;
+  background-color: rgba(22, 38, 70, 0.9) !important;
 }
 .dark .bg-surface-container-highest {
-  background-color: #1a2847 !important;
+  background-color: rgba(26, 44, 80, 0.92) !important;
 }
 .dark .bg-\[\#f8fafc\] {
-  background-color: #0c1527 !important;
+  background-color: transparent !important;
 }
 
-/* Text colors */
+/* Text colors (incluyendo azul institucional oscuro que antes no se leía) */
 .dark .text-on-surface {
-  color: #e2e8f0 !important;
+  color: #f1f5f9 !important;
 }
 .dark .text-on-surface-variant {
-  color: #94a3b8 !important;
+  color: #cbd5e1 !important;
 }
 .dark .text-\[\#0b1c30\],
-.dark .text-\[\#1a1a2e\] {
-  color: #e2e8f0 !important;
+.dark .text-\[\#0b2545\],
+.dark .text-\[\#001026\],
+.dark .text-\[\#1a1a2e\],
+.dark .text-primary,
+.dark .text-institutional-navy,
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-gray-900,
+.dark .text-gray-800 {
+  color: #f1f5f9 !important;
+}
+.dark .text-slate-700,
+.dark .text-slate-600,
+.dark .text-gray-700,
+.dark .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+.dark .bg-\[\#0b2545\]\/10 {
+  background-color: rgba(197, 160, 89, 0.18) !important;
+}
+.dark .border-\[\#0b2545\]\/20 {
+  border-color: rgba(197, 160, 89, 0.45) !important;
 }
 
 /* Borders */

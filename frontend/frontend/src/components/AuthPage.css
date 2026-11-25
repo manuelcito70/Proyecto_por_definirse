@@ -22,6 +22,10 @@
   overflow-x: hidden;
 }
 
+.dark .auth-page {
+  background-image: url('/bg-fini-noche.jpg');
+}
+
 /* Capa de contraste y oscurecimiento profesional sobre el fondo */
 .auth-page::before {
   content: '';

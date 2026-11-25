@@ -358,6 +358,16 @@
   border-color: rgba(148, 163, 184, 0.25) !important;
 }
 
+/* Scroll interno garantizado en formularios dentro de modales */
+.modal-glass-card > form,
+.max-h-\[calc\(100vh-100px\)\] > form {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 /* Modales Crystal Glassmorphism en modo noche */
 .dark .modal-glass-card {
   background: rgba(10, 20, 42, 0.78) !important;

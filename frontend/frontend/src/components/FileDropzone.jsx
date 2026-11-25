@@ -257,8 +257,8 @@ export default function FileDropzone({
           onDrop={handleDrop}
           className={`cursor-pointer rounded-2xl border-2 border-dashed transition-all p-5 sm:p-6 flex flex-col items-center justify-center text-center group ${
             isDragging
-              ? 'border-[#0b2545] bg-blue-50/60 shadow-lg scale-[1.01]'
-              : 'border-slate-300 bg-gradient-to-b from-slate-50/80 to-slate-100/50 hover:bg-white hover:border-[#c5a059] shadow-2xs hover:shadow-md'
+              ? 'border-[#0b2545] dark:border-[#c5a059] bg-blue-50/60 dark:bg-blue-950/40 shadow-lg scale-[1.01]'
+              : 'border-slate-300 dark:border-slate-600/60 bg-gradient-to-b from-slate-50/80 to-slate-100/50 dark:from-slate-900/55 dark:to-slate-950/65 hover:bg-white dark:hover:bg-slate-900/75 hover:border-[#c5a059] shadow-2xs hover:shadow-md'
           }`}
         >
           {/* Icono de Carga Nítido y Centrado */}
@@ -276,7 +276,7 @@ export default function FileDropzone({
             Suba el documento oficial firmado o escaneado ({accept.replace(/\./g, '').toUpperCase()})
           </p>
 
-          <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-200/70 text-slate-700 font-label-code text-[11px] font-semibold border border-slate-300/80">
+          <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-200/70 dark:bg-slate-800/70 text-slate-700 dark:text-slate-200 font-label-code text-[11px] font-semibold border border-slate-300/80 dark:border-slate-600/60">
             <span className="material-symbols-outlined text-xs text-[#0b2545]">verified</span>
             <span>PDF/A, JPG o PNG · Máx {maxSizeMB} MB</span>
           </div>

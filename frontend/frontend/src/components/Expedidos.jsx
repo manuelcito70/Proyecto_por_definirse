@@ -434,8 +434,94 @@ const Expedidos = () => {
             />
           </div>
         ) : (
-          <div className="overflow-x-auto w-full max-w-full min-w-0">
-            <table className="w-full text-left border-collapse">
+          <>
+            {/* Vista en tarjetas para móvil (sin scroll horizontal) */}
+            <div className="md:hidden divide-y divide-slate-200/70">
+              {currentExpedidos.map((doc) => (
+                <div key={doc.id} className="p-3.5 flex flex-col gap-2.5 bg-surface-container-lowest">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className={`font-label-code text-xs font-bold px-2 py-0.5 rounded border whitespace-nowrap ${
+                        doc.estado === 'pendiente'
+                          ? 'bg-red-50 text-[#c1121f] border-red-200'
+                          : 'bg-slate-100 text-[#0b2545] border-slate-200'
+                      }`}>
+                        #{String(doc.nro_oficio).padStart(2, '0')} / {doc.gestion}
+                      </span>
+                      <span className="font-label-code text-[10px] font-bold uppercase px-1.5 py-0.5 rounded border border-slate-200 bg-surface-container-high text-[#0b2545]">
+                        {doc.categoria || 'otro'}
+                      </span>
+                    </div>
+                    <span className="font-mono text-[11px] text-on-surface-variant">{doc.fecha}</span>
+                  </div>
+
+                  <div className="min-w-0">
+                    <div className="text-xs font-bold text-[#0b2545] truncate">Para: {doc.destinatario}</div>
+                    <div className="text-sm font-medium text-on-surface mt-0.5 leading-snug">{doc.asunto}</div>
+                    {doc.descripcion && (
+                      <div className="font-caption text-[11px] text-on-surface-variant mt-0.5 line-clamp-1">
+                        {doc.descripcion}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
+                    <div>{getStatusBadge(doc.estado)}</div>
+
+                    <div className="inline-flex items-center gap-1 shrink-0">
+                      {doc.archivo_path ? (
+                        <button
+                          onClick={() => downloadFile(`/expedidos/${doc.id}/download`, doc.nombre_archivo || 'oficio.pdf')}
+                          className="p-1.5 rounded-md text-[#0b2545] hover:bg-surface-container transition-colors cursor-pointer"
+                          title="Descargar PDF"
+                          type="button"
+                        >
+                          <span className="material-symbols-outlined text-lg">download</span>
+                        </button>
+                      ) : (
+                        <span className="text-[11px] text-outline italic mr-1">Sin archivo</span>
+                      )}
+                      {doc.estado === 'completado' && (
+                        <button
+                          onClick={() => handleArchivar(doc)}
+                          className="p-1.5 rounded-md text-slate-600 hover:bg-surface-container hover:text-[#0b2545] transition-colors cursor-pointer"
+                          title="Archivar oficio"
+                          type="button"
+                        >
+                          <span className="material-symbols-outlined text-base">archive</span>
+                        </button>
+                      )}
+                      {doc.estado === 'archivado' && (
+                        <button
+                          onClick={() => handleDesarchivar(doc)}
+                          className="p-1.5 rounded-md text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer"
+                          title="Desarchivar"
+                          type="button"
+                        >
+                          <span className="material-symbols-outlined text-base">unarchive</span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleOpenEditModal(doc)}
+                        className="p-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-[#c1121f] transition-colors cursor-pointer"
+                        title="Editar oficio"
+                        type="button"
+                      >
+                        <span className="material-symbols-outlined text-base">edit</span>
+                      </button>
+                      <DeleteButton
+                        onClick={() => handleDelete(doc.id, doc.nro_oficio)}
+                        title="Eliminar oficio"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Vista en tabla para tablet/desktop */}
+            <div className="hidden md:block overflow-x-auto w-full max-w-full min-w-0">
+              <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-[#0b2545] text-white font-caption text-[11px] uppercase tracking-wider">
                   <th className="py-3 px-space-md font-bold">N.° de Oficio</th>
@@ -550,7 +636,8 @@ const Expedidos = () => {
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+          </>
         )}
 
         {/* Table Footer: Pagination & Records Tracker */}

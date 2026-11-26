@@ -420,18 +420,20 @@ const Recibidos = () => {
       <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-surface-container overflow-hidden flex flex-col relative">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
 
-        <div className="px-space-lg py-space-md bg-surface-container-lowest flex flex-col sm:flex-row items-start sm:items-center justify-between gap-space-md border-b border-surface-container">
-          <div className="flex items-center gap-space-sm">
-            <div className="h-6 w-1 bg-[#c1121f] rounded-full"></div>
-            <h2 className="font-institutional-serif text-lg md:text-xl text-[#0b2545] font-bold">
-              Registro de correspondencia recibida
-            </h2>
-            <span className="bg-surface-container-low text-[#0b2545] px-2.5 py-0.5 rounded-full font-label-code text-caption font-bold border border-surface-container">
+        <div className="px-4 sm:px-space-lg py-3.5 sm:py-space-md bg-surface-container-lowest flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-space-md border-b border-surface-container">
+          <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-space-sm w-full sm:w-auto">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="h-5 sm:h-6 w-1 bg-[#c1121f] rounded-full shrink-0"></div>
+              <h2 className="font-institutional-serif text-[15px] sm:text-lg md:text-xl text-[#0b2545] font-bold leading-snug">
+                Registro de correspondencia recibida
+              </h2>
+            </div>
+            <span className="bg-surface-container-low text-[#0b2545] px-2.5 py-0.5 rounded-full font-label-code text-[11px] sm:text-caption font-bold border border-surface-container whitespace-nowrap shrink-0">
               {recibidos.length} registros
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-space-xs w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             <div className="relative w-full sm:w-56">
               <input 
                 className="w-full bg-surface-container-low text-on-surface placeholder:text-on-surface-variant font-body-sm text-body-sm pl-9 pr-3 py-1.5 rounded-lg focus:outline-none focus:bg-surface-container-lowest border border-slate-200 shadow-2xs" 
@@ -443,39 +445,41 @@ const Recibidos = () => {
               />
               <span className="material-symbols-outlined absolute left-2.5 top-2 text-on-surface-variant text-base">search</span>
             </div>
-            <select
-              className="bg-surface-container-low text-on-surface font-body-sm text-body-sm px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs focus:outline-none cursor-pointer"
-              value={filterCategoria}
-              onChange={(e) => setFilterCategoria(e.target.value)}
-              title="Filtrar por categoría"
-            >
-              <option value="all">Categorías (Todas)</option>
-              <option value="carta">Carta</option>
-              <option value="solicitud">Solicitud</option>
-              <option value="informe">Informe</option>
-              <option value="memorandum">Memorándum</option>
-              <option value="otro">Otro</option>
-            </select>
-            <select
-              className="bg-surface-container-low text-on-surface font-body-sm text-body-sm px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs focus:outline-none cursor-pointer"
-              value={filterEstado}
-              onChange={(e) => setFilterEstado(e.target.value)}
-              title="Filtrar por estado"
-            >
-              <option value="all">Estados (Todos)</option>
-              <option value="pendiente">Pendiente</option>
-              <option value="en_curso">En curso</option>
-              <option value="completado">Completado</option>
-              <option value="archivado">Archivado</option>
-            </select>
-            <button
-              onClick={fetchData}
-              className="p-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant border border-slate-200 cursor-pointer"
-              title="Refrescar lista"
-              type="button"
-            >
-              <span className="material-symbols-outlined text-base">refresh</span>
-            </button>
+            <div className="flex items-center gap-1.5 w-full sm:w-auto">
+              <select
+                className="flex-1 sm:flex-none min-w-0 bg-surface-container-low text-on-surface font-body-sm text-xs sm:text-body-sm px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs focus:outline-none cursor-pointer"
+                value={filterCategoria}
+                onChange={(e) => setFilterCategoria(e.target.value)}
+                title="Filtrar por categoría"
+              >
+                <option value="all">Categorías (Todas)</option>
+                <option value="carta">Carta</option>
+                <option value="solicitud">Solicitud</option>
+                <option value="informe">Informe</option>
+                <option value="memorandum">Memorándum</option>
+                <option value="otro">Otro</option>
+              </select>
+              <select
+                className="flex-1 sm:flex-none min-w-0 bg-surface-container-low text-on-surface font-body-sm text-xs sm:text-body-sm px-2.5 py-1.5 rounded-lg border border-slate-200 shadow-2xs focus:outline-none cursor-pointer"
+                value={filterEstado}
+                onChange={(e) => setFilterEstado(e.target.value)}
+                title="Filtrar por estado"
+              >
+                <option value="all">Estados (Todos)</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="en_curso">En curso</option>
+                <option value="completado">Completado</option>
+                <option value="archivado">Archivado</option>
+              </select>
+              <button
+                onClick={fetchData}
+                className="p-1.5 rounded-lg bg-surface-container-low hover:bg-surface-container text-on-surface-variant border border-slate-200 cursor-pointer shrink-0"
+                title="Refrescar lista"
+                type="button"
+              >
+                <span className="material-symbols-outlined text-base">refresh</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -493,8 +497,127 @@ const Recibidos = () => {
             />
           </div>
         ) : (
-          <div className="overflow-x-auto w-full max-w-full min-w-0">
-            <table className="w-full min-w-[700px] text-left" id="tabla-recibidos">
+          <>
+            {/* Vista en tarjetas para móvil (sin scroll horizontal) */}
+            <div className="md:hidden divide-y divide-slate-200/70">
+              {currentRecibidos.map((doc) => {
+                const esPendiente = doc.estado === 'pendiente';
+                return (
+                  <div key={doc.id} className="p-3.5 flex flex-col gap-2.5 bg-surface-container-lowest">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className={`font-label-code text-xs font-bold px-2 py-0.5 rounded border whitespace-nowrap ${
+                          esPendiente
+                            ? 'text-[#c1121f] bg-red-50 border-red-200'
+                            : 'text-[#0b2545] bg-surface-container-high border-slate-200'
+                        }`}>
+                          #{String(doc.nro_recibido).padStart(2, '0')} / {gestion}
+                        </span>
+                        <span className="font-label-code text-[10px] font-bold uppercase px-1.5 py-0.5 rounded border border-slate-200 bg-surface-container-high text-[#0b2545]">
+                          {doc.categoria || 'otro'}
+                        </span>
+                      </div>
+                      <span className="font-mono text-[11px] text-on-surface-variant">{doc.fecha}</span>
+                    </div>
+
+                    <div className="min-w-0">
+                      <div className="text-xs font-bold text-[#0b2545] truncate">{doc.remitente}</div>
+                      <div className="text-sm font-medium text-on-surface mt-0.5 leading-snug">{doc.asunto}</div>
+                      {doc.descripcion && (
+                        <div className="font-label-code text-[11px] text-on-surface-variant mt-0.5 truncate">
+                          {doc.descripcion}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-100">
+                      <div>
+                        {esPendiente ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-label-badge text-[10px] font-bold bg-red-50 text-red-700 border border-red-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#c1121f] animate-pulse"></span> PENDIENTE
+                          </span>
+                        ) : doc.estado === 'en_curso' ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-label-badge text-[10px] font-bold bg-amber-50 text-amber-800 border border-amber-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-600"></span> EN CURSO
+                          </span>
+                        ) : doc.estado === 'archivado' ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-label-badge text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-300">
+                            <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span> ARCHIVADO
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full font-label-badge text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600"></span> COMPLETADO
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="inline-flex items-center gap-1 shrink-0">
+                        {doc.archivo_path ? (
+                          <>
+                            <button
+                              className="p-1.5 rounded-lg text-[#0b2545] hover:bg-surface-container-high transition-colors cursor-pointer"
+                              onClick={() => setPreviewDoc(doc)}
+                              title="Ver escaneo digital"
+                              type="button"
+                            >
+                              <span className="material-symbols-outlined text-lg">visibility</span>
+                            </button>
+                            <button
+                              className="p-1.5 rounded-lg text-on-surface-variant hover:text-[#0b2545] hover:bg-surface-container-high transition-colors cursor-pointer"
+                              onClick={() => downloadFile(`/recibidos/${doc.id}/download`, doc.nombre_archivo || 'recibido.pdf')}
+                              title="Descargar documento"
+                              type="button"
+                            >
+                              <span className="material-symbols-outlined text-lg">download</span>
+                            </button>
+                          </>
+                        ) : (
+                          <span className="text-[11px] text-outline italic mr-1">Sin archivo</span>
+                        )}
+                        <button
+                          className="p-1.5 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-[#0b2545] transition-colors cursor-pointer"
+                          onClick={() => handleToggleEstado(doc)}
+                          title={esPendiente ? "Marcar como respondido" : "Reabrir como pendiente"}
+                          type="button"
+                        >
+                          <span className="material-symbols-outlined text-base">
+                            {esPendiente ? 'check_circle' : 'replay'}
+                          </span>
+                        </button>
+                        {doc.estado === 'completado' && (
+                          <button
+                            className="p-1.5 rounded-lg text-slate-600 hover:text-[#0b2545] hover:bg-surface-container-high transition-colors cursor-pointer"
+                            onClick={() => handleArchivar(doc)}
+                            title="Archivar documento"
+                            type="button"
+                          >
+                            <span className="material-symbols-outlined text-lg">archive</span>
+                          </button>
+                        )}
+                        {doc.estado === 'archivado' && (
+                          <button
+                            className="p-1.5 rounded-lg text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer"
+                            onClick={() => handleDesarchivar(doc)}
+                            title="Desarchivar"
+                            type="button"
+                          >
+                            <span className="material-symbols-outlined text-lg">unarchive</span>
+                          </button>
+                        )}
+                        <DeleteButton
+                          onClick={() => handleDelete(doc.id, doc.nro_recibido)}
+                          title="Eliminar registro"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Vista en tabla para tablet/desktop */}
+            <div className="hidden md:block overflow-x-auto w-full max-w-full min-w-0">
+              <table className="w-full min-w-[700px] text-left" id="tabla-recibidos">
               <thead className="bg-surface-container-low text-on-surface-variant font-caption text-caption uppercase tracking-wider border-b border-surface-container">
                 <tr>
                   <th className="py-3.5 px-space-lg font-bold text-[#0b2545]">N.° Interno</th>
@@ -646,7 +769,8 @@ const Recibidos = () => {
                 })}
               </tbody>
             </table>
-          </div>
+            </div>
+          </>
         )}
 
         {/* Pagination Footer */}

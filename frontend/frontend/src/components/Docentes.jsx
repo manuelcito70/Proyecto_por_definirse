@@ -707,7 +707,7 @@ const Docentes = () => {
 
               {/* Título de la Sección de Documentos y Botón + Cargar PDF */}
               <div className="flex items-center justify-between pt-1">
-                <span className="font-body-sm text-xs font-bold text-slate-700">
+                <span className="font-body-sm text-xs font-bold text-slate-700 dark:text-slate-200">
                   Documentos en resguardo institucional (PDF/A)
                 </span>
                 <button
@@ -720,10 +720,10 @@ const Docentes = () => {
                     });
                     setIsArchivoModalOpen(true);
                   }}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-[#0B2545] hover:text-[#C1121F] transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#0b2545] border border-blue-200/80 dark:bg-blue-500/20 dark:hover:bg-blue-500/30 dark:text-blue-200 dark:border-blue-400/40 text-xs font-bold transition-all shadow-2xs cursor-pointer"
                   type="button"
                 >
-                  <span className="material-symbols-outlined text-base">upload_file</span>
+                  <span className="material-symbols-outlined text-base text-blue-600 dark:text-blue-300">upload_file</span>
                   <span>Cargar PDF</span>
                 </button>
               </div>

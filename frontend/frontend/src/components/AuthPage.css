@@ -466,63 +466,257 @@
   margin: 0;
 }
 
-/* ===== RESPONSIVE PARA DISPOSITIVOS MÓVILES ===== */
+/* ===== RESPONSIVE PARA DISPOSITIVOS MÓVILES (CONSERVA TARJETA DUAL Y ANIMACIÓN COMPLETA) ===== */
 @media (max-width: 768px) {
+  .auth-page {
+    padding: 12px 8px;
+    background-attachment: scroll;
+    justify-content: center;
+  }
+
   .auth-sliding-container {
     width: 100%;
-    min-height: auto;
-    height: auto;
+    max-width: 620px;
+    min-height: 520px;
+    height: 520px;
     border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+    margin: auto 0;
   }
 
-  .toggle-container {
-    display: none;
-  }
-
-  .sign-in, .sign-up {
-    position: relative;
-    width: 100%;
-    opacity: 1;
-    pointer-events: all;
-    transform: none !important;
-  }
-
-  .sign-up {
-    display: none;
-  }
-
-  .auth-sliding-container.active .sign-in {
-    display: none;
-  }
-
-  .auth-sliding-container.active .sign-up {
-    display: flex;
-    animation: none;
+  /* Los formularios mantienen sus 2 columnas del 50% */
+  .form-container {
+    height: 100%;
   }
 
   .auth-form {
-    padding: 32px 24px;
+    padding: 24px 18px;
+    height: 100%;
+    justify-content: center;
+  }
+
+  .form-brand {
+    margin-bottom: 14px;
+  }
+
+  .brand-logo {
+    max-height: 44px;
+    margin-bottom: 6px;
+  }
+
+  .form-brand h2 {
+    font-size: 18px;
+    letter-spacing: -0.2px;
+  }
+
+  .brand-subtitle {
+    font-size: 10px;
+    margin-top: 3px;
+  }
+
+  .form-scrollable {
+    max-height: 270px;
+    overflow-y: auto;
+    padding-right: 4px;
+    margin-bottom: 10px;
+  }
+
+  .input-group {
+    margin-bottom: 11px;
+  }
+
+  .input-group label {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+
+  .auth-form input[type="text"],
+  .auth-form input[type="email"],
+  .auth-form input[type="password"],
+  .auth-form select {
+    padding: 8px 10px;
+    font-size: 12px;
+    border-radius: 9px;
+  }
+
+  .input-with-icon svg {
+    left: 9px;
+    width: 15px;
+    height: 15px;
+  }
+
+  .input-with-icon input {
+    padding-left: 30px !important;
+  }
+
+  .forgot-password {
+    margin-top: -3px;
+    margin-bottom: 12px;
+  }
+
+  .forgot-password a {
+    font-size: 11px;
+  }
+
+  .submit-btn {
+    padding: 10px 16px;
+    font-size: 12px;
+    border-radius: 9px;
+  }
+
+  /* El panel curvo toggle permanece visible y adaptado */
+  .toggle-container {
+    display: block !important;
+    border-radius: 85px 0 0 55px;
+  }
+
+  .auth-sliding-container.active .toggle-container {
+    border-radius: 0 85px 55px 0;
+  }
+
+  .toggle-panel {
+    padding: 0 16px;
+  }
+
+  .toggle-icon-badge {
+    width: 100%;
+    max-height: 80px;
+    margin-bottom: -4px;
+  }
+
+  .toggle-panel h1 {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .toggle-panel p {
+    font-size: 11px;
+    line-height: 1.45;
+    margin-bottom: 16px;
+    max-width: 180px;
+  }
+
+  .toggle-action-btn {
+    font-size: 10.5px;
+    padding: 8px 22px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    border-width: 1.5px;
   }
 
   .mobile-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-top: 20px;
-    font-size: 13px;
-    color: #64748b;
+    display: none !important;
   }
 
-  .mobile-toggle button {
-    background: none;
-    border: none;
-    color: #1d4ed8;
-    font-weight: 700;
-    cursor: pointer;
-    font-size: 13px;
-    padding: 0;
-    text-decoration: underline;
+  .auth-footer-bottom p {
+    font-size: 11px;
+    padding: 0 8px;
+  }
+}
+
+/* Pantallas móviles muy compactas (< 480px, ej. 360px - 400px como en la captura) */
+@media (max-width: 480px) {
+  .auth-page {
+    padding: 8px 4px;
+  }
+
+  .auth-sliding-container {
+    max-width: 100%;
+    min-height: 480px;
+    height: 490px;
+    border-radius: 16px;
+  }
+
+  .auth-form {
+    padding: 18px 10px;
+  }
+
+  .brand-logo {
+    max-height: 36px;
+    margin-bottom: 4px;
+  }
+
+  .form-brand h2 {
+    font-size: 15px;
+  }
+
+  .brand-subtitle {
+    font-size: 8.5px;
+  }
+
+  .input-group {
+    margin-bottom: 8px;
+  }
+
+  .input-group label {
+    font-size: 10px;
+    margin-bottom: 2px;
+  }
+
+  .auth-form input[type="text"],
+  .auth-form input[type="email"],
+  .auth-form input[type="password"],
+  .auth-form select {
+    padding: 6px 8px;
+    font-size: 11px;
+    border-radius: 8px;
+  }
+
+  .input-with-icon svg {
+    left: 8px;
+    width: 13px;
+    height: 13px;
+  }
+
+  .input-with-icon input {
+    padding-left: 26px !important;
+  }
+
+  .forgot-password a {
+    font-size: 9.5px;
+  }
+
+  .submit-btn {
+    padding: 8px 12px;
+    font-size: 11px;
+    border-radius: 8px;
+  }
+
+  .form-scrollable {
+    max-height: 240px;
+  }
+
+  .toggle-container {
+    border-radius: 65px 0 0 45px;
+  }
+
+  .auth-sliding-container.active .toggle-container {
+    border-radius: 0 65px 45px 0;
+  }
+
+  .toggle-panel {
+    padding: 0 8px;
+  }
+
+  .toggle-icon-badge {
+    max-height: 60px;
+  }
+
+  .toggle-panel h1 {
+    font-size: 14.5px;
+    margin-bottom: 6px;
+  }
+
+  .toggle-panel p {
+    font-size: 9.5px;
+    line-height: 1.35;
+    margin-bottom: 12px;
+    max-width: 145px;
+  }
+
+  .toggle-action-btn {
+    font-size: 9px;
+    padding: 6px 14px;
   }
 }
 

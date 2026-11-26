@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import DeleteButton from './DeleteButton';
 import { useGestion } from '../context/GestionContext';
 import { 
   getDocentes, 
@@ -602,14 +603,10 @@ const Docentes = () => {
                         <span className="material-symbols-outlined text-base">folder_shared</span>
                       </button>
 
-                      <button
+                      <DeleteButton
                         onClick={(e) => handleDeleteDocente(doc.id, doc.nombre, e)}
-                        className="p-2 rounded-lg text-slate-400 hover:text-[#C1121F] hover:bg-red-50 transition-colors cursor-pointer"
                         title="Eliminar docente"
-                        type="button"
-                      >
-                        <span className="material-symbols-outlined text-base">delete</span>
-                      </button>
+                      />
                     </div>
                   </div>
                 </div>
@@ -651,14 +648,10 @@ const Docentes = () => {
 
                 {/* Acciones del Panel */}
                 <div className="flex items-center gap-1 shrink-0">
-                  <button
+                  <DeleteButton
                     onClick={(e) => handleDeleteDocente(selectedDocente.id, selectedDocente.nombre, e)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-[#C1121F] hover:bg-red-50 transition-colors cursor-pointer"
                     title="Eliminar docente y legajo"
-                    type="button"
-                  >
-                    <span className="material-symbols-outlined text-lg">delete</span>
-                  </button>
+                  />
 
                   {/* Botón Cerrar Panel ✕ */}
                   <button
@@ -866,14 +859,10 @@ const Docentes = () => {
                                 </button>
                               </>
                             )}
-                            <button
+                            <DeleteButton
                               onClick={() => handleDeleteArchivo(docItem.id, docItem.nombre_original)}
-                              className="p-1.5 rounded-lg text-slate-300 hover:text-[#C1121F] hover:bg-white transition-colors cursor-pointer"
                               title="Eliminar del expediente"
-                              type="button"
-                            >
-                              <span className="material-symbols-outlined text-base">delete</span>
-                            </button>
+                            />
                           </div>
                         </div>
                       );
@@ -991,14 +980,10 @@ const Docentes = () => {
                               </button>
                             </>
                           )}
-                          <button
+                          <DeleteButton
                             onClick={() => handleDeleteArchivo(docItem.id, docItem.nombre_original)}
-                            className="p-1.5 rounded-lg text-slate-300 hover:text-[#C1121F] hover:bg-white transition-colors cursor-pointer"
                             title="Eliminar del expediente"
-                            type="button"
-                          >
-                            <span className="material-symbols-outlined text-base">delete</span>
-                          </button>
+                          />
                         </div>
                       </div>
                     ))

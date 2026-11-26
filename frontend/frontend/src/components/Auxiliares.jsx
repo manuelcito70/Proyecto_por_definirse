@@ -10,6 +10,7 @@ import {
   getFasesConvocatoria
 } from '../services/api';
 import EmptyState from './EmptyState';
+import DeleteButton from './DeleteButton';
 import LoadingState from './LoadingState';
 import SuccessModal from './SuccessModal';
 import { getUserCarrera } from '../utils/carreraHelper';
@@ -658,14 +659,10 @@ const Auxiliares = () => {
                       </button>
 
                       {/* Eliminar */}
-                      <button
+                      <DeleteButton
                         onClick={(e) => handleDelete(aux.id, aux.nombre, e)}
-                        className="p-2 rounded-lg text-slate-300 hover:text-[#C1121F] hover:bg-slate-100 transition-colors cursor-pointer"
                         title="Eliminar registro"
-                        type="button"
-                      >
-                        <span className="material-symbols-outlined text-base">delete</span>
-                      </button>
+                      />
                     </div>
                   </div>
                 </div>

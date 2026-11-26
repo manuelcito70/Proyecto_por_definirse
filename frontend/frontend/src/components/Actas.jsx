@@ -7,6 +7,7 @@ import SuccessModal from './SuccessModal';
 import { imprimirDocumentoOficial, FIRMAS, esc } from '../utils/documentoOficial';
 import { getUserCarrera } from '../utils/carreraHelper';
 import FileDropzone from './FileDropzone';
+import DeleteButton from './DeleteButton';
 
 const MODALIDADES = [
   { id: '', label: 'Todas las modalidades' },
@@ -581,14 +582,10 @@ const Actas = () => {
                       </button>
 
                       {/* Eliminar */}
-                      <button
+                      <DeleteButton
                         onClick={(e) => handleDelete(acta.id, acta.nombre_estudiante, e)}
-                        className="p-2 rounded-lg text-slate-300 hover:text-[#C1121F] hover:bg-slate-100 transition-colors cursor-pointer"
                         title="Eliminar acta"
-                        type="button"
-                      >
-                        <span className="material-symbols-outlined text-base">delete</span>
-                      </button>
+                      />
                     </div>
                   </div>
                 </div>

@@ -1,0 +1,47 @@
+/* ===== DELETE BIN BUTTON (Uiverse animated bin) ===== */
+.bin-button {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5px;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background-color: rgb(255, 95, 95);
+  cursor: pointer;
+  border: 2px solid rgb(255, 201, 201);
+  transition-duration: 0.3s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.bin-bottom {
+  width: 11px;
+  height: auto;
+  display: block;
+}
+
+.bin-top {
+  width: 13px;
+  height: auto;
+  display: block;
+  transform-origin: right;
+  transition-duration: 0.3s;
+}
+
+.bin-button:hover .bin-top {
+  transform: rotate(45deg);
+}
+
+.bin-button:hover {
+  background-color: rgb(255, 0, 0);
+}
+
+.bin-button:active {
+  transform: scale(0.9);
+}
+
+.dark .bin-button {
+  border-color: rgba(255, 180, 180, 0.55);
+}

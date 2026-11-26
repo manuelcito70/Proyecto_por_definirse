@@ -9,6 +9,7 @@ import {
   getFileBlob
 } from '../services/api';
 import EmptyState from './EmptyState';
+import DeleteButton from './DeleteButton';
 import LoadingState from './LoadingState';
 import SuccessModal from './SuccessModal';
 import FileDropzone from './FileDropzone';
@@ -634,14 +635,10 @@ const Recibidos = () => {
                             </button>
                           )}
 
-                          <button 
-                            className="p-1.5 rounded-lg text-on-surface-variant hover:text-[#c1121f] hover:bg-surface-container-high transition-colors cursor-pointer"
+                          <DeleteButton
                             onClick={() => handleDelete(doc.id, doc.nro_recibido)}
                             title="Eliminar registro"
-                            type="button"
-                          >
-                            <span className="material-symbols-outlined text-base">delete</span>
-                          </button>
+                          />
                         </div>
                       </td>
                     </tr>

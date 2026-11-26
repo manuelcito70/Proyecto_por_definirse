@@ -9,6 +9,7 @@ import {
   downloadFile 
 } from '../services/api';
 import EmptyState from './EmptyState';
+import DeleteButton from './DeleteButton';
 import LoadingState from './LoadingState';
 import SuccessModal from './SuccessModal';
 import FileDropzone from './FileDropzone';
@@ -539,14 +540,10 @@ const Expedidos = () => {
                         >
                           <span className="material-symbols-outlined text-base">edit</span>
                         </button>
-                        <button 
+                        <DeleteButton
                           onClick={() => handleDelete(doc.id, doc.nro_oficio)}
-                          className="p-1.5 rounded-md text-on-surface-variant hover:bg-surface-container hover:text-[#c1121f] transition-colors cursor-pointer" 
                           title="Eliminar oficio"
-                          type="button"
-                        >
-                          <span className="material-symbols-outlined text-base">delete</span>
-                        </button>
+                        />
                       </div>
                     </td>
                   </tr>

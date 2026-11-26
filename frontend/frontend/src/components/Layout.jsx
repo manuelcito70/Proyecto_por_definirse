@@ -144,7 +144,7 @@ const Layout = ({ user, onLogout, children }) => {
                   {user?.nombre || 'Dirección de Carrera'}
                 </span>
                 <span className="font-caption text-caption text-white/60">
-                  {user?.email || (user?.username ? `${user.username}@uagrm.edu.bo` : 'admin@uagrm.edu.bo')}
+                  {user?.cargo || user?.rol || 'Dirección de Carrera'}
                 </span>
               </div>
               <div className="relative">

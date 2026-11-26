@@ -189,8 +189,6 @@ const PanelControl = () => {
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600"></span>
               </span>
               <span className="font-bold text-emerald-800">Sistema en línea</span>
-              <span className="text-outline-variant">·</span>
-              <span className="font-medium text-[#0b2545]">Base de datos oficial FINI-UAGRM (Yapacaní)</span>
             </div>
 
             <div className="flex items-center gap-3 mt-1">
@@ -779,11 +777,7 @@ const PanelControl = () => {
             </div>
           </div>
 
-          <div className="relative z-10 mt-space-lg pt-space-md border-t border-slate-100 flex flex-wrap items-center justify-between gap-space-sm">
-            <div className="flex items-center gap-space-xs text-on-surface-variant font-caption text-caption">
-              <span className="material-symbols-outlined text-sm text-[#0b2545]">schedule</span>
-              <span>Último respaldo de base de datos: Hoy (Servidor Central Ichilo)</span>
-            </div>
+          <div className="relative z-10 mt-space-lg pt-space-md border-t border-slate-100 flex flex-wrap items-center justify-end gap-space-sm">
             <button 
               onClick={() => alert('Reglamento de Digitalización y Archivo Documental UAGRM: Todo documento oficial recibido en dirección debe registrarse con correlativo secuencial y resguardo en PDF/A sin alteración de contenido.')}
               className="text-[#0b2545] hover:text-[#c1121f] font-body-sm font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer" 

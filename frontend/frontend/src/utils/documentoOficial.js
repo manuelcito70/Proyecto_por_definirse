@@ -23,8 +23,8 @@ export const FIRMAS = {
     detalle: ['CARRERA ING. EN SISTEMAS', 'Facultad Integral de Ichilo - U.A.G.R.M.']
   },
   vicedecano: {
-    nombre: 'M.Sc. Ing. Félix Vallejos Vallejos',
-    cargo: 'VICE-DECANO',
+    nombre: 'M.Sc. Ing. Luis Fernando Villaroel Santacruz',
+    cargo: 'DECANO',
     detalle: ['FACULTAD INTEGRAL DE ICHILO', 'Universidad Autónoma Gabriel René Moreno']
   }
 };
@@ -232,7 +232,6 @@ export function imprimirDocumentoOficial(doc, ventanaPrevia = null) {
     <div class="raya"></div>
     <div class="datos">
       <span>${ICONOS.ubicacion}${esc(INSTITUCION.direccion)}</span>
-      <span>${ICONOS.telefono}${esc(INSTITUCION.telefono)}</span>
       <span>${ICONOS.correo}${esc(INSTITUCION.correo)}</span>
       <span>${ICONOS.facebook}${esc(INSTITUCION.facebook)}</span>
     </div>

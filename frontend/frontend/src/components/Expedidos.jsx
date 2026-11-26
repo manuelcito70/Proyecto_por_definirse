@@ -232,12 +232,6 @@ const Expedidos = () => {
           <span className="material-symbols-outlined text-sm">chevron_right</span>
           <span className="font-bold text-[#c1121f]">Documentos expedidos</span>
         </nav>
-        <div className="flex items-center gap-space-xs bg-surface-container-low px-space-sm py-1 rounded-full text-on-surface-variant font-caption text-caption border border-slate-200/60">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>Base de datos activa</span>
-          <span className="text-outline-variant">•</span>
-          <span className="font-label-code text-[#0b2545] font-semibold">FINI-UAGRM</span>
-        </div>
       </div>
 
       {/* Page Header Title & Main Action */}

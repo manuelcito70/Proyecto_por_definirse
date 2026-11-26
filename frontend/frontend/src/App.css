@@ -287,17 +287,20 @@
   background-color: rgba(255, 255, 255, 0.025) !important;
 }
 
-/* Input fields */
-.dark input:not([type="checkbox"]):not([type="radio"]),
-.dark select,
-.dark textarea {
+/* Input fields (excluye explícitamente el portal de autenticación) */
+.dark :not(.auth-form):not(.auth-page):not(.form-container) > input:not([type="checkbox"]):not([type="radio"]),
+.dark :not(.auth-form):not(.auth-page):not(.form-container) > select,
+.dark :not(.auth-form):not(.auth-page):not(.form-container) > textarea,
+.dark .app-container input:not([type="checkbox"]):not([type="radio"]),
+.dark .app-container select,
+.dark .app-container textarea {
   background-color: rgba(10, 20, 42, 0.55) !important;
   color: #f1f5f9 !important;
   border-color: rgba(148, 163, 184, 0.28) !important;
   backdrop-filter: blur(8px) !important;
 }
-.dark input::placeholder,
-.dark textarea::placeholder {
+.dark .app-container input::placeholder,
+.dark .app-container textarea::placeholder {
   color: #64748b !important;
 }
 

@@ -28,6 +28,11 @@ function AuthPage({ onLoginSuccess }) {
   const [carreras, setCarreras] = useState(FALLBACK_CARRERAS);
 
   useEffect(() => {
+    // Al estar en el portal de login / registro, aseguramos que la clase 'dark' no contamine la tarjeta
+    document.documentElement.classList.remove('dark');
+  }, []);
+
+  useEffect(() => {
     fetch('/api/carreras')
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {

@@ -205,24 +205,39 @@
 .auth-form input[type="text"],
 .auth-form input[type="email"],
 .auth-form input[type="password"],
-.auth-form select {
+.auth-form select,
+.auth-page input[type="text"],
+.auth-page input[type="email"],
+.auth-page input[type="password"],
+.auth-page select {
   width: 100%;
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
+  background: #f8fafc !important;
+  background-color: #f8fafc !important;
+  border: 1.5px solid #e2e8f0 !important;
   padding: 12px 16px;
   font-size: 14px;
   border-radius: 12px;
   outline: none;
   box-sizing: border-box;
-  color: #0f172a;
+  color: #0f172a !important;
+  -webkit-text-fill-color: #0f172a !important;
   transition: all 0.2s ease;
 }
 
 .auth-form input:focus,
-.auth-form select:focus {
-  background: #ffffff;
-  border-color: #1d4ed8;
-  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+.auth-form select:focus,
+.auth-page input:focus,
+.auth-page select:focus {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  border-color: #1d4ed8 !important;
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15) !important;
+}
+
+.auth-form input::placeholder,
+.auth-page input::placeholder {
+  color: #94a3b8 !important;
+  -webkit-text-fill-color: #94a3b8 !important;
 }
 
 .input-with-icon input:focus + svg,
@@ -515,10 +530,23 @@
   }
 
   .form-scrollable {
-    max-height: 270px;
+    max-height: 290px;
     overflow-y: auto;
     padding-right: 4px;
     margin-bottom: 10px;
+  }
+
+  .form-scrollable::-webkit-scrollbar {
+    width: 3.5px !important;
+  }
+
+  .form-scrollable::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  .form-scrollable::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 6px !important;
   }
 
   .input-group {
@@ -622,8 +650,8 @@
 
   .auth-sliding-container {
     max-width: 100%;
-    min-height: 480px;
-    height: 490px;
+    min-height: 520px;
+    height: 535px;
     border-radius: 16px;
   }
 
@@ -683,7 +711,23 @@
   }
 
   .form-scrollable {
-    max-height: 240px;
+    max-height: 275px;
+    overflow-y: auto;
+    padding-right: 4px;
+    margin-bottom: 8px;
+  }
+
+  .form-scrollable::-webkit-scrollbar {
+    width: 3px !important;
+  }
+
+  .form-scrollable::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  .form-scrollable::-webkit-scrollbar-thumb {
+    background: #cbd5e1 !important;
+    border-radius: 6px !important;
   }
 
   .toggle-container {

@@ -68,10 +68,10 @@ const Layout = ({ user, onLogout, children }) => {
         </div>
 
         {/* Barra Principal Institucional */}
-        <div className="w-full px-3 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between border-b border-white/10 bg-[#07162b] text-on-primary relative overflow-hidden">
-          {/* Cortes geométricos diagonales de prestigio */}
-          <div className="absolute right-0 top-0 bottom-0 w-80 bg-gradient-to-l from-[#c1121f]/20 via-transparent to-transparent pointer-events-none transform skew-x-[-24deg] translate-x-20"></div>
-          <div className="absolute right-48 top-0 bottom-0 w-2 bg-[#c5a059]/40 pointer-events-none transform skew-x-[-24deg]"></div>
+        <div className="w-full px-2.5 sm:px-6 py-2 sm:py-2.5 flex items-center justify-between gap-2 border-b border-white/10 bg-[#07162b] text-on-primary relative overflow-hidden">
+          {/* Cortes geométricos diagonales de prestigio (solo tablet/desktop para no tapar el texto en móvil) */}
+          <div className="hidden sm:block absolute right-0 top-0 bottom-0 w-80 bg-gradient-to-l from-[#c1121f]/20 via-transparent to-transparent pointer-events-none transform skew-x-[-24deg] translate-x-20"></div>
+          <div className="hidden sm:block absolute right-48 top-0 bottom-0 w-2 bg-[#c5a059]/40 pointer-events-none transform skew-x-[-24deg]"></div>
 
           {/* Logotipos y Membrete */}
           <div className="flex items-center gap-1.5 sm:gap-3.5 relative z-10 min-w-0">

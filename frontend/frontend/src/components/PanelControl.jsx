@@ -164,7 +164,7 @@ const PanelControl = () => {
   return (
     <div className="flex flex-col w-full">
       {/* 1. ENCABEZADO INSTITUCIONAL DE BIENVENIDA (Folder y Diploma FINI) */}
-      <section className="relative mb-space-2xl overflow-hidden rounded-2xl bg-surface-container-lowest p-space-xl border border-surface-container shadow-[0_8px_30px_rgba(11,37,69,0.06)]">
+      <section className="relative mb-6 sm:mb-space-2xl overflow-hidden rounded-2xl bg-surface-container-lowest p-4 sm:p-space-xl border border-surface-container shadow-[0_8px_30px_rgba(11,37,69,0.06)]">
         {/* Franjas geométricas angulares diagonales (Rojo + Azul Marino + Acento Dorado) */}
         <div className="hidden md:block absolute -right-10 top-0 bottom-0 w-80 bg-gradient-to-bl from-[#c1121f] via-[#d90429] to-[#8b0000] pointer-events-none transform skew-x-[-20deg] opacity-95"></div>
         <div className="hidden md:block absolute right-64 top-0 bottom-0 w-8 bg-[#0b2545] pointer-events-none transform skew-x-[-20deg]"></div>
@@ -194,10 +194,10 @@ const PanelControl = () => {
             <div className="flex items-center gap-3 mt-1">
               <div className="w-1.5 h-10 bg-[#c1121f] rounded-full hidden sm:block"></div>
               <div>
-                <h1 className="font-institutional-serif text-[26px] md:text-[32px] text-[#0b2545] font-bold tracking-tight leading-tight">
+                <h1 className="font-institutional-serif text-[21px] sm:text-[26px] md:text-[32px] text-[#0b2545] font-bold tracking-tight leading-tight">
                   Panel de Control y Archivo Documental
                 </h1>
-                <p className="font-body-md text-body-md text-on-surface-variant mt-0.5">
+                <p className="font-body-md text-[13px] sm:text-body-md text-on-surface-variant mt-1">
                   Gestión {gestion} · Dirección de Carrera de {getUserCarrera()} — <span className="font-semibold text-[#0b2545]">Facultad Integral del Ichilo</span>
                 </p>
               </div>
@@ -205,7 +205,7 @@ const PanelControl = () => {
           </div>
 
           {/* Quick Action / Date stamp con diseño protocolar */}
-          <div className="flex items-center gap-space-md self-start lg:self-auto bg-white/95 backdrop-blur-sm p-2 rounded-xl border border-surface-container shadow-sm">
+          <div className="flex items-center justify-center sm:justify-start gap-space-md w-full sm:w-auto self-stretch sm:self-auto bg-white/95 backdrop-blur-sm p-2 rounded-xl border border-surface-container shadow-sm">
             <div className="flex flex-col text-right hidden sm:flex px-2">
               <span className="font-label-code text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">
                 Período Fiscal Activo
@@ -216,7 +216,7 @@ const PanelControl = () => {
             </div>
             <div className="h-10 w-px bg-surface-container hidden sm:block"></div>
             <button
-              className="btn-doc-fold"
+              className="btn-doc-fold w-full sm:w-auto justify-center"
               onClick={() => setIsQuickEmitOpen(true)}
               type="button"
             >
@@ -227,9 +227,9 @@ const PanelControl = () => {
         </div>
 
         {/* CINTA DECORATIVA DE DIPLOMA */}
-        <div className="relative w-full my-space-lg">
+        <div className="relative w-full my-6 sm:my-space-lg">
           <div className="h-[3px] w-full bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f] rounded-full opacity-80"></div>
-          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-surface-container-lowest/95 dark:bg-slate-900/95 backdrop-blur-xs px-3.5 py-0.5 rounded-full border border-[#c5a059]/40 shadow-2xs">
+          <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-surface-container-lowest/95 dark:bg-slate-900/95 backdrop-blur-xs px-3.5 py-0.5 rounded-full border border-[#c5a059]/40 shadow-2xs whitespace-nowrap">
             <span className="font-label-code text-[9px] uppercase tracking-widest text-[#c5a059] font-bold">
               REGISTRO OFICIAL DE CONTROL
             </span>
@@ -237,20 +237,20 @@ const PanelControl = () => {
         </div>
 
         {/* METRICS TICKER STRIP CON REFINAMIENTO DE DIPLOMA */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-space-md bg-gradient-to-b from-surface-container-low/70 to-surface-container-low/40 rounded-xl p-space-md border border-surface-container">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-space-md bg-gradient-to-b from-surface-container-low/70 to-surface-container-low/40 rounded-xl p-3 sm:p-space-md border border-surface-container">
           {/* Stat 1 */}
           <div
             onClick={() => navigate('/expedidos')}
-            className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all"
+            className="flex items-center gap-3 sm:gap-space-md px-3 py-2.5 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all min-w-0"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#091a32] to-[#15418c] text-white shadow-sm ring-1 ring-[#c5a059]/40">
-              <span className="material-symbols-outlined text-2xl">outbox</span>
+            <div className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#091a32] to-[#15418c] text-white shadow-sm ring-1 ring-[#c5a059]/40">
+              <span className="material-symbols-outlined text-xl sm:text-2xl">outbox</span>
             </div>
-            <div>
-              <span className="block font-caption text-[11px] uppercase text-on-surface-variant font-bold tracking-wider">
+            <div className="min-w-0">
+              <span className="block font-caption text-[11px] uppercase text-on-surface-variant font-bold tracking-wider truncate">
                 Oficios Expedidos
               </span>
-              <div className="flex items-baseline gap-1.5">
+              <div className="flex items-baseline gap-1.5 flex-wrap">
                 <span className="font-correlative-counter text-correlative-counter font-bold text-[#0b2545]">
                   {metrics.expedidos}
                 </span>
@@ -264,16 +264,16 @@ const PanelControl = () => {
           {/* Stat 2 */}
           <div
             onClick={() => navigate('/recibidos')}
-            className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group"
+            className="flex items-center gap-3 sm:gap-space-md px-3 py-2.5 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group min-w-0"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#c1121f] to-[#8b0000] text-white shadow-sm">
-              <span className="material-symbols-outlined text-2xl">move_to_inbox</span>
+            <div className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#c1121f] to-[#8b0000] text-white shadow-sm">
+              <span className="material-symbols-outlined text-xl sm:text-2xl">move_to_inbox</span>
             </div>
-            <div>
-              <span className="block font-caption text-[11px] uppercase text-on-surface-variant font-bold tracking-wider">
+            <div className="min-w-0">
+              <span className="block font-caption text-[11px] uppercase text-on-surface-variant font-bold tracking-wider truncate">
                 Documentos Recibidos
               </span>
-              <div className="flex items-baseline gap-1.5">
+              <div className="flex items-baseline gap-1.5 flex-wrap">
                 <span className="font-correlative-counter text-correlative-counter font-bold text-[#0b2545]">
                   {metrics.recibidos}
                 </span>
@@ -290,16 +290,16 @@ const PanelControl = () => {
           {/* Stat 3 */}
           <div
             onClick={() => navigate('/actas')}
-            className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group"
+            className="flex items-center gap-3 sm:gap-space-md px-3 py-2.5 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group min-w-0"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#0b2545] to-[#1d4ed8] text-white shadow-sm ring-1 ring-[#c5a059]/40">
-              <span className="material-symbols-outlined text-2xl">school</span>
+            <div className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#0b2545] to-[#1d4ed8] text-white shadow-sm ring-1 ring-[#c5a059]/40">
+              <span className="material-symbols-outlined text-xl sm:text-2xl">school</span>
             </div>
-            <div>
-              <span className="block font-caption text-[11px] uppercase text-on-surface-variant font-bold tracking-wider">
+            <div className="min-w-0">
+              <span className="block font-caption text-[11px] uppercase text-on-surface-variant font-bold tracking-wider truncate">
                 Actas de Graduación
               </span>
-              <div className="flex items-baseline gap-1.5">
+              <div className="flex items-baseline gap-1.5 flex-wrap">
                 <span className="font-correlative-counter text-correlative-counter font-bold text-[#0b2545]">
                   {metrics.actas}
                 </span>
@@ -313,16 +313,16 @@ const PanelControl = () => {
           {/* Stat 4 */}
           <div
             onClick={() => navigate('/auxiliares')}
-            className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group"
+            className="flex items-center gap-3 sm:gap-space-md px-3 py-2.5 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group min-w-0"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#c1121f] to-[#9e0c18] text-white shadow-sm">
-              <span className="material-symbols-outlined text-2xl">group_work</span>
+            <div className="flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#c1121f] to-[#9e0c18] text-white shadow-sm">
+              <span className="material-symbols-outlined text-xl sm:text-2xl">group_work</span>
             </div>
-            <div>
-              <span className="block font-caption text-[11px] uppercase text-on-surface-variant font-bold tracking-wider">
+            <div className="min-w-0">
+              <span className="block font-caption text-[11px] uppercase text-on-surface-variant font-bold tracking-wider truncate">
                 Auxiliares de Cátedra
               </span>
-              <div className="flex items-baseline gap-1.5">
+              <div className="flex items-baseline gap-1.5 flex-wrap">
                 <span className="font-correlative-counter text-correlative-counter font-bold text-[#0b2545]">
                   {metrics.auxiliares}
                 </span>

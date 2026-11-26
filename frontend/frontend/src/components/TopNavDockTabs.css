@@ -272,8 +272,9 @@
    ======================================================== */
 @media (max-width: 768px) {
   .top-dock-container {
-    padding: 6px 2px;
-    gap: 4px;
+    padding: 6px 8px;
+    gap: 6px;
+    justify-content: flex-start;
   }
   .dock-tab-item {
     height: 34px;

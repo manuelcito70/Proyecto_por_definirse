@@ -1,12 +1,19 @@
 /* ===== THEME TOGGLE (Day/Night Switch) ===== */
 .theme-toggle-label {
-  font-size: 17px;
+  font-size: 13px;
   position: relative;
   display: inline-block;
   width: 4em;
   cursor: pointer;
   vertical-align: middle;
   line-height: 0;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .theme-toggle-label {
+    font-size: 17px;
+  }
 }
 
 .theme-toggle-input {

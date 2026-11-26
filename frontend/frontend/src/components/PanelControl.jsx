@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGestion } from '../context/GestionContext';
-import { 
-  getExpedidos, 
-  getNextExpedidoNumber, 
-  getRecibidos, 
-  getActas, 
-  getAuxiliares, 
+import {
+  getExpedidos,
+  getNextExpedidoNumber,
+  getRecibidos,
+  getActas,
+  getAuxiliares,
   getDocentes,
   createExpedido
 } from '../services/api';
@@ -172,9 +172,9 @@ const PanelControl = () => {
         <div className="hidden md:block absolute -right-6 -bottom-6 w-56 h-56 bg-[#0b2545] pointer-events-none transform rotate-12 opacity-90 rounded-2xl"></div>
 
         {/* Marca de agua institucional sutil del escudo FINI en el fondo */}
-        <img 
-          alt="Marca de agua institucional" 
-          className="absolute right-12 top-1/2 -translate-y-1/2 h-64 w-auto object-contain opacity-[0.09] pointer-events-none select-none filter contrast-125" 
+        <img
+          alt="Marca de agua institucional"
+          className="absolute right-12 top-1/2 -translate-y-1/2 h-64 w-auto object-contain opacity-[0.09] pointer-events-none select-none filter contrast-125"
           src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQiMcjjl81LiDusLYwNzVCfvGUsQDoVqxd3cQizcnsxOLE2cNcLwZlo_sxrNeia2SKc7wB36KrWMwQFrViefGkYZ5-ElVlfe7tcybBODmWl3_0arfnQlUCPNaoNAl10CQABBGjadxs1kSCDJlmh8V4SvcRAvFXxC-P3C5BfG8GaZKT_UI53F6XmGGd1Arat8sB8EdSoh6T5SORw5csO55Rbmxk4OWByKhmIAkiT332pcGZAZzlHPEKDx3o-xjqhmfA"
         />
 
@@ -215,9 +215,9 @@ const PanelControl = () => {
               </span>
             </div>
             <div className="h-10 w-px bg-surface-container hidden sm:block"></div>
-            <button 
-              className="btn-doc-fold" 
-              onClick={() => setIsQuickEmitOpen(true)} 
+            <button
+              className="btn-doc-fold"
+              onClick={() => setIsQuickEmitOpen(true)}
               type="button"
             >
               <span className="material-symbols-outlined text-base">add_circle</span>
@@ -239,7 +239,7 @@ const PanelControl = () => {
         {/* METRICS TICKER STRIP CON REFINAMIENTO DE DIPLOMA */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-space-md bg-gradient-to-b from-surface-container-low/70 to-surface-container-low/40 rounded-xl p-space-md border border-surface-container">
           {/* Stat 1 */}
-          <div 
+          <div
             onClick={() => navigate('/expedidos')}
             className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all"
           >
@@ -262,7 +262,7 @@ const PanelControl = () => {
           </div>
 
           {/* Stat 2 */}
-          <div 
+          <div
             onClick={() => navigate('/recibidos')}
             className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group"
           >
@@ -277,11 +277,10 @@ const PanelControl = () => {
                 <span className="font-correlative-counter text-correlative-counter font-bold text-[#0b2545]">
                   {metrics.recibidos}
                 </span>
-                <span className={`font-label-code text-[11px] px-1.5 py-0.5 rounded font-bold border ${
-                  metrics.recibidosPendientes > 0
+                <span className={`font-label-code text-[11px] px-1.5 py-0.5 rounded font-bold border ${metrics.recibidosPendientes > 0
                     ? 'text-[#c1121f] bg-red-50 border-red-200'
                     : 'text-emerald-700 bg-emerald-50 border-emerald-200'
-                }`}>
+                  }`}>
                   {metrics.recibidosPendientes > 0 ? `${metrics.recibidosPendientes} Pendiente` : 'Al día'}
                 </span>
               </div>
@@ -289,7 +288,7 @@ const PanelControl = () => {
           </div>
 
           {/* Stat 3 */}
-          <div 
+          <div
             onClick={() => navigate('/actas')}
             className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group"
           >
@@ -312,7 +311,7 @@ const PanelControl = () => {
           </div>
 
           {/* Stat 4 */}
-          <div 
+          <div
             onClick={() => navigate('/auxiliares')}
             className="flex items-center gap-space-md px-space-sm py-1 bg-white/80 rounded-lg border border-slate-200/60 shadow-2xs cursor-pointer hover:bg-white transition-all group"
           >
@@ -362,17 +361,17 @@ const PanelControl = () => {
             {/* Detalle angular institucional de esquina superior derecha */}
             <div className="absolute -top-12 -right-12 w-28 h-28 bg-gradient-to-bl from-[#c1121f] to-[#8b0000] transform rotate-45 pointer-events-none opacity-90"></div>
             <div className="absolute -top-14 -right-14 w-32 h-32 border-2 border-[#c5a059] pointer-events-none transform rotate-45"></div>
-            
+
             {/* Marca de agua sutil de fondo */}
-            <img 
-              alt="Filigrana" 
-              className="absolute -left-6 -bottom-6 w-32 h-32 object-contain opacity-[0.04] pointer-events-none" 
+            <img
+              alt="Filigrana"
+              className="absolute -left-6 -bottom-6 w-32 h-32 object-contain opacity-[0.04] pointer-events-none"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQiMcjjl81LiDusLYwNzVCfvGUsQDoVqxd3cQizcnsxOLE2cNcLwZlo_sxrNeia2SKc7wB36KrWMwQFrViefGkYZ5-ElVlfe7tcybBODmWl3_0arfnQlUCPNaoNAl10CQABBGjadxs1kSCDJlmh8V4SvcRAvFXxC-P3C5BfG8GaZKT_UI53F6XmGGd1Arat8sB8EdSoh6T5SORw5csO55Rbmxk4OWByKhmIAkiT332pcGZAZzlHPEKDx3o-xjqhmfA"
             />
-            
+
             {/* Borde superior protocolar */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
-            
+
             <div>
               <div className="flex items-start justify-between mb-space-md">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#091a32] to-[#15418c] text-white shadow-md ring-2 ring-[#c5a059]/30 group-hover:scale-105 transition-transform">
@@ -384,7 +383,7 @@ const PanelControl = () => {
               </div>
               <span className="font-caption text-caption uppercase tracking-wider text-[#c1121f] font-bold">Módulo 01</span>
               <h3 className="font-institutional-serif text-lg text-[#0b2545] font-bold mt-0.5">Documentos Expedidos</h3>
-              
+
               {/* Key Metric Indicator Box */}
               <div className="my-space-md rounded-lg bg-gradient-to-r from-surface-container-low to-white p-space-md border border-surface-container relative overflow-hidden">
                 <div className="font-caption text-caption text-on-surface-variant font-medium">Próximo Oficio a Expedir:</div>
@@ -417,16 +416,16 @@ const PanelControl = () => {
             </div>
 
             <div className="mt-space-lg pt-space-md border-t border-slate-100 flex items-center justify-between gap-space-sm">
-              <button 
-                onClick={() => navigate('/expedidos')} 
+              <button
+                onClick={() => navigate('/expedidos')}
                 className="inline-flex items-center gap-space-xs font-body-sm font-semibold text-[#0b2545] hover:text-[#c1121f] transition-colors cursor-pointer"
               >
                 <span>Entrar al módulo</span>
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </button>
-              <button 
+              <button
                 onClick={() => navigate('/expedidos')}
-                className="inline-flex items-center gap-1 rounded-md bg-[#c1121f]/10 hover:bg-[#c1121f] hover:text-white text-[#c1121f] px-space-md py-1.5 font-label-code text-caption font-bold transition-all border border-[#c1121f]/20 shadow-2xs cursor-pointer" 
+                className="inline-flex items-center gap-1 rounded-md bg-[#c1121f]/10 hover:bg-[#c1121f] hover:text-white text-[#c1121f] px-space-md py-1.5 font-label-code text-caption font-bold transition-all border border-[#c1121f]/20 shadow-2xs cursor-pointer"
                 type="button"
               >
                 <span className="material-symbols-outlined text-sm">add</span> Nuevo Oficio
@@ -438,13 +437,13 @@ const PanelControl = () => {
           <div className="group relative flex flex-col justify-between rounded-xl bg-surface-container-lowest p-space-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-surface-container overflow-hidden">
             <div className="absolute -top-12 -right-12 w-28 h-28 bg-gradient-to-bl from-[#c1121f] to-[#8b0000] transform rotate-45 pointer-events-none opacity-90"></div>
             <div className="absolute -top-14 -right-14 w-32 h-32 border-2 border-[#c5a059]/40 pointer-events-none transform rotate-45"></div>
-            
-            <img 
-              alt="Filigrana" 
-              className="absolute -left-6 -bottom-6 w-32 h-32 object-contain opacity-[0.04] pointer-events-none" 
+
+            <img
+              alt="Filigrana"
+              className="absolute -left-6 -bottom-6 w-32 h-32 object-contain opacity-[0.04] pointer-events-none"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQiMcjjl81LiDusLYwNzVCfvGUsQDoVqxd3cQizcnsxOLE2cNcLwZlo_sxrNeia2SKc7wB36KrWMwQFrViefGkYZ5-ElVlfe7tcybBODmWl3_0arfnQlUCPNaoNAl10CQABBGjadxs1kSCDJlmh8V4SvcRAvFXxC-P3C5BfG8GaZKT_UI53F6XmGGd1Arat8sB8EdSoh6T5SORw5csO55Rbmxk4OWByKhmIAkiT332pcGZAZzlHPEKDx3o-xjqhmfA"
             />
-            
+
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
 
             <div>
@@ -452,11 +451,10 @@ const PanelControl = () => {
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-amber-50 to-amber-100 text-amber-800 border border-amber-200/80 shadow-md group-hover:scale-105 transition-transform">
                   <span className="material-symbols-outlined text-2xl">mark_email_unread</span>
                 </div>
-                <span className={`inline-flex items-center gap-1.5 rounded-full px-space-sm py-0.5 font-label-badge text-caption font-bold mr-6 border ${
-                  metrics.recibidosPendientes > 0
+                <span className={`inline-flex items-center gap-1.5 rounded-full px-space-sm py-0.5 font-label-badge text-caption font-bold mr-6 border ${metrics.recibidosPendientes > 0
                     ? 'bg-red-50 text-red-700 border-red-200'
                     : 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                }`}>
+                  }`}>
                   <span className={`h-1.5 w-1.5 rounded-full ${metrics.recibidosPendientes > 0 ? 'bg-[#c1121f] animate-pulse' : 'bg-emerald-600'}`}></span>
                   {metrics.recibidosPendientes > 0 ? `${metrics.recibidosPendientes} Pendientes` : 'Al día'}
                 </span>
@@ -495,16 +493,16 @@ const PanelControl = () => {
             </div>
 
             <div className="mt-space-lg pt-space-md border-t border-slate-100 flex items-center justify-between gap-space-sm">
-              <button 
-                onClick={() => navigate('/recibidos')} 
+              <button
+                onClick={() => navigate('/recibidos')}
                 className="inline-flex items-center gap-space-xs font-body-sm font-semibold text-[#0b2545] hover:text-[#c1121f] transition-colors cursor-pointer"
               >
                 <span>Ver recibidos</span>
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </button>
-              <button 
+              <button
                 onClick={() => navigate('/recibidos')}
-                className="inline-flex items-center gap-1 rounded-md bg-surface-container hover:bg-surface-container-high text-on-surface px-space-md py-1.5 font-label-code text-caption font-bold transition-all border border-slate-200 shadow-2xs cursor-pointer" 
+                className="inline-flex items-center gap-1 rounded-md bg-surface-container hover:bg-surface-container-high text-on-surface px-space-md py-1.5 font-label-code text-caption font-bold transition-all border border-slate-200 shadow-2xs cursor-pointer"
                 type="button"
               >
                 <span className="material-symbols-outlined text-sm">document_scanner</span> Registrar Escaneo
@@ -516,13 +514,13 @@ const PanelControl = () => {
           <div className="group relative flex flex-col justify-between rounded-xl bg-surface-container-lowest p-space-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-surface-container overflow-hidden">
             <div className="absolute -top-12 -right-12 w-28 h-28 bg-gradient-to-bl from-[#0b2545] to-[#15418c] transform rotate-45 pointer-events-none opacity-90"></div>
             <div className="absolute -top-14 -right-14 w-32 h-32 border-2 border-[#c5a059]/60 pointer-events-none transform rotate-45"></div>
-            
-            <img 
-              alt="Filigrana" 
-              className="absolute -left-6 -bottom-6 w-32 h-32 object-contain opacity-[0.04] pointer-events-none" 
+
+            <img
+              alt="Filigrana"
+              className="absolute -left-6 -bottom-6 w-32 h-32 object-contain opacity-[0.04] pointer-events-none"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQiMcjjl81LiDusLYwNzVCfvGUsQDoVqxd3cQizcnsxOLE2cNcLwZlo_sxrNeia2SKc7wB36KrWMwQFrViefGkYZ5-ElVlfe7tcybBODmWl3_0arfnQlUCPNaoNAl10CQABBGjadxs1kSCDJlmh8V4SvcRAvFXxC-P3C5BfG8GaZKT_UI53F6XmGGd1Arat8sB8EdSoh6T5SORw5csO55Rbmxk4OWByKhmIAkiT332pcGZAZzlHPEKDx3o-xjqhmfA"
             />
-            
+
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#c5a059] via-[#0b2545] to-[#c1121f]"></div>
 
             <div>
@@ -553,8 +551,8 @@ const PanelControl = () => {
             </div>
 
             <div className="mt-space-lg pt-space-md border-t border-slate-100 flex items-center justify-between gap-space-sm">
-              <button 
-                onClick={() => navigate('/actas')} 
+              <button
+                onClick={() => navigate('/actas')}
                 className="inline-flex items-center gap-space-xs font-body-sm font-semibold text-[#0b2545] hover:text-[#c1121f] transition-colors cursor-pointer"
               >
                 <span>Consultar actas</span>
@@ -570,13 +568,13 @@ const PanelControl = () => {
           <div className="group relative flex flex-col justify-between rounded-xl bg-surface-container-lowest p-space-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-surface-container overflow-hidden">
             <div className="absolute -top-12 -right-12 w-28 h-28 bg-gradient-to-bl from-emerald-600 to-emerald-800 transform rotate-45 pointer-events-none opacity-90"></div>
             <div className="absolute -top-14 -right-14 w-32 h-32 border-2 border-emerald-300/60 pointer-events-none transform rotate-45"></div>
-            
-            <img 
-              alt="Filigrana" 
-              className="absolute -left-6 -bottom-6 w-32 h-32 object-contain opacity-[0.04] pointer-events-none" 
+
+            <img
+              alt="Filigrana"
+              className="absolute -left-6 -bottom-6 w-32 h-32 object-contain opacity-[0.04] pointer-events-none"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQiMcjjl81LiDusLYwNzVCfvGUsQDoVqxd3cQizcnsxOLE2cNcLwZlo_sxrNeia2SKc7wB36KrWMwQFrViefGkYZ5-ElVlfe7tcybBODmWl3_0arfnQlUCPNaoNAl10CQABBGjadxs1kSCDJlmh8V4SvcRAvFXxC-P3C5BfG8GaZKT_UI53F6XmGGd1Arat8sB8EdSoh6T5SORw5csO55Rbmxk4OWByKhmIAkiT332pcGZAZzlHPEKDx3o-xjqhmfA"
             />
-            
+
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-600 via-[#c5a059] to-[#0b2545]"></div>
 
             <div>
@@ -607,16 +605,16 @@ const PanelControl = () => {
             </div>
 
             <div className="mt-space-lg pt-space-md border-t border-slate-100 flex items-center justify-between gap-space-sm">
-              <button 
-                onClick={() => navigate('/auxiliares')} 
+              <button
+                onClick={() => navigate('/auxiliares')}
                 className="inline-flex items-center gap-space-xs font-body-sm font-semibold text-[#0b2545] hover:text-[#c1121f] transition-colors cursor-pointer"
               >
                 <span>Gestionar auxiliares</span>
                 <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </button>
-              <button 
+              <button
                 onClick={() => navigate('/auxiliares')}
-                className="inline-flex items-center gap-1 rounded-md bg-surface-container hover:bg-surface-container-high text-on-surface px-space-md py-1.5 font-label-code text-caption font-bold transition-all border border-slate-200 shadow-2xs cursor-pointer" 
+                className="inline-flex items-center gap-1 rounded-md bg-surface-container hover:bg-surface-container-high text-on-surface px-space-md py-1.5 font-label-code text-caption font-bold transition-all border border-slate-200 shadow-2xs cursor-pointer"
                 type="button"
               >
                 <span className="material-symbols-outlined text-sm">print</span> Emitir Constancia
@@ -628,13 +626,13 @@ const PanelControl = () => {
           <div className="group relative flex flex-col justify-between rounded-xl bg-surface-container-lowest p-space-lg shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-surface-container overflow-hidden">
             <div className="absolute -top-12 -right-12 w-28 h-28 bg-gradient-to-bl from-[#c1121f] to-[#8b0000] transform rotate-45 pointer-events-none opacity-90"></div>
             <div className="absolute -top-14 -right-14 w-32 h-32 border-2 border-[#c5a059]/60 pointer-events-none transform rotate-45"></div>
-            
-            <img 
-              alt="Filigrana" 
-              className="absolute -left-6 -bottom-6 w-32 h-32 object-contain opacity-[0.04] pointer-events-none" 
+
+            <img
+              alt="Filigrana"
+              className="absolute -left-6 -bottom-6 w-32 h-32 object-contain opacity-[0.04] pointer-events-none"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQiMcjjl81LiDusLYwNzVCfvGUsQDoVqxd3cQizcnsxOLE2cNcLwZlo_sxrNeia2SKc7wB36KrWMwQFrViefGkYZ5-ElVlfe7tcybBODmWl3_0arfnQlUCPNaoNAl10CQABBGjadxs1kSCDJlmh8V4SvcRAvFXxC-P3C5BfG8GaZKT_UI53F6XmGGd1Arat8sB8EdSoh6T5SORw5csO55Rbmxk4OWByKhmIAkiT332pcGZAZzlHPEKDx3o-xjqhmfA"
             />
-            
+
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f]"></div>
 
             <div>
@@ -665,8 +663,8 @@ const PanelControl = () => {
             </div>
 
             <div className="mt-space-lg pt-space-md border-t border-slate-100 flex items-center justify-between gap-space-sm">
-              <button 
-                onClick={() => navigate('/docentes')} 
+              <button
+                onClick={() => navigate('/docentes')}
                 className="inline-flex items-center gap-space-xs font-body-sm font-semibold text-[#0b2545] hover:text-[#c1121f] transition-colors cursor-pointer"
               >
                 <span>Expedientes docentes</span>
@@ -681,10 +679,10 @@ const PanelControl = () => {
             {/* Franjas diagonales angulares interiores */}
             <div className="absolute -right-10 top-0 bottom-0 w-32 bg-gradient-to-l from-[#c1121f]/40 via-transparent to-transparent pointer-events-none transform skew-x-[-24deg]"></div>
             <div className="absolute -right-4 top-0 bottom-0 w-1 bg-[#c5a059]/60 pointer-events-none transform skew-x-[-24deg]"></div>
-            
-            <img 
-              alt="Escudo de agua" 
-              className="absolute -right-8 -bottom-8 w-40 h-40 object-contain opacity-10 pointer-events-none filter contrast-150" 
+
+            <img
+              alt="Escudo de agua"
+              className="absolute -right-8 -bottom-8 w-40 h-40 object-contain opacity-10 pointer-events-none filter contrast-150"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQiMcjjl81LiDusLYwNzVCfvGUsQDoVqxd3cQizcnsxOLE2cNcLwZlo_sxrNeia2SKc7wB36KrWMwQFrViefGkYZ5-ElVlfe7tcybBODmWl3_0arfnQlUCPNaoNAl10CQABBGjadxs1kSCDJlmh8V4SvcRAvFXxC-P3C5BfG8GaZKT_UI53F6XmGGd1Arat8sB8EdSoh6T5SORw5csO55Rbmxk4OWByKhmIAkiT332pcGZAZzlHPEKDx3o-xjqhmfA"
             />
 
@@ -778,9 +776,9 @@ const PanelControl = () => {
           </div>
 
           <div className="relative z-10 mt-space-lg pt-space-md border-t border-slate-100 flex flex-wrap items-center justify-end gap-space-sm">
-            <button 
+            <button
               onClick={() => alert('Reglamento de Digitalización y Archivo Documental UAGRM: Todo documento oficial recibido en dirección debe registrarse con correlativo secuencial y resguardo en PDF/A sin alteración de contenido.')}
-              className="text-[#0b2545] hover:text-[#c1121f] font-body-sm font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer" 
+              className="text-[#0b2545] hover:text-[#c1121f] font-body-sm font-semibold inline-flex items-center gap-1 transition-colors cursor-pointer"
               type="button"
             >
               <span>Ver reglamento documental completo</span>
@@ -800,7 +798,7 @@ const PanelControl = () => {
             <span className="font-caption text-caption text-on-surface-variant uppercase tracking-wider block mb-space-md font-semibold">
               Sucesos en el archivo
             </span>
-            
+
             {recentActivity.length === 0 ? (
               <div className="py-2">
                 <EmptyState
@@ -826,7 +824,7 @@ const PanelControl = () => {
           </div>
 
           <div className="mt-space-lg pt-space-md border-t border-slate-100">
-            <button 
+            <button
               onClick={() => navigate('/expedidos')}
               className="w-full flex items-center justify-center gap-space-xs py-2 rounded-lg bg-surface-container hover:bg-surface-container-high font-body-sm font-semibold text-[#0b2545] transition-all border border-slate-200 cursor-pointer"
             >
@@ -839,12 +837,12 @@ const PanelControl = () => {
 
       {/* QUICK ACTION SLIDE-OVER / MODAL TEMPLATE */}
       {isQuickEmitOpen && (
-        <div 
-          className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center bg-black/60 backdrop-blur-sm p-4 pt-16 sm:pt-20 pb-12 animate-in fade-in zoom-in-95 duration-200" 
+        <div
+          className="fixed inset-0 z-[100] overflow-y-auto flex items-start justify-center bg-black/60 backdrop-blur-sm p-4 pt-16 sm:pt-20 pb-12 animate-in fade-in zoom-in-95 duration-200"
           onClick={() => !submitting && setIsQuickEmitOpen(false)}
         >
-          <div 
-            className="bg-white w-full max-w-lg rounded-2xl p-space-xl shadow-2xl relative border border-[#c5a059]/40 overflow-hidden max-h-[calc(100vh-100px)] mt-2 sm:mt-4" 
+          <div
+            className="bg-white w-full max-w-lg rounded-2xl p-space-xl shadow-2xl relative border border-[#c5a059]/40 overflow-hidden max-h-[calc(100vh-100px)] mt-2 sm:mt-4"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#c1121f] via-[#c5a059] to-[#0b2545]"></div>
@@ -860,9 +858,9 @@ const PanelControl = () => {
                   </span>
                 </div>
               </div>
-              <button 
-                className="p-1 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-slate-100 transition-colors cursor-pointer" 
-                onClick={() => setIsQuickEmitOpen(false)} 
+              <button
+                className="p-1 rounded-full text-on-surface-variant hover:text-on-surface hover:bg-slate-100 transition-colors cursor-pointer"
+                onClick={() => setIsQuickEmitOpen(false)}
                 type="button"
               >
                 <span className="material-symbols-outlined">close</span>
@@ -874,12 +872,12 @@ const PanelControl = () => {
                 <label className="block font-caption text-caption uppercase text-on-surface-variant font-bold mb-1">
                   Destinatario / Entidad
                 </label>
-                <input 
-                  className="w-full rounded-lg bg-surface-container-low px-space-md py-2.5 text-body-sm text-on-surface focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0b2545]/30 border border-slate-200" 
-                  placeholder="Ej. Decano Fac. Integral del Ichilo - Dr. ..." 
+                <input
+                  className="w-full rounded-lg bg-surface-container-low px-space-md py-2.5 text-body-sm text-on-surface focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0b2545]/30 border border-slate-200"
+                  placeholder="Ej. Decano Fac. Integral del Ichilo - Dr. ..."
                   value={quickForm.destinatario}
                   onChange={(e) => setQuickForm({ ...quickForm, destinatario: e.target.value })}
-                  required 
+                  required
                   type="text"
                 />
               </div>
@@ -888,12 +886,12 @@ const PanelControl = () => {
                 <label className="block font-caption text-caption uppercase text-on-surface-variant font-bold mb-1">
                   Referencia / Asunto Oficial
                 </label>
-                <input 
-                  className="w-full rounded-lg bg-surface-container-low px-space-md py-2.5 text-body-sm text-on-surface focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0b2545]/30 border border-slate-200" 
-                  placeholder="Ej. Remisión de informes de auxiliares..." 
+                <input
+                  className="w-full rounded-lg bg-surface-container-low px-space-md py-2.5 text-body-sm text-on-surface focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#0b2545]/30 border border-slate-200"
+                  placeholder="Ej. Remisión de informes de auxiliares..."
                   value={quickForm.asunto}
                   onChange={(e) => setQuickForm({ ...quickForm, asunto: e.target.value })}
-                  required 
+                  required
                   type="text"
                 />
               </div>
@@ -903,9 +901,9 @@ const PanelControl = () => {
                   <label className="block font-caption text-caption uppercase text-on-surface-variant font-bold mb-1">
                     Fecha de Expedición
                   </label>
-                  <input 
-                    className="w-full rounded-lg bg-surface-container-low px-space-md py-2 text-body-sm text-on-surface focus:outline-none border border-slate-200" 
-                    type="date" 
+                  <input
+                    className="w-full rounded-lg bg-surface-container-low px-space-md py-2 text-body-sm text-on-surface focus:outline-none border border-slate-200"
+                    type="date"
                     value={quickForm.fecha}
                     onChange={(e) => setQuickForm({ ...quickForm, fecha: e.target.value })}
                   />
@@ -914,7 +912,7 @@ const PanelControl = () => {
                   <label className="block font-caption text-caption uppercase text-on-surface-variant font-bold mb-1">
                     Clasificación
                   </label>
-                  <select 
+                  <select
                     className="w-full rounded-lg bg-surface-container-low px-space-md py-2 text-body-sm text-on-surface focus:outline-none border border-slate-200 cursor-pointer"
                     value={quickForm.clasificacion}
                     onChange={(e) => setQuickForm({ ...quickForm, clasificacion: e.target.value })}
@@ -928,16 +926,16 @@ const PanelControl = () => {
               </div>
 
               <div className="pt-space-md flex items-center justify-end gap-space-sm border-t border-slate-100">
-                <button 
-                  className="px-space-lg py-2 rounded-lg font-body-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-all cursor-pointer" 
-                  onClick={() => setIsQuickEmitOpen(false)} 
+                <button
+                  className="px-space-lg py-2 rounded-lg font-body-sm font-semibold text-on-surface-variant hover:bg-surface-container transition-all cursor-pointer"
+                  onClick={() => setIsQuickEmitOpen(false)}
                   type="button"
                   disabled={submitting}
                 >
                   Cancelar
                 </button>
-                <button 
-                  className="px-space-lg py-2 rounded-lg bg-gradient-to-r from-[#c1121f] to-[#9e0c18] text-white font-body-sm font-semibold shadow hover:shadow-md transition-all border border-white/20 cursor-pointer disabled:opacity-50" 
+                <button
+                  className="px-space-lg py-2 rounded-lg bg-gradient-to-r from-[#c1121f] to-[#9e0c18] text-white font-body-sm font-semibold shadow hover:shadow-md transition-all border border-white/20 cursor-pointer disabled:opacity-50"
                   type="submit"
                   disabled={submitting}
                 >

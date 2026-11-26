@@ -364,7 +364,7 @@ const Expedidos = () => {
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
               />
-              <span className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-outline-variant font-label-code text-caption">
+              <span className="hidden sm:flex absolute inset-y-0 right-0 items-center pr-3 pointer-events-none text-outline-variant font-label-code text-caption">
                 Enter ↵
               </span>
             </form>
@@ -419,41 +419,37 @@ const Expedidos = () => {
         </div>
 
         {/* Responsive Table Wrapper with Institutional Theme */}
-        <div className="overflow-x-auto w-full max-w-full min-w-0">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-[#0b2545] text-white font-caption text-[11px] uppercase tracking-wider">
-                <th className="py-3 px-space-md font-bold">N.° de Oficio</th>
-                <th className="py-3 px-space-sm font-bold">Gestión</th>
-                <th className="py-3 px-space-sm font-bold">Fecha</th>
-                <th className="py-3 px-space-sm font-bold">Categoría</th>
-                <th className="py-3 px-space-md font-bold min-w-[280px]">Asunto</th>
-                <th className="py-3 px-space-md font-bold">Destinatario</th>
-                <th className="py-3 px-space-sm font-bold">Estado</th>
-                <th className="py-3 px-space-md font-bold">Documento</th>
-                <th className="py-3 px-space-md font-bold text-center">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 text-on-surface font-body-sm text-body-sm">
-              {loading ? (
-                <tr>
-                  <td colSpan="9" className="py-6 px-4">
-                    <LoadingState message={`Sincronizando oficios expedidos (${gestion})...`} />
-                  </td>
+        {loading ? (
+          <div className="py-12 px-4">
+            <LoadingState message={`Sincronizando oficios expedidos (${gestion})...`} />
+          </div>
+        ) : currentExpedidos.length === 0 ? (
+          <div className="py-6 px-4 w-full max-w-full overflow-hidden">
+            <EmptyState
+              title={`No se encontraron oficios expedidos en ${gestion}`}
+              message={busqueda ? `No hay oficios que coincidan con la búsqueda "${busqueda}".` : "No existen oficios registrados para la gestión seleccionada."}
+              actionText="Emitir nuevo oficio"
+              onAction={handleOpenCreateModal}
+            />
+          </div>
+        ) : (
+          <div className="overflow-x-auto w-full max-w-full min-w-0">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-[#0b2545] text-white font-caption text-[11px] uppercase tracking-wider">
+                  <th className="py-3 px-space-md font-bold">N.° de Oficio</th>
+                  <th className="py-3 px-space-sm font-bold">Gestión</th>
+                  <th className="py-3 px-space-sm font-bold">Fecha</th>
+                  <th className="py-3 px-space-sm font-bold">Categoría</th>
+                  <th className="py-3 px-space-md font-bold min-w-[280px]">Asunto</th>
+                  <th className="py-3 px-space-md font-bold">Destinatario</th>
+                  <th className="py-3 px-space-sm font-bold">Estado</th>
+                  <th className="py-3 px-space-md font-bold">Documento</th>
+                  <th className="py-3 px-space-md font-bold text-center">Acciones</th>
                 </tr>
-              ) : currentExpedidos.length === 0 ? (
-                <tr>
-                  <td colSpan="9" className="py-6 px-4">
-                    <EmptyState
-                      title={`No se encontraron oficios expedidos en ${gestion}`}
-                      message={busqueda ? `No hay oficios que coincidan con la búsqueda "${busqueda}".` : "No existen oficios registrados para la gestión seleccionada."}
-                      actionText="Emitir nuevo oficio"
-                      onAction={handleOpenCreateModal}
-                    />
-                  </td>
-                </tr>
-              ) : (
-                currentExpedidos.map((doc, idx) => (
+              </thead>
+              <tbody className="divide-y divide-slate-100 text-on-surface font-body-sm text-body-sm">
+                {currentExpedidos.map((doc, idx) => (
                   <tr 
                     key={doc.id} 
                     className={`hover:bg-surface-container-low/60 transition-colors group ${
@@ -554,11 +550,11 @@ const Expedidos = () => {
                       </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {/* Table Footer: Pagination & Records Tracker */}
         <div className="p-space-md bg-surface-container-low/40 flex flex-col sm:flex-row items-center justify-between gap-space-sm border-t border-slate-200/60">
@@ -700,9 +696,9 @@ const Expedidos = () => {
                     </div>
                   </div>
 
-                  <div className="inline-flex items-center self-start sm:self-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50/80 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-2xs">
+                  <div className="inline-flex items-center self-start sm:self-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-semibold shadow-2xs backdrop-blur-xs">
                     <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span className="material-symbols-outlined text-xs text-emerald-600">lock</span>
+                    <span className="material-symbols-outlined text-xs text-emerald-600 dark:text-emerald-400">lock</span>
                     <span>Consecutivo Legal</span>
                   </div>
                 </div>

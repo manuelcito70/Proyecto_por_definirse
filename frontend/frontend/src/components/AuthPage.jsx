@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { login } from '../services/auth';
+import { login, resendVerification } from '../services/auth';
 import './AuthPage.css';
 
 const FALLBACK_CARRERAS = [
@@ -20,6 +20,9 @@ const FALLBACK_CARRERAS = [
 function AuthPage({ onLoginSuccess }) {
   const [isActive, setIsActive] = useState(false); // false = Sign In, true = Sign Up
   const [isLoading, setIsLoading] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [showResendPrompt, setShowResendPrompt] = useState(false);
+  const [resendEmail, setResendEmail] = useState('');
   const [loginMessage, setLoginMessage] = useState({ text: '', type: '' });
   const [registerMessage, setRegisterMessage] = useState({ text: '', type: '' });
   const [carreras, setCarreras] = useState(FALLBACK_CARRERAS);
@@ -77,6 +80,31 @@ function AuthPage({ onLoginSuccess }) {
     });
   };
 
+  const handleResendVerification = async (targetEmail) => {
+    const emailToSend = (targetEmail || resendEmail || loginData.email || '').trim();
+    if (!emailToSend) {
+      setLoginMessage({ text: 'Por favor ingresa tu correo electrónico para reenviar el enlace.', type: 'error' });
+      return;
+    }
+
+    try {
+      setIsResending(true);
+      const res = await resendVerification(emailToSend);
+      setLoginMessage({
+        text: res.mensaje || '¡Enlace reenviado! Revisa tu bandeja de entrada o spam.',
+        type: 'success'
+      });
+      setShowResendPrompt(false);
+    } catch (err) {
+      setLoginMessage({
+        text: err.message || 'Error al reenviar enlace de verificación.',
+        type: 'error'
+      });
+    } finally {
+      setIsResending(false);
+    }
+  };
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setLoginMessage({ text: '', type: '' });
@@ -92,6 +120,10 @@ function AuthPage({ onLoginSuccess }) {
       onLoginSuccess(data.user);
     } catch (error) {
       console.error(error);
+      if (error.no_verificado) {
+        setShowResendPrompt(true);
+        setResendEmail(loginData.email);
+      }
       setLoginMessage({ text: error.message || 'Error al iniciar sesion', type: 'error' });
     } finally {
       setIsLoading(false);
@@ -271,6 +303,60 @@ function AuthPage({ onLoginSuccess }) {
               </div>
             )}
 
+            {showResendPrompt && (
+              <div style={{
+                background: '#eff6ff',
+                border: '1px solid #bfdbfe',
+                borderRadius: '12px',
+                padding: '12px 14px',
+                marginBottom: '14px',
+                textAlign: 'left'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#1d4ed8', fontWeight: 'bold', fontSize: '13px', marginBottom: '4px' }}>
+                  <span>✉️</span>
+                  <span>¿No recibiste el enlace de activación?</span>
+                </div>
+                <p style={{ color: '#1e40af', fontSize: '12px', margin: '0 0 8px 0', lineHeight: '1.4' }}>
+                  Podemos enviarte un nuevo enlace a tu correo:
+                </p>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  <input
+                    type="email"
+                    placeholder="tu-correo@ejemplo.com"
+                    value={resendEmail || loginData.email}
+                    onChange={(e) => setResendEmail(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '8px 10px',
+                      borderRadius: '8px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '12px',
+                      background: '#ffffff',
+                      color: '#0f172a'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleResendVerification(resendEmail || loginData.email)}
+                    disabled={isResending}
+                    style={{
+                      background: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
+                      color: '#ffffff',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '8px 12px',
+                      fontSize: '12px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {isResending ? 'Enviando...' : 'Reenviar enlace'}
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="input-group">
               <label>Correo Electronico</label>
               <div className="input-with-icon">
@@ -307,10 +393,29 @@ function AuthPage({ onLoginSuccess }) {
               </div>
             </div>
 
-            <div className="forgot-password">
+            <div className="forgot-password" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '6px' }}>
               <a href="#forgot" onClick={(e) => { e.preventDefault(); setLoginMessage({ text: 'Por favor contacta al administrador del sistema para restablecer tu clave.', type: 'error' }); }}>
                 Olvidaste tu contrasena?
               </a>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowResendPrompt(!showResendPrompt);
+                  setResendEmail(loginData.email);
+                }}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: '#1d4ed8',
+                  fontSize: '12px',
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  textDecoration: 'underline',
+                  padding: 0
+                }}
+              >
+                Reenviar activación
+              </button>
             </div>
 
             <button type="submit" className="submit-btn" disabled={isLoading}>

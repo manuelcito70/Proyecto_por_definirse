@@ -14,7 +14,9 @@ export const login = async (emailOrUsername, password) => {
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.mensaje || 'Error en el login');
+            const err = new Error(data.mensaje || 'Error en el login');
+            err.no_verificado = data.no_verificado;
+            throw err;
         }
 
         // Guardar token y usuario en localStorage
@@ -111,4 +113,24 @@ export const fetchWithAuth = async (endpoint, options = {}) => {
     }
 
     return res;
+};
+
+export const resendVerification = async (email) => {
+    try {
+        const response = await fetch(`${API_URL}/resend-verification`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: email?.trim() }),
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.mensaje || 'Error al reenviar enlace de verificación');
+        }
+        return data;
+    } catch (error) {
+        throw error;
+    }
 };

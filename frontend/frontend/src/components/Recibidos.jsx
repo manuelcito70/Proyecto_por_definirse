@@ -478,39 +478,35 @@ const Recibidos = () => {
           </div>
         </div>
 
-        <div className="overflow-x-auto w-full max-w-full min-w-0">
-          <table className="w-full min-w-[700px] text-left" id="tabla-recibidos">
-            <thead className="bg-surface-container-low text-on-surface-variant font-caption text-caption uppercase tracking-wider border-b border-surface-container">
-              <tr>
-                <th className="py-3.5 px-space-lg font-bold text-[#0b2545]">N.° Interno</th>
-                <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Fecha recepción</th>
-                <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Categoría</th>
-                <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Remitente / Oficio original</th>
-                <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Asunto / Referencia documental</th>
-                <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Estado</th>
-                <th className="py-3.5 px-space-lg text-right font-bold text-[#0b2545]">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 font-body-sm text-body-sm text-on-surface">
-              {loading ? (
+        {loading ? (
+          <div className="py-12 px-4">
+            <LoadingState message={`Sincronizando correspondencia recibida (${gestion})...`} />
+          </div>
+        ) : currentRecibidos.length === 0 ? (
+          <div className="py-6 px-4 w-full max-w-full overflow-hidden">
+            <EmptyState
+              title={`No se encontraron documentos en ${gestion}`}
+              message={busqueda ? `No hay documentos que coincidan con la búsqueda "${busqueda}".` : "No existen registros de correspondencia externa para esta gestión."}
+              actionText="Registrar documento recibido"
+              onAction={() => setIsModalOpen(true)}
+            />
+          </div>
+        ) : (
+          <div className="overflow-x-auto w-full max-w-full min-w-0">
+            <table className="w-full min-w-[700px] text-left" id="tabla-recibidos">
+              <thead className="bg-surface-container-low text-on-surface-variant font-caption text-caption uppercase tracking-wider border-b border-surface-container">
                 <tr>
-                  <td colSpan="7" className="py-6 px-4">
-                    <LoadingState message={`Sincronizando correspondencia recibida (${gestion})...`} />
-                  </td>
+                  <th className="py-3.5 px-space-lg font-bold text-[#0b2545]">N.° Interno</th>
+                  <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Fecha recepción</th>
+                  <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Categoría</th>
+                  <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Remitente / Oficio original</th>
+                  <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Asunto / Referencia documental</th>
+                  <th className="py-3.5 px-space-md font-bold text-[#0b2545]">Estado</th>
+                  <th className="py-3.5 px-space-lg text-right font-bold text-[#0b2545]">Acciones</th>
                 </tr>
-              ) : currentRecibidos.length === 0 ? (
-                <tr>
-                  <td colSpan="7" className="py-6 px-4">
-                    <EmptyState
-                      title={`No se encontraron documentos en ${gestion}`}
-                      message={busqueda ? `No hay documentos que coincidan con la búsqueda "${busqueda}".` : "No existen registros de correspondencia externa para esta gestión."}
-                      actionText="Registrar documento recibido"
-                      onAction={() => setIsModalOpen(true)}
-                    />
-                  </td>
-                </tr>
-              ) : (
-                currentRecibidos.map((doc, idx) => {
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-body-sm text-body-sm text-on-surface">
+                {currentRecibidos.map((doc, idx) => {
                   const esPendiente = doc.estado === 'pendiente';
                   return (
                     <tr 
@@ -650,11 +646,11 @@ const Recibidos = () => {
                       </td>
                     </tr>
                   );
-                })
-              )}
-            </tbody>
-          </table>
-        </div>
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {/* Pagination Footer */}
         <div className="px-space-lg py-3 bg-surface-container-low flex flex-col sm:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-caption text-caption border-t border-surface-container">
@@ -747,9 +743,9 @@ const Recibidos = () => {
                   </div>
                 </div>
 
-                <div className="inline-flex items-center self-start sm:self-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50/80 border border-emerald-200 text-emerald-800 text-xs font-semibold shadow-2xs">
+                <div className="inline-flex items-center self-start sm:self-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-semibold shadow-2xs backdrop-blur-xs">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span className="material-symbols-outlined text-xs text-emerald-600">lock</span>
+                  <span className="material-symbols-outlined text-xs text-emerald-600 dark:text-emerald-400">lock</span>
                   <span>Secuencia Reservada</span>
                 </div>
               </div>

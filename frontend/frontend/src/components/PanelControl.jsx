@@ -166,10 +166,10 @@ const PanelControl = () => {
       {/* 1. ENCABEZADO INSTITUCIONAL DE BIENVENIDA (Folder y Diploma FINI) */}
       <section className="relative mb-space-2xl overflow-hidden rounded-2xl bg-surface-container-lowest p-space-xl border border-surface-container shadow-[0_8px_30px_rgba(11,37,69,0.06)]">
         {/* Franjas geométricas angulares diagonales (Rojo + Azul Marino + Acento Dorado) */}
-        <div className="absolute -right-10 top-0 bottom-0 w-80 bg-gradient-to-bl from-[#c1121f] via-[#d90429] to-[#8b0000] pointer-events-none transform skew-x-[-20deg] opacity-95"></div>
-        <div className="absolute right-64 top-0 bottom-0 w-8 bg-[#0b2545] pointer-events-none transform skew-x-[-20deg]"></div>
-        <div className="absolute right-72 top-0 bottom-0 w-2 bg-[#c5a059] pointer-events-none transform skew-x-[-20deg]"></div>
-        <div className="absolute -right-6 -bottom-6 w-56 h-56 bg-[#0b2545] pointer-events-none transform rotate-12 opacity-90 rounded-2xl"></div>
+        <div className="hidden md:block absolute -right-10 top-0 bottom-0 w-80 bg-gradient-to-bl from-[#c1121f] via-[#d90429] to-[#8b0000] pointer-events-none transform skew-x-[-20deg] opacity-95"></div>
+        <div className="hidden md:block absolute right-64 top-0 bottom-0 w-8 bg-[#0b2545] pointer-events-none transform skew-x-[-20deg]"></div>
+        <div className="hidden md:block absolute right-72 top-0 bottom-0 w-2 bg-[#c5a059] pointer-events-none transform skew-x-[-20deg]"></div>
+        <div className="hidden md:block absolute -right-6 -bottom-6 w-56 h-56 bg-[#0b2545] pointer-events-none transform rotate-12 opacity-90 rounded-2xl"></div>
 
         {/* Marca de agua institucional sutil del escudo FINI en el fondo */}
         <img 
@@ -229,7 +229,7 @@ const PanelControl = () => {
         {/* CINTA DECORATIVA DE DIPLOMA */}
         <div className="relative w-full my-space-lg">
           <div className="h-[3px] w-full bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f] rounded-full opacity-80"></div>
-          <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-surface-container-lowest px-3">
+          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-surface-container-lowest/95 dark:bg-slate-900/95 backdrop-blur-xs px-3.5 py-0.5 rounded-full border border-[#c5a059]/40 shadow-2xs">
             <span className="font-label-code text-[9px] uppercase tracking-widest text-[#c5a059] font-bold">
               REGISTRO OFICIAL DE CONTROL
             </span>
@@ -338,9 +338,9 @@ const PanelControl = () => {
 
       {/* 2. SECCIÓN CENTRAL: CUADRICULA DE TARJETAS DE ALTO IMPACTO */}
       <section className="mb-space-2xl">
-        <div className="flex items-center justify-between mb-space-md">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-space-md">
           <div className="flex items-center gap-2">
-            <div className="h-6 w-1 bg-[#c1121f] rounded-full"></div>
+            <div className="h-6 w-1 bg-[#c1121f] rounded-full shrink-0"></div>
             <div>
               <h2 className="font-institutional-serif text-xl md:text-2xl text-[#0b2545] font-bold tracking-tight">
                 Módulos Administrativos Centrales
@@ -350,7 +350,7 @@ const PanelControl = () => {
               </p>
             </div>
           </div>
-          <span className="font-label-code text-caption text-[#0b2545] font-semibold uppercase tracking-wider bg-white px-space-sm py-1 rounded border border-surface-container shadow-2xs">
+          <span className="hidden sm:inline-block font-label-code text-caption text-[#0b2545] font-semibold uppercase tracking-wider bg-white px-space-sm py-1 rounded border border-surface-container shadow-2xs shrink-0 self-start sm:self-auto">
             Sede Ichilo — Registro Legal
           </span>
         </div>

@@ -74,33 +74,33 @@ const Layout = ({ user, onLogout, children }) => {
           <div className="absolute right-48 top-0 bottom-0 w-2 bg-[#c5a059]/40 pointer-events-none transform skew-x-[-24deg]"></div>
 
           {/* Logotipos y Membrete */}
-          <div className="flex items-center gap-2 sm:gap-3.5 relative z-10 min-w-0">
-            <div className="flex items-center gap-1.5 sm:gap-2.5 bg-white/5 py-1 px-1.5 sm:px-2.5 rounded-lg border border-white/10 backdrop-blur-sm shadow-inner shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3.5 relative z-10 min-w-0">
+            <div className="flex items-center gap-1 sm:gap-2.5 bg-white/5 py-1 px-1 sm:px-2.5 rounded-lg border border-white/10 backdrop-blur-sm shadow-inner shrink-0">
               <img 
                 alt="Escudo UAGRM" 
-                className="h-7 sm:h-9 w-auto object-contain drop-shadow" 
+                className="h-6 sm:h-9 w-auto object-contain drop-shadow" 
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQiMcjjl81LiDusLYwNzVCfvGUsQDoVqxd3cQizcnsxOLE2cNcLwZlo_sxrNeia2SKc7wB36KrWMwQFrViefGkYZ5-ElVlfe7tcybBODmWl3_0arfnQlUCPNaoNAl10CQABBGjadxs1kSCDJlmh8V4SvcRAvFXxC-P3C5BfG8GaZKT_UI53F6XmGGd1Arat8sB8EdSoh6T5SORw5csO55Rbmxk4OWByKhmIAkiT332pcGZAZzlHPEKDx3o-xjqhmfA"
                 onError={(e) => { e.target.src = '/logo-uagrm.png'; }}
               />
-              <div className="h-5 sm:h-6 w-px bg-white/20"></div>
+              <div className="h-4 sm:h-6 w-px bg-white/20"></div>
               <img 
                 alt="Facultad Integral del Ichilo" 
-                className="h-6 sm:h-8 w-auto object-contain brightness-0 invert opacity-95 hidden xs:block sm:block" 
+                className="h-5 sm:h-8 w-auto object-contain brightness-0 invert opacity-95 hidden sm:block" 
                 src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDmrHQRn9Xf0Mz9nsMwjEP_7hhFBDxX6ioB8bhTmQGRc9cwL6pD3hw6YnRdna6A3RGoFBv5QzO8xS6ybYxKhKLpbY0t9JRyxyJYcpN-7Z3l_6tkXTrko141UaGtqIuHrFBMUeF5uRM1T22Jqo5FoUk0ZOIfAMGgge4OMFBwaSxqQlczL--jwZ1T6uzx6u3sajOp5l7HVPuThTPijaa-B7Oqxmh-CcAsgyccAIbzXxCxAqd1U-U7nOsomeIGGk-Y0K_"
                 onError={(e) => { e.target.src = '/logo-ichilo.png'; }}
               />
             </div>
 
             <div className="flex flex-col min-w-0 leading-tight">
-              <div className="flex items-center gap-1.5 sm:gap-2">
-                <span className="font-institutional-serif text-[13px] sm:text-[17px] font-bold tracking-wider leading-none text-white uppercase drop-shadow-sm truncate">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="font-institutional-serif text-[12px] sm:text-[17px] font-bold tracking-wider leading-none text-white uppercase drop-shadow-sm truncate">
                   Dirección de Carrera
                 </span>
                 <span className="hidden md:inline-flex items-center px-2 py-0.5 rounded-full bg-gradient-to-r from-[#c1121f] to-[#9e0c18] text-white font-label-badge text-[10px] uppercase tracking-wider border border-white/20 shadow-sm shrink-0">
                   Sede Ichilo: Yapacaní
                 </span>
               </div>
-              <span className="font-caption text-[9px] sm:text-[11px] tracking-wider uppercase text-[#c5a059] font-semibold mt-0.5 truncate flex items-center gap-1">
+              <span className="font-caption text-[8.5px] sm:text-[11px] tracking-wider uppercase text-[#c5a059] font-semibold mt-0.5 truncate flex items-center gap-1">
                 <span>{(user?.carrera || 'Ingeniería de Sistemas').toUpperCase()}</span>
                 <span className="text-white/40">•</span>
                 <span className="text-white/80">FINI — UAGRM</span>

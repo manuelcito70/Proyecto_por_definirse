@@ -674,10 +674,17 @@ const Auxiliares = () => {
           )}
         </div>
 
-        {/* 3. PANEL DERECHO DE EXPEDIENTE DEL AUXILIAR (DRAWER / INSPECTOR LATERAL CON ANIMACIÓN SUAVE) */}
+        {/* 3. PANEL DERECHO DE EXPEDIENTE DEL AUXILIAR (DRAWER EN PC / VENTANA EMERGENTE EN MÓVILES) */}
         {selectedAux && (
-          <div className="lg:w-[42%] w-full shrink-0 sticky top-24 transition-all duration-300 ease-in-out animate-in slide-in-from-right-6 fade-in duration-300">
-            <div className="bg-white rounded-2xl shadow-lg border border-slate-200/90 p-5 sm:p-6 flex flex-col gap-4 relative overflow-hidden">
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm lg:relative lg:inset-auto lg:z-auto lg:p-0 lg:bg-transparent lg:w-[42%] lg:shrink-0 lg:sticky lg:top-24 transition-all duration-300 ease-in-out">
+            {/* Fondo oscuro para cerrar tocando afuera en móviles */}
+            <div 
+              className="absolute inset-0 lg:hidden" 
+              onClick={() => setSelectedAuxId(null)}
+              aria-hidden="true"
+            />
+
+            <div className="relative z-10 w-full max-w-lg lg:max-w-none max-h-[88vh] lg:max-h-none overflow-y-auto bg-white rounded-t-3xl sm:rounded-2xl lg:rounded-2xl shadow-2xl lg:shadow-lg border border-slate-200/90 p-5 sm:p-6 flex flex-col gap-4">
               
               {/* Barra de Acento Superior Institucional */}
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#C1121F] via-[#c5a059] to-[#0B2545]"></div>

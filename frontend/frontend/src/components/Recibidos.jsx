@@ -274,10 +274,10 @@ const Recibidos = () => {
     <div className="flex flex-col w-full gap-y-space-lg">
       {/* 1. Header Banner Principal con Cortes Geométricos Institucionales */}
       <section className="relative overflow-hidden rounded-2xl bg-surface-container-lowest p-space-xl border border-surface-container shadow-[0_8px_30px_rgba(11,37,69,0.06)]">
-        <div className="absolute -right-10 top-0 bottom-0 w-80 bg-gradient-to-bl from-[#c1121f] via-[#d90429] to-[#8b0000] pointer-events-none transform skew-x-[-20deg] opacity-95"></div>
-        <div className="absolute right-64 top-0 bottom-0 w-8 bg-[#0b2545] pointer-events-none transform skew-x-[-20deg]"></div>
-        <div className="absolute right-72 top-0 bottom-0 w-2 bg-[#c5a059] pointer-events-none transform skew-x-[-20deg]"></div>
-        <div className="absolute -right-6 -bottom-6 w-56 h-56 bg-[#0b2545] pointer-events-none transform rotate-12 opacity-90 rounded-2xl"></div>
+        <div className="hidden md:block absolute -right-10 top-0 bottom-0 w-80 bg-gradient-to-bl from-[#c1121f] via-[#d90429] to-[#8b0000] pointer-events-none transform skew-x-[-20deg] opacity-95"></div>
+        <div className="hidden md:block absolute right-64 top-0 bottom-0 w-8 bg-[#0b2545] pointer-events-none transform skew-x-[-20deg]"></div>
+        <div className="hidden md:block absolute right-72 top-0 bottom-0 w-2 bg-[#c5a059] pointer-events-none transform skew-x-[-20deg]"></div>
+        <div className="hidden md:block absolute -right-6 -bottom-6 w-56 h-56 bg-[#0b2545] pointer-events-none transform rotate-12 opacity-90 rounded-2xl"></div>
         
         <img 
           alt="Marca de agua institucional" 
@@ -334,9 +334,9 @@ const Recibidos = () => {
         {/* Separador Institucional con Insignia Central */}
         <div className="relative w-full my-space-lg">
           <div className="h-[2px] w-full bg-gradient-to-r from-[#0b2545] via-[#c5a059] to-[#c1121f] rounded-full opacity-70"></div>
-          <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 bg-surface-container-lowest px-3">
+          <div className="absolute -top-2 left-1/2 -translate-x-1/2 bg-surface-container-lowest/95 dark:bg-slate-900/95 backdrop-blur-xs px-3.5 py-0.5 rounded-full border border-[#c5a059]/40 shadow-2xs whitespace-nowrap">
             <span className="font-label-code text-[9px] uppercase tracking-widest text-[#c5a059] font-bold">
-              CUSTODIA INSTITUCIONAL DE CORRESPONDENCIA
+              CUSTODIA INSTITUCIONAL
             </span>
           </div>
         </div>
